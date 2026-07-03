@@ -105,7 +105,6 @@ fn portfolio() -> Result<(),moco::APIError>
             // Input (gamma, GTx) in the AFE (affine expression) storage
             // We need k+1 rows
             // The first affine expression = gamma
-            //task.put_row_g(2, gamma.sqrt())?;
             task.put_row_g(2, gamma)?;
             // The remaining k expressions comprise GT*x, we add them row by row
             // In more realisic scenarios it would be better to extract nonzeros and input in sparse form
