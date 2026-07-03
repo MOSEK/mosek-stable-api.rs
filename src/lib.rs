@@ -171,6 +171,7 @@ type  MSK120_IntSolCallbackFunc = extern "C" fn (handle : c_void_p,num : i32,xx 
 
 
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum DomainType {
   NIL = 0,
   RZERO = 1,
@@ -210,6 +211,7 @@ impl DomainType {
   } // from
 } // impl DomainType
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum Feature {
   PTON = 0,
   PTS = 1,
@@ -225,6 +227,7 @@ impl Feature {
   } // from
 } // impl Feature
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum ObjSense {
   MINIMIZE = 0,
   MAXIMIZE = 1,
@@ -240,6 +243,7 @@ impl ObjSense {
   } // from
 } // impl ObjSense
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum SolType {
   BASIC = 0,
   INTERIOR = 1,
@@ -259,6 +263,7 @@ impl SolType {
   } // from
 } // impl SolType
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum SolSta {
   UNKNOWN = 0,
   UNDEFINED = 1,
@@ -284,6 +289,7 @@ impl SolSta {
   } // from
 } // impl SolSta
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum ProSta {
   UNKNOWN = 0,
   PRIMAL_AND_DUAL_FEASIBLE = 1,
@@ -313,6 +319,7 @@ impl ProSta {
   } // from
 } // impl ProSta
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum Format {
   PTF = 0,
   TASK = 1,
@@ -330,6 +337,7 @@ impl Format {
   } // from
 } // impl Format
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum VariableType {
   INTEGER = 0,
   CONTINUOUS = 1,
@@ -345,6 +353,7 @@ impl VariableType {
   } // from
 } // impl VariableType
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum Compression {
   NONE = 0,
   GZIP = 1,
@@ -362,6 +371,7 @@ impl Compression {
   } // from
 } // impl Compression
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum SolutionFormat {
   TASK = 0,
   JTASK = 1,
@@ -379,6 +389,7 @@ impl SolutionFormat {
   } // from
 } // impl SolutionFormat
 #[allow(non_camel_case_types)]
+#[derive(Debug)]
 pub enum StreamType {
   MSG = 0,
   WRN = 1,
@@ -889,8 +900,10 @@ impl std::fmt::Debug for APIError {
 pub struct Task {
     task : Task_t,
 }
+unsafe impl std::marker::Send for Task {}
 
 pub struct MosekCoreAPI {}
+unsafe impl std::marker::Send for MosekCoreAPI {}
 
 impl APIError {
     fn new<S>(code : i32, msg : S) -> APIError where S : Into<String> {
