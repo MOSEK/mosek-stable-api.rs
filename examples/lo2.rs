@@ -47,6 +47,7 @@ fn lo2() -> Result<(),moco::APIError> {
     msk.task()?
         /* Directs the log task stream to the printer function. */
         .with_stream_callback(
+            moco::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task| {
                 /* Bounds on constraints. */

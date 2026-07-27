@@ -1,5 +1,10 @@
 Rust bindings for dynamic MOSEK Core API 12.0. 
 
+This library is intended for anyone who wishes to 
+- Build and distribute a binary using MOSEK, and wants to allow MOSEK to be updated without rebuilding
+- Allow using MOSEK functionality without requiring MOSEK to be present at build time, and only requiring MOSEK at
+  runtime if functionality is actually used.
+
 The MOSEK Core API is a stable API for MOSEK that guarantees binary
 compatibility between versions. Core API 12.0 is based on functionality
 available in MOSEK 12.0 and will be supported for multiple subsequent versions.

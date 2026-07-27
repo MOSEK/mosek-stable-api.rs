@@ -40,101 +40,101 @@
 #define NULLABLE
 #define BOOLEAN
 
-#define MSK120_RES_OK 0
-#define MSK120_TRM_OK 0
+#define MSK12_RES_OK 0
+#define MSK12_TRM_OK 0
 
 
-struct MSK120_Task_s;
-typedef struct MSK120_Task_s * MSK120_Task_t;
+struct MSK12_Task_s;
+typedef struct MSK12_Task_s * MSK12_Task_t;
 
-typedef enum MSK120_DomainType_enum {
-  MSK120_DOMAIN_NIL,
-  MSK120_DOMAIN_RZERO,
-  MSK120_DOMAIN_RPLUS,
-  MSK120_DOMAIN_RMINUS,
-  MSK120_DOMAIN_R,
-  MSK120_DOMAIN_QUADRATIC_CONE,
-  MSK120_DOMAIN_ROTATED_QUADRATIC_CONE,
-  MSK120_DOMAIN_PRIMAL_EXP_CONE,
-  MSK120_DOMAIN_DUAL_EXP_CONE,
-  MSK120_DOMAIN_PRIMAL_POWER_CONE,
-  MSK120_DOMAIN_DUAL_POWER_CONE,
-  MSK120_DOMAIN_PRIMAL_GEOMETRIC_MEAN_CONE,
-  MSK120_DOMAIN_DUAL_GEOMETRIC_MEAN_CONE,
-  MSK120_DOMAIN_SVEC_PSD_CONE,
-} MSK120_DomainType;
+typedef enum MSK12_DomainType_enum {
+  MSK12_DOMAIN_NIL,
+  MSK12_DOMAIN_RZERO,
+  MSK12_DOMAIN_RPLUS,
+  MSK12_DOMAIN_RMINUS,
+  MSK12_DOMAIN_R,
+  MSK12_DOMAIN_QUADRATIC_CONE,
+  MSK12_DOMAIN_ROTATED_QUADRATIC_CONE,
+  MSK12_DOMAIN_PRIMAL_EXP_CONE,
+  MSK12_DOMAIN_DUAL_EXP_CONE,
+  MSK12_DOMAIN_PRIMAL_POWER_CONE,
+  MSK12_DOMAIN_DUAL_POWER_CONE,
+  MSK12_DOMAIN_PRIMAL_GEOMETRIC_MEAN_CONE,
+  MSK12_DOMAIN_DUAL_GEOMETRIC_MEAN_CONE,
+  MSK12_DOMAIN_SVEC_PSD_CONE,
+} MSK12_DomainType;
 
-typedef enum MSK120_Feature_enum {
-  MSK120_FEATURE_PTON,
-  MSK120_FEATURE_PTS,
-} MSK120_Feature;
+typedef enum MSK12_Feature_enum {
+  MSK12_FEATURE_PTON,
+  MSK12_FEATURE_PTS,
+} MSK12_Feature;
 
-typedef enum MSK120_ObjSense_enum {
-  MSK120_OBJ_SENSE_MINIMIZE,
-  MSK120_OBJ_SENSE_MAXIMIZE,
-} MSK120_ObjSense;
+typedef enum MSK12_ObjSense_enum {
+  MSK12_OBJ_SENSE_MINIMIZE,
+  MSK12_OBJ_SENSE_MAXIMIZE,
+} MSK12_ObjSense;
 
-typedef enum MSK120_SolType_enum {
-  MSK120_SOL_TYPE_BASIC,
-  MSK120_SOL_TYPE_INTERIOR,
-  MSK120_SOL_TYPE_INTEGER,
-  MSK120_SOL_TYPE_UNKNOWN,
-} MSK120_SolType;
+typedef enum MSK12_SolType_enum {
+  MSK12_SOL_TYPE_BASIC,
+  MSK12_SOL_TYPE_INTERIOR,
+  MSK12_SOL_TYPE_INTEGER,
+  MSK12_SOL_TYPE_UNKNOWN,
+} MSK12_SolType;
 
 /**
  * Status of a primal or a dual solution.
  */
-typedef enum MSK120_SolSta_enum {
-  MSK120_SOL_STA_UNKNOWN,
-  MSK120_SOL_STA_UNDEFINED,
-  MSK120_SOL_STA_OPTIMAL,
-  MSK120_SOL_STA_INTEGER_OPTIMAL,
-  MSK120_SOL_STA_FEASIBLE,
-  MSK120_SOL_STA_INFEAS_CERT,
-  MSK120_SOL_STA_ILLPOSED_CERT,
-} MSK120_SolSta;
+typedef enum MSK12_SolSta_enum {
+  MSK12_SOL_STA_UNKNOWN,
+  MSK12_SOL_STA_UNDEFINED,
+  MSK12_SOL_STA_OPTIMAL,
+  MSK12_SOL_STA_INTEGER_OPTIMAL,
+  MSK12_SOL_STA_FEASIBLE,
+  MSK12_SOL_STA_INFEAS_CERT,
+  MSK12_SOL_STA_ILLPOSED_CERT,
+} MSK12_SolSta;
 
-typedef enum MSK120_ProSta_enum {
-  MSK120_PRO_STA_UNKNOWN,
-  MSK120_PRO_STA_PRIMAL_AND_DUAL_FEASIBLE,
-  MSK120_PRO_STA_PRIMAL_FEASIBLE,
-  MSK120_PRO_STA_DUAL_FEASIBLE,
-  MSK120_PRO_STA_PRIMAL_INFEASIBLE,
-  MSK120_PRO_STA_DUAL_INFEASIBLE,
-  MSK120_PRO_STA_PRIMAL_AND_DUAL_INFEASIBLE,
-  MSK120_PRO_STA_ILLPOSED,
-  MSK120_PRO_STA_PRIMAL_INFEASIBLE_OR_UNBOUNDED,
-} MSK120_ProSta;
+typedef enum MSK12_ProSta_enum {
+  MSK12_PRO_STA_UNKNOWN,
+  MSK12_PRO_STA_PRIMAL_AND_DUAL_FEASIBLE,
+  MSK12_PRO_STA_PRIMAL_FEASIBLE,
+  MSK12_PRO_STA_DUAL_FEASIBLE,
+  MSK12_PRO_STA_PRIMAL_INFEASIBLE,
+  MSK12_PRO_STA_DUAL_INFEASIBLE,
+  MSK12_PRO_STA_PRIMAL_AND_DUAL_INFEASIBLE,
+  MSK12_PRO_STA_ILLPOSED,
+  MSK12_PRO_STA_PRIMAL_INFEASIBLE_OR_UNBOUNDED,
+} MSK12_ProSta;
 
-typedef enum MSK120_Format_enum {
-  MSK120_FORMAT_PTF,
-  MSK120_FORMAT_TASK,
-  MSK120_FORMAT_JTASK,
-} MSK120_Format;
+typedef enum MSK12_Format_enum {
+  MSK12_FORMAT_PTF,
+  MSK12_FORMAT_TASK,
+  MSK12_FORMAT_JTASK,
+} MSK12_Format;
 
-typedef enum MSK120_VariableType_enum {
-  MSK120_VAR_TYPE_INTEGER,
-  MSK120_VAR_TYPE_CONTINUOUS,
-} MSK120_VariableType;
+typedef enum MSK12_VariableType_enum {
+  MSK12_VAR_TYPE_INTEGER,
+  MSK12_VAR_TYPE_CONTINUOUS,
+} MSK12_VariableType;
 
-typedef enum MSK120_Compression_enum {
-  MSK120_COMPRESS_NONE,
-  MSK120_COMPRESS_GZIP,
-  MSK120_COMPRESS_ZSTD,
-} MSK120_Compression;
+typedef enum MSK12_Compression_enum {
+  MSK12_COMPRESS_NONE,
+  MSK12_COMPRESS_GZIP,
+  MSK12_COMPRESS_ZSTD,
+} MSK12_Compression;
 
-typedef enum MSK120_SolutionFormat_enum {
-  MSK120_SOL_FORMAT_TASK,
-  MSK120_SOL_FORMAT_JTASK,
-  MSK120_SOL_FORMAT_TEXT,
-} MSK120_SolutionFormat;
+typedef enum MSK12_SolutionFormat_enum {
+  MSK12_SOL_FORMAT_TASK,
+  MSK12_SOL_FORMAT_JTASK,
+  MSK12_SOL_FORMAT_TEXT,
+} MSK12_SolutionFormat;
 
-typedef enum MSK120_StreamType_enum {
-  MSK120_STREAM_MSG,
-  MSK120_STREAM_WRN,
-  MSK120_STREAM_ERR,
-  MSK120_STREAM_LOG,
-} MSK120_StreamType;
+typedef enum MSK12_StreamType_enum {
+  MSK12_STREAM_MSG,
+  MSK12_STREAM_WRN,
+  MSK12_STREAM_ERR,
+  MSK12_STREAM_LOG,
+} MSK12_StreamType;
 
 
 /**
@@ -143,21 +143,21 @@ typedef enum MSK120_StreamType_enum {
  * and may change between versions. Use `get_resp_descr` and `get_resp_name`
  * to get description and string representation for the code.
  */
-typedef int32_t MSK120_ResCode;
+typedef int32_t MSK12_ResCode;
 /**
  * Optimizer termination code. 0 indicates normal termination, anything
  * else indicates that the optimizer termianted for other reasons than
  * optimality or valid certificate.
  */
-typedef int32_t MSK120_TrmCode;
+typedef int32_t MSK12_TrmCode;
 /**
  * Handle for reading from a stream via function callback.
  */
-typedef void* MSK120_ReadHandle;
+typedef void* MSK12_ReadHandle;
 /**
  * Handle for writing to a stream via function callback. 
  */
-typedef void* MSK120_WriteHandle;
+typedef void* MSK12_WriteHandle;
 /**
  * Stream reader function type. The reader function MUST work as follows:
  * 
@@ -167,7 +167,7 @@ typedef void* MSK120_WriteHandle;
  * 
  * It is forbidden to access the tash object that the callback function is attached to from the callback function.
  */
-typedef size_t (*MSK120_ReadFunc)(MSK120_ReadHandle h,void* dest,size_t num);
+typedef size_t (*MSK12_ReadFunc)(MSK12_ReadHandle h,void* dest,size_t num);
 /**
  * Stream writer function type. The writer function MUST work as follows:
  * 
@@ -176,36 +176,36 @@ typedef size_t (*MSK120_ReadFunc)(MSK120_ReadHandle h,void* dest,size_t num);
  * 
  * It is forbidden to access the tash object that the callback function is attached to from the callback function.
  */
-typedef size_t (*MSK120_WriteFunc)(MSK120_WriteHandle h,const void* src,size_t num);
+typedef size_t (*MSK12_WriteFunc)(MSK12_WriteHandle h,const void* src,size_t num);
 /**
  * Message stream writer function type.
  * The function must write the entire string give or fail silently.
  * It is forbidden to access the tash object that the callback function is attached to from the callback function.
  */
-typedef void (*MSK120_StreamFunc)(MSK120_WriteHandle h,const char* src);
+typedef void (*MSK12_StreamFunc)(MSK12_WriteHandle h,const char* src);
 /**
  * Handle for callback functions.
  */
-typedef void* MSK120_CallbackHandle;
+typedef void* MSK12_CallbackHandle;
 /**
  * Handle for error and warning callback to a stream via function callback. 
  */
-typedef void* MSK120_ErrorCallbackHandle;
+typedef void* MSK12_ErrorCallbackHandle;
 /**
  * Function type for error and warning callback. This is attached to a task and called whenever a function call to the
  * task produces an error or a warning.
  * 
  * It is forbidden to access the task object that the callback function is attached to from the callback function.
  */
-typedef void (*MSK120_ErrorCallbackFunc)(MSK120_ErrorCallbackHandle h,int32_t r,const char* name,const char* desc,const char* message);
+typedef void (*MSK12_ErrorCallbackFunc)(MSK12_ErrorCallbackHandle h,int32_t r,const char* name,const char* desc,const char* message);
 /**
  * Information callback function.
  */
-typedef int32_t (*MSK120_CallbackFunc)(MSK120_CallbackHandle h,int32_t code,int32_t len_iinf,const int32_t* iinf,int32_t len_liinf,const int64_t* liinf,int32_t len_dinf,const double* dinf);
+typedef int32_t (*MSK12_CallbackFunc)(MSK12_CallbackHandle h,int32_t code,int32_t len_iinf,const int32_t* iinf,int32_t len_liinf,const int64_t* liinf,int32_t len_dinf,const double* dinf);
 /**
  * Integer solution callback function.
  */
-typedef void (*MSK120_IntSolCallbackFunc)(MSK120_CallbackHandle handle,int32_t num,const double* xx);
+typedef void (*MSK12_IntSolCallbackFunc)(MSK12_CallbackHandle handle,int32_t num,const double* xx);
 
 
 #ifdef __cplusplus
@@ -219,9 +219,9 @@ extern "C" {
  * # Arguments
  * - `code` 
  */
-typedef const char* (*MSK120_get_callback_code_name_func_t)(int32_t code);
-extern MSK120_get_callback_code_name_func_t MSK120_get_callback_code_name_ptr;
-const char* MSK120_get_callback_code_name(int32_t code);
+typedef const char* (*MSK12_get_callback_code_name_func_t)(int32_t code);
+extern MSK12_get_callback_code_name_func_t MSK12_get_callback_code_name_ptr;
+const char* MSK12_get_callback_code_name(int32_t code);
 
 /**
 
@@ -230,9 +230,9 @@ const char* MSK120_get_callback_code_name(int32_t code);
  * # Arguments
  * - `r` 
  */
-typedef const char* (*MSK120_get_resp_name_func_t)(MSK120_ResCode r);
-extern MSK120_get_resp_name_func_t MSK120_get_resp_name_ptr;
-const char* MSK120_get_resp_name(MSK120_ResCode r);
+typedef const char* (*MSK12_get_resp_name_func_t)(MSK12_ResCode r);
+extern MSK12_get_resp_name_func_t MSK12_get_resp_name_ptr;
+const char* MSK12_get_resp_name(MSK12_ResCode r);
 
 /**
 
@@ -241,9 +241,9 @@ const char* MSK120_get_resp_name(MSK120_ResCode r);
  * # Arguments
  * - `r` 
  */
-typedef const char* (*MSK120_get_resp_descr_func_t)(MSK120_ResCode r);
-extern MSK120_get_resp_descr_func_t MSK120_get_resp_descr_ptr;
-const char* MSK120_get_resp_descr(MSK120_ResCode r);
+typedef const char* (*MSK12_get_resp_descr_func_t)(MSK12_ResCode r);
+extern MSK12_get_resp_descr_func_t MSK12_get_resp_descr_ptr;
+const char* MSK12_get_resp_descr(MSK12_ResCode r);
 
 /**
 
@@ -252,9 +252,9 @@ const char* MSK120_get_resp_descr(MSK120_ResCode r);
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef MSK120_ResCode (*MSK120_get_last_resp_func_t)(MSK120_Task_t task);
-extern MSK120_get_last_resp_func_t MSK120_get_last_resp_ptr;
-MSK120_ResCode MSK120_get_last_resp(MSK120_Task_t task);
+typedef MSK12_ResCode (*MSK12_get_last_resp_func_t)(MSK12_Task_t task);
+extern MSK12_get_last_resp_func_t MSK12_get_last_resp_ptr;
+MSK12_ResCode MSK12_get_last_resp(MSK12_Task_t task);
 
 /**
 
@@ -265,10 +265,10 @@ MSK120_ResCode MSK120_get_last_resp(MSK120_Task_t task);
  * - `buf[buf_len]` (out) Last message will be copied here, truncated to `buf_len` including trailing 0.
  * - `buf_len` Length of target buffer
  */
-typedef MSK120_ResCode (*MSK120_get_last_resp_msg_func_t)(MSK120_Task_t task,char* buf,size_t buf_len);
-extern MSK120_get_last_resp_msg_func_t MSK120_get_last_resp_msg_ptr;
-MSK120_ResCode MSK120_get_last_resp_msg(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_last_resp_msg_func_t)(MSK12_Task_t task,char* buf,size_t buf_len);
+extern MSK12_get_last_resp_msg_func_t MSK12_get_last_resp_msg_ptr;
+MSK12_ResCode MSK12_get_last_resp_msg(
+    MSK12_Task_t task,
     char* buf,
     size_t buf_len);
 
@@ -278,9 +278,9 @@ MSK120_ResCode MSK120_get_last_resp_msg(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef size_t (*MSK120_get_last_resp_msg_len_func_t)(MSK120_Task_t task);
-extern MSK120_get_last_resp_msg_len_func_t MSK120_get_last_resp_msg_len_ptr;
-size_t MSK120_get_last_resp_msg_len(MSK120_Task_t task);
+typedef size_t (*MSK12_get_last_resp_msg_len_func_t)(MSK12_Task_t task);
+extern MSK12_get_last_resp_msg_len_func_t MSK12_get_last_resp_msg_len_ptr;
+size_t MSK12_get_last_resp_msg_len(MSK12_Task_t task);
 
 /**
 
@@ -289,9 +289,9 @@ size_t MSK120_get_last_resp_msg_len(MSK120_Task_t task);
  * # Arguments
  * - `trm` 
  */
-typedef const char* (*MSK120_get_trm_name_func_t)(MSK120_TrmCode trm);
-extern MSK120_get_trm_name_func_t MSK120_get_trm_name_ptr;
-const char* MSK120_get_trm_name(MSK120_TrmCode trm);
+typedef const char* (*MSK12_get_trm_name_func_t)(MSK12_TrmCode trm);
+extern MSK12_get_trm_name_func_t MSK12_get_trm_name_ptr;
+const char* MSK12_get_trm_name(MSK12_TrmCode trm);
 
 /**
 
@@ -300,17 +300,17 @@ const char* MSK120_get_trm_name(MSK120_TrmCode trm);
  * # Arguments
  * - `trm` 
  */
-typedef const char* (*MSK120_get_trm_descr_func_t)(MSK120_TrmCode trm);
-extern MSK120_get_trm_descr_func_t MSK120_get_trm_descr_ptr;
-const char* MSK120_get_trm_descr(MSK120_TrmCode trm);
+typedef const char* (*MSK12_get_trm_descr_func_t)(MSK12_TrmCode trm);
+extern MSK12_get_trm_descr_func_t MSK12_get_trm_descr_ptr;
+const char* MSK12_get_trm_descr(MSK12_TrmCode trm);
 
 /**
 
  * Create new task. On failure NULL is returned.
  */
-typedef MSK120_Task_t (*MSK120_new_task_func_t)();
-extern MSK120_new_task_func_t MSK120_new_task_ptr;
-MSK120_Task_t MSK120_new_task();
+typedef MSK12_Task_t (*MSK12_new_task_func_t)();
+extern MSK12_new_task_func_t MSK12_new_task_ptr;
+MSK12_Task_t MSK12_new_task();
 
 /**
 
@@ -329,9 +329,9 @@ MSK120_Task_t MSK120_new_task();
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef MSK120_Task_t (*MSK120_new_task_from_task_func_t)(MSK120_Task_t task);
-extern MSK120_new_task_from_task_func_t MSK120_new_task_from_task_ptr;
-MSK120_Task_t MSK120_new_task_from_task(MSK120_Task_t task);
+typedef MSK12_Task_t (*MSK12_new_task_from_task_func_t)(MSK12_Task_t task);
+extern MSK12_new_task_from_task_func_t MSK12_new_task_from_task_ptr;
+MSK12_Task_t MSK12_new_task_from_task(MSK12_Task_t task);
 
 /**
 
@@ -340,9 +340,9 @@ MSK120_Task_t MSK120_new_task_from_task(MSK120_Task_t task);
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef void (*MSK120_delete_task_func_t)(MSK120_Task_t task);
-extern MSK120_delete_task_func_t MSK120_delete_task_ptr;
-void MSK120_delete_task(MSK120_Task_t task);
+typedef void (*MSK12_delete_task_func_t)(MSK12_Task_t task);
+extern MSK12_delete_task_func_t MSK12_delete_task_ptr;
+void MSK12_delete_task(MSK12_Task_t task);
 
 /**
 
@@ -352,10 +352,10 @@ void MSK120_delete_task(MSK120_Task_t task);
  * - `task` The optimizatioj task object
  * - `add_num` Number of item to add
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_var_func_t)(MSK120_Task_t task,int32_t add_num);
-extern MSK120_reserve_num_var_func_t MSK120_reserve_num_var_ptr;
-MSK120_ResCode MSK120_reserve_num_var(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_var_func_t)(MSK12_Task_t task,int32_t add_num);
+extern MSK12_reserve_num_var_func_t MSK12_reserve_num_var_ptr;
+MSK12_ResCode MSK12_reserve_num_var(
+    MSK12_Task_t task,
     int32_t add_num);
 
 /**
@@ -366,10 +366,10 @@ MSK120_ResCode MSK120_reserve_num_var(
  * - `task` The optimizatioj task object
  * - `num_barvar` Number of variables
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_barvar_func_t)(MSK120_Task_t task,int32_t num_barvar);
-extern MSK120_reserve_num_barvar_func_t MSK120_reserve_num_barvar_ptr;
-MSK120_ResCode MSK120_reserve_num_barvar(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_barvar_func_t)(MSK12_Task_t task,int32_t num_barvar);
+extern MSK12_reserve_num_barvar_func_t MSK12_reserve_num_barvar_ptr;
+MSK12_ResCode MSK12_reserve_num_barvar(
+    MSK12_Task_t task,
     int32_t num_barvar);
 
 /**
@@ -380,10 +380,10 @@ MSK120_ResCode MSK120_reserve_num_barvar(
  * - `task` The optimizatioj task object
  * - `num_con` Number of constraints
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_con_func_t)(MSK120_Task_t task,int32_t num_con);
-extern MSK120_reserve_num_con_func_t MSK120_reserve_num_con_ptr;
-MSK120_ResCode MSK120_reserve_num_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_con_func_t)(MSK12_Task_t task,int32_t num_con);
+extern MSK12_reserve_num_con_func_t MSK12_reserve_num_con_ptr;
+MSK12_ResCode MSK12_reserve_num_con(
+    MSK12_Task_t task,
     int32_t num_con);
 
 /**
@@ -394,10 +394,10 @@ MSK120_ResCode MSK120_reserve_num_con(
  * - `task` The optimizatioj task object
  * - `num_row` Number of affine rows
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_row_func_t)(MSK120_Task_t task,int64_t num_row);
-extern MSK120_reserve_num_row_func_t MSK120_reserve_num_row_ptr;
-MSK120_ResCode MSK120_reserve_num_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_row_func_t)(MSK12_Task_t task,int64_t num_row);
+extern MSK12_reserve_num_row_func_t MSK12_reserve_num_row_ptr;
+MSK12_ResCode MSK12_reserve_num_row(
+    MSK12_Task_t task,
     int64_t num_row);
 
 /**
@@ -408,10 +408,10 @@ MSK120_ResCode MSK120_reserve_num_row(
  * - `task` The optimizatioj task object
  * - `num_nz` 
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_nz_func_t)(MSK120_Task_t task,int64_t num_nz);
-extern MSK120_reserve_num_nz_func_t MSK120_reserve_num_nz_ptr;
-MSK120_ResCode MSK120_reserve_num_nz(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_nz_func_t)(MSK12_Task_t task,int64_t num_nz);
+extern MSK12_reserve_num_nz_func_t MSK12_reserve_num_nz_ptr;
+MSK12_ResCode MSK12_reserve_num_nz(
+    MSK12_Task_t task,
     int64_t num_nz);
 
 /**
@@ -422,10 +422,10 @@ MSK120_ResCode MSK120_reserve_num_nz(
  * - `task` The optimizatioj task object
  * - `num_dom` Number of domains
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_dom_func_t)(MSK120_Task_t task,int64_t num_dom);
-extern MSK120_reserve_num_dom_func_t MSK120_reserve_num_dom_ptr;
-MSK120_ResCode MSK120_reserve_num_dom(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_dom_func_t)(MSK12_Task_t task,int64_t num_dom);
+extern MSK12_reserve_num_dom_func_t MSK12_reserve_num_dom_ptr;
+MSK12_ResCode MSK12_reserve_num_dom(
+    MSK12_Task_t task,
     int64_t num_dom);
 
 /**
@@ -436,10 +436,10 @@ MSK120_ResCode MSK120_reserve_num_dom(
  * - `task` The optimizatioj task object
  * - `num_symmat` Number of symmetric matrixes
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_symmat_func_t)(MSK120_Task_t task,int64_t num_symmat);
-extern MSK120_reserve_num_symmat_func_t MSK120_reserve_num_symmat_ptr;
-MSK120_ResCode MSK120_reserve_num_symmat(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_symmat_func_t)(MSK12_Task_t task,int64_t num_symmat);
+extern MSK12_reserve_num_symmat_func_t MSK12_reserve_num_symmat_ptr;
+MSK12_ResCode MSK12_reserve_num_symmat(
+    MSK12_Task_t task,
     int64_t num_symmat);
 
 /**
@@ -450,10 +450,10 @@ MSK120_ResCode MSK120_reserve_num_symmat(
  * - `task` The optimizatioj task object
  * - `num_nz` 
  */
-typedef MSK120_ResCode (*MSK120_reserve_num_symmat_nz_func_t)(MSK120_Task_t task,int64_t num_nz);
-extern MSK120_reserve_num_symmat_nz_func_t MSK120_reserve_num_symmat_nz_ptr;
-MSK120_ResCode MSK120_reserve_num_symmat_nz(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_reserve_num_symmat_nz_func_t)(MSK12_Task_t task,int64_t num_nz);
+extern MSK12_reserve_num_symmat_nz_func_t MSK12_reserve_num_symmat_nz_ptr;
+MSK12_ResCode MSK12_reserve_num_symmat_nz(
+    MSK12_Task_t task,
     int64_t num_nz);
 
 /**
@@ -463,9 +463,9 @@ MSK120_ResCode MSK120_reserve_num_symmat_nz(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_num_var_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_var_func_t MSK120_get_num_var_ptr;
-int32_t MSK120_get_num_var(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_num_var_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_var_func_t MSK12_get_num_var_ptr;
+int32_t MSK12_get_num_var(MSK12_Task_t task);
 
 /**
 
@@ -474,64 +474,64 @@ int32_t MSK120_get_num_var(MSK120_Task_t task);
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_num_barvar_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_barvar_func_t MSK120_get_num_barvar_ptr;
-int32_t MSK120_get_num_barvar(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_num_barvar_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_barvar_func_t MSK12_get_num_barvar_ptr;
+int32_t MSK12_get_num_barvar(MSK12_Task_t task);
 
 /**
 
- * Get number of domains.
+ * Get number of domains. Cannot fail. 
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int64_t (*MSK120_get_num_domain_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_domain_func_t MSK120_get_num_domain_ptr;
-int64_t MSK120_get_num_domain(MSK120_Task_t task);
+typedef int64_t (*MSK12_get_num_domain_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_domain_func_t MSK12_get_num_domain_ptr;
+int64_t MSK12_get_num_domain(MSK12_Task_t task);
 
 /**
 
- * Get number of affine rows.
+ * Get number of affine rows. Cannot fail. 
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int64_t (*MSK120_get_num_row_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_row_func_t MSK120_get_num_row_ptr;
-int64_t MSK120_get_num_row(MSK120_Task_t task);
+typedef int64_t (*MSK12_get_num_row_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_row_func_t MSK12_get_num_row_ptr;
+int64_t MSK12_get_num_row(MSK12_Task_t task);
 
 /**
 
- * Get number of symmetric matrixes
+ * Get number of symmetric matrixes. Cannot fail. 
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int64_t (*MSK120_get_num_symmat_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_symmat_func_t MSK120_get_num_symmat_ptr;
-int64_t MSK120_get_num_symmat(MSK120_Task_t task);
+typedef int64_t (*MSK12_get_num_symmat_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_symmat_func_t MSK12_get_num_symmat_ptr;
+int64_t MSK12_get_num_symmat(MSK12_Task_t task);
 
 /**
 
- * Get number of constraints.
+ * Get number of constraints. Cannot fail. 
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int64_t (*MSK120_get_num_con_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_con_func_t MSK120_get_num_con_ptr;
-int64_t MSK120_get_num_con(MSK120_Task_t task);
+typedef int64_t (*MSK12_get_num_con_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_con_func_t MSK12_get_num_con_ptr;
+int64_t MSK12_get_num_con(MSK12_Task_t task);
 
 /**
 
- * Get number of disjunctive constraints.
+ * Get number of disjunctive constraints. Cannot fail. 
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int64_t (*MSK120_get_num_djc_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_djc_func_t MSK120_get_num_djc_ptr;
-int64_t MSK120_get_num_djc(MSK120_Task_t task);
+typedef int64_t (*MSK12_get_num_djc_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_djc_func_t MSK12_get_num_djc_ptr;
+int64_t MSK12_get_num_djc(MSK12_Task_t task);
 
 /**
 
@@ -541,10 +541,10 @@ int64_t MSK120_get_num_djc(MSK120_Task_t task);
  * - `task` The optimizatioj task object
  * - `num_var` Number of variables
  */
-typedef MSK120_ResCode (*MSK120_append_vars_func_t)(MSK120_Task_t task,int32_t num_var);
-extern MSK120_append_vars_func_t MSK120_append_vars_ptr;
-MSK120_ResCode MSK120_append_vars(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_vars_func_t)(MSK12_Task_t task,int32_t num_var);
+extern MSK12_append_vars_func_t MSK12_append_vars_ptr;
+MSK12_ResCode MSK12_append_vars(
+    MSK12_Task_t task,
     int32_t num_var);
 
 /**
@@ -555,39 +555,39 @@ MSK120_ResCode MSK120_append_vars(
  * - `task` The optimizatioj task object
  * - `num_row` Number of affine rows
  */
-typedef MSK120_ResCode (*MSK120_append_rows_func_t)(MSK120_Task_t task,int64_t num_row);
-extern MSK120_append_rows_func_t MSK120_append_rows_ptr;
-MSK120_ResCode MSK120_append_rows(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_rows_func_t)(MSK12_Task_t task,int64_t num_row);
+extern MSK12_append_rows_func_t MSK12_append_rows_ptr;
+MSK12_ResCode MSK12_append_rows(
+    MSK12_Task_t task,
     int64_t num_row);
 
 /**
 
- * Append a single semidefinite variable.
+ * Append a single positive semi-definite variable.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `dim` Dimension
  */
-typedef MSK120_ResCode (*MSK120_append_barvar_func_t)(MSK120_Task_t task,int32_t dim);
-extern MSK120_append_barvar_func_t MSK120_append_barvar_ptr;
-MSK120_ResCode MSK120_append_barvar(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_barvar_func_t)(MSK12_Task_t task,int32_t dim);
+extern MSK12_append_barvar_func_t MSK12_append_barvar_ptr;
+MSK12_ResCode MSK12_append_barvar(
+    MSK12_Task_t task,
     int32_t dim);
 
 /**
 
- * Append `num` semidefinite variables with the given dimensions.
+ * Append multiple positive semi-definite variables with the given dimensions.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `num_barvar` Number of variables
  * - `dims[num_barvar]` (in) Array of dimensionms
  */
-typedef MSK120_ResCode (*MSK120_append_barvars_func_t)(MSK120_Task_t task,int32_t num_barvar,const int32_t* dims);
-extern MSK120_append_barvars_func_t MSK120_append_barvars_ptr;
-MSK120_ResCode MSK120_append_barvars(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_barvars_func_t)(MSK12_Task_t task,int32_t num_barvar,const int32_t* dims);
+extern MSK12_append_barvars_func_t MSK12_append_barvars_ptr;
+MSK12_ResCode MSK12_append_barvars(
+    MSK12_Task_t task,
     int32_t num_barvar,
     const int32_t* dims);
 
@@ -603,10 +603,10 @@ MSK120_ResCode MSK120_append_barvars(
  * - `symmat_j[nnz]` (in) Symmetric matrix column subscripts
  * - `symmat_val[nnz]` (in) Symmetric matrix values
  */
-typedef MSK120_ResCode (*MSK120_append_symmat_func_t)(MSK120_Task_t task,int32_t dim,int64_t nnz,const int32_t* symmat_i,const int32_t* symmat_j,const double* symmat_val);
-extern MSK120_append_symmat_func_t MSK120_append_symmat_ptr;
-MSK120_ResCode MSK120_append_symmat(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_symmat_func_t)(MSK12_Task_t task,int32_t dim,int64_t nnz,const int32_t* symmat_i,const int32_t* symmat_j,const double* symmat_val);
+extern MSK12_append_symmat_func_t MSK12_append_symmat_ptr;
+MSK12_ResCode MSK12_append_symmat(
+    MSK12_Task_t task,
     int32_t dim,
     int64_t nnz,
     const int32_t* symmat_i,
@@ -615,7 +615,7 @@ MSK120_ResCode MSK120_append_symmat(
 
 /**
 
- * Append a list of symmetric matrix.
+ * Append a list of symmetric matrixes.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -626,10 +626,10 @@ MSK120_ResCode MSK120_append_symmat(
  * - `symmat_j[nnz]` (in) Symmetric matrix column subscripts
  * - `symmat_val[nnz]` (in) Symmetric matrix values
  */
-typedef MSK120_ResCode (*MSK120_append_symmats_func_t)(MSK120_Task_t task,int64_t num_symmat,const int32_t* dim,const int64_t* nnz,const int32_t* symmat_i,const int32_t* symmat_j,const double* symmat_val);
-extern MSK120_append_symmats_func_t MSK120_append_symmats_ptr;
-MSK120_ResCode MSK120_append_symmats(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_symmats_func_t)(MSK12_Task_t task,int64_t num_symmat,const int32_t* dim,const int64_t* nnz,const int32_t* symmat_i,const int32_t* symmat_j,const double* symmat_val);
+extern MSK12_append_symmats_func_t MSK12_append_symmats_ptr;
+MSK12_ResCode MSK12_append_symmats(
+    MSK12_Task_t task,
     int64_t num_symmat,
     const int32_t* dim,
     const int64_t* nnz,
@@ -639,30 +639,30 @@ MSK120_ResCode MSK120_append_symmats(
 
 /**
 
- * Append `num` empty constraints, initially it will have domain `null`.
+ * Append a number of empty constraints, initially they will have domain `null`.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `num_con` Number of constraints
  */
-typedef MSK120_ResCode (*MSK120_append_empty_cons_func_t)(MSK120_Task_t task,int64_t num_con);
-extern MSK120_append_empty_cons_func_t MSK120_append_empty_cons_ptr;
-MSK120_ResCode MSK120_append_empty_cons(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_empty_cons_func_t)(MSK12_Task_t task,int64_t num_con);
+extern MSK12_append_empty_cons_func_t MSK12_append_empty_cons_ptr;
+MSK12_ResCode MSK12_append_empty_cons(
+    MSK12_Task_t task,
     int64_t num_con);
 
 /**
 
- * Append `num` empty djcs, initially each having 0 terms.
+ * Append a number of empty disjunctive constraints.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `num_djc` Number of disjunctive constraints
  */
-typedef MSK120_ResCode (*MSK120_append_empty_djcs_func_t)(MSK120_Task_t task,int64_t num_djc);
-extern MSK120_append_empty_djcs_func_t MSK120_append_empty_djcs_ptr;
-MSK120_ResCode MSK120_append_empty_djcs(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_empty_djcs_func_t)(MSK12_Task_t task,int64_t num_djc);
+extern MSK12_append_empty_djcs_func_t MSK12_append_empty_djcs_ptr;
+MSK12_ResCode MSK12_append_empty_djcs(
+    MSK12_Task_t task,
     int64_t num_djc);
 
 /**
@@ -674,16 +674,16 @@ MSK120_ResCode MSK120_append_empty_djcs(
  * - `j` 
  * - `var_type` 
  */
-typedef MSK120_ResCode (*MSK120_put_var_type_func_t)(MSK120_Task_t task,int32_t j,MSK120_VariableType var_type);
-extern MSK120_put_var_type_func_t MSK120_put_var_type_ptr;
-MSK120_ResCode MSK120_put_var_type(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_type_func_t)(MSK12_Task_t task,int32_t j,MSK12_VariableType var_type);
+extern MSK12_put_var_type_func_t MSK12_put_var_type_ptr;
+MSK12_ResCode MSK12_put_var_type(
+    MSK12_Task_t task,
     int32_t j,
-    MSK120_VariableType var_type);
+    MSK12_VariableType var_type);
 
 /**
 
- * Set variable type to integer or continuous.
+ * Set variable types in a slice to integer or continuous.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -691,17 +691,17 @@ MSK120_ResCode MSK120_put_var_type(
  * - `num_var` Number of variables
  * - `var_types[num_var]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_var_type_slice_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,const MSK120_VariableType* var_types);
-extern MSK120_put_var_type_slice_func_t MSK120_put_var_type_slice_ptr;
-MSK120_ResCode MSK120_put_var_type_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_type_slice_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,const MSK12_VariableType* var_types);
+extern MSK12_put_var_type_slice_func_t MSK12_put_var_type_slice_ptr;
+MSK12_ResCode MSK12_put_var_type_slice(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
-    const MSK120_VariableType* var_types);
+    const MSK12_VariableType* var_types);
 
 /**
 
- * Set variable type to integer or continuous.
+ * Set variable types for all entries in a slice to a single value.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -709,17 +709,17 @@ MSK120_ResCode MSK120_put_var_type_slice(
  * - `num_var` Number of variables
  * - `var_type` 
  */
-typedef MSK120_ResCode (*MSK120_put_var_type_slice_value_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,MSK120_VariableType var_type);
-extern MSK120_put_var_type_slice_value_func_t MSK120_put_var_type_slice_value_ptr;
-MSK120_ResCode MSK120_put_var_type_slice_value(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_type_slice_value_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,MSK12_VariableType var_type);
+extern MSK12_put_var_type_slice_value_func_t MSK12_put_var_type_slice_value_ptr;
+MSK12_ResCode MSK12_put_var_type_slice_value(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
-    MSK120_VariableType var_type);
+    MSK12_VariableType var_type);
 
 /**
 
- * Set variable type to integer or continuous.
+ * Set variable types in a list to integer or continuous.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -727,13 +727,13 @@ MSK120_ResCode MSK120_put_var_type_slice_value(
  * - `var_idxs[num_var]` (in) Array of variable indexes
  * - `var_types[num_var]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_var_type_list_func_t)(MSK120_Task_t task,int32_t num_var,const int32_t* var_idxs,const MSK120_VariableType* var_types);
-extern MSK120_put_var_type_list_func_t MSK120_put_var_type_list_ptr;
-MSK120_ResCode MSK120_put_var_type_list(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_type_list_func_t)(MSK12_Task_t task,int32_t num_var,const int32_t* var_idxs,const MSK12_VariableType* var_types);
+extern MSK12_put_var_type_list_func_t MSK12_put_var_type_list_ptr;
+MSK12_ResCode MSK12_put_var_type_list(
+    MSK12_Task_t task,
     int32_t num_var,
     const int32_t* var_idxs,
-    const MSK120_VariableType* var_types);
+    const MSK12_VariableType* var_types);
 
 /**
 
@@ -744,12 +744,12 @@ MSK120_ResCode MSK120_put_var_type_list(
  * - `var_idx` Variable index
  * - `var_type[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_var_type_func_t)(MSK120_Task_t task,int32_t var_idx,MSK120_VariableType var_type[1]);
-extern MSK120_get_var_type_func_t MSK120_get_var_type_ptr;
-MSK120_ResCode MSK120_get_var_type(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_type_func_t)(MSK12_Task_t task,int32_t var_idx,MSK12_VariableType var_type[1]);
+extern MSK12_get_var_type_func_t MSK12_get_var_type_ptr;
+MSK12_ResCode MSK12_get_var_type(
+    MSK12_Task_t task,
     int32_t var_idx,
-    MSK120_VariableType var_type[1]);
+    MSK12_VariableType var_type[1]);
 
 /**
 
@@ -761,13 +761,13 @@ MSK120_ResCode MSK120_get_var_type(
  * - `num_var` Number of variables
  * - `var_types[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_var_type_slice_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,MSK120_VariableType* var_types);
-extern MSK120_get_var_type_slice_func_t MSK120_get_var_type_slice_ptr;
-MSK120_ResCode MSK120_get_var_type_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_type_slice_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,MSK12_VariableType* var_types);
+extern MSK12_get_var_type_slice_func_t MSK12_get_var_type_slice_ptr;
+MSK12_ResCode MSK12_get_var_type_slice(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
-    MSK120_VariableType* var_types);
+    MSK12_VariableType* var_types);
 
 /**
 
@@ -779,10 +779,10 @@ MSK120_ResCode MSK120_get_var_type_slice(
  * - `low` Lower bound
  * - `upr` Upper bound
  */
-typedef MSK120_ResCode (*MSK120_put_var_bound_func_t)(MSK120_Task_t task,int32_t var_idx,double low,double upr);
-extern MSK120_put_var_bound_func_t MSK120_put_var_bound_ptr;
-MSK120_ResCode MSK120_put_var_bound(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_bound_func_t)(MSK12_Task_t task,int32_t var_idx,double low,double upr);
+extern MSK12_put_var_bound_func_t MSK12_put_var_bound_ptr;
+MSK12_ResCode MSK12_put_var_bound(
+    MSK12_Task_t task,
     int32_t var_idx,
     double low,
     double upr);
@@ -798,10 +798,10 @@ MSK120_ResCode MSK120_put_var_bound(
  * - `low[num_var]` (in) Lower bound
  * - `upr[num_var]` (in) Upper bound
  */
-typedef MSK120_ResCode (*MSK120_put_var_bound_slice_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,const double* low,const double* upr);
-extern MSK120_put_var_bound_slice_func_t MSK120_put_var_bound_slice_ptr;
-MSK120_ResCode MSK120_put_var_bound_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_bound_slice_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,const double* low,const double* upr);
+extern MSK12_put_var_bound_slice_func_t MSK12_put_var_bound_slice_ptr;
+MSK12_ResCode MSK12_put_var_bound_slice(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
     const double* low,
@@ -818,10 +818,10 @@ MSK120_ResCode MSK120_put_var_bound_slice(
  * - `low` Lower bound
  * - `upr` Upper bound
  */
-typedef MSK120_ResCode (*MSK120_put_var_bound_slice_value_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,double low,double upr);
-extern MSK120_put_var_bound_slice_value_func_t MSK120_put_var_bound_slice_value_ptr;
-MSK120_ResCode MSK120_put_var_bound_slice_value(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_bound_slice_value_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,double low,double upr);
+extern MSK12_put_var_bound_slice_value_func_t MSK12_put_var_bound_slice_value_ptr;
+MSK12_ResCode MSK12_put_var_bound_slice_value(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
     double low,
@@ -837,10 +837,10 @@ MSK120_ResCode MSK120_put_var_bound_slice_value(
  * - `low[1]` (out) Lower bound
  * - `upr[1]` (out) Upper bound
  */
-typedef MSK120_ResCode (*MSK120_get_var_bound_func_t)(MSK120_Task_t task,int32_t var_idx,double low[1],double upr[1]);
-extern MSK120_get_var_bound_func_t MSK120_get_var_bound_ptr;
-MSK120_ResCode MSK120_get_var_bound(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_bound_func_t)(MSK12_Task_t task,int32_t var_idx,double low[1],double upr[1]);
+extern MSK12_get_var_bound_func_t MSK12_get_var_bound_ptr;
+MSK12_ResCode MSK12_get_var_bound(
+    MSK12_Task_t task,
     int32_t var_idx,
     double low[1],
     double upr[1]);
@@ -856,10 +856,10 @@ MSK120_ResCode MSK120_get_var_bound(
  * - `low[num_var]` (out) Lower bound
  * - `upr[num_var]` (out) Upper bound
  */
-typedef MSK120_ResCode (*MSK120_get_var_bound_slice_func_t)(MSK120_Task_t task,int32_t first_var,int32_t num_var,double* low,double* upr);
-extern MSK120_get_var_bound_slice_func_t MSK120_get_var_bound_slice_ptr;
-MSK120_ResCode MSK120_get_var_bound_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_bound_slice_func_t)(MSK12_Task_t task,int32_t first_var,int32_t num_var,double* low,double* upr);
+extern MSK12_get_var_bound_slice_func_t MSK12_get_var_bound_slice_ptr;
+MSK12_ResCode MSK12_get_var_bound_slice(
+    MSK12_Task_t task,
     int32_t first_var,
     int32_t num_var,
     double* low,
@@ -875,10 +875,10 @@ MSK120_ResCode MSK120_get_var_bound_slice(
  * - `num_barvar` Number of variables
  * - `num_elm[num_barvar]` (out) Number of positive semidefinite non-zero entries
  */
-typedef MSK120_ResCode (*MSK120_get_barvar_slice_num_elm_func_t)(MSK120_Task_t task,int32_t first_barvar,int32_t num_barvar,int64_t* num_elm);
-extern MSK120_get_barvar_slice_num_elm_func_t MSK120_get_barvar_slice_num_elm_ptr;
-MSK120_ResCode MSK120_get_barvar_slice_num_elm(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_barvar_slice_num_elm_func_t)(MSK12_Task_t task,int32_t first_barvar,int32_t num_barvar,int64_t* num_elm);
+extern MSK12_get_barvar_slice_num_elm_func_t MSK12_get_barvar_slice_num_elm_ptr;
+MSK12_ResCode MSK12_get_barvar_slice_num_elm(
+    MSK12_Task_t task,
     int32_t first_barvar,
     int32_t num_barvar,
     int64_t* num_elm);
@@ -892,10 +892,10 @@ MSK120_ResCode MSK120_get_barvar_slice_num_elm(
  * - `barvar_idx` Positive semi-definite variable index
  * - `dim[1]` (out) Dimension
  */
-typedef MSK120_ResCode (*MSK120_get_barvar_dim_func_t)(MSK120_Task_t task,int32_t barvar_idx,int32_t dim[1]);
-extern MSK120_get_barvar_dim_func_t MSK120_get_barvar_dim_ptr;
-MSK120_ResCode MSK120_get_barvar_dim(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_barvar_dim_func_t)(MSK12_Task_t task,int32_t barvar_idx,int32_t dim[1]);
+extern MSK12_get_barvar_dim_func_t MSK12_get_barvar_dim_ptr;
+MSK12_ResCode MSK12_get_barvar_dim(
+    MSK12_Task_t task,
     int32_t barvar_idx,
     int32_t dim[1]);
 
@@ -909,10 +909,10 @@ MSK120_ResCode MSK120_get_barvar_dim(
  * - `num_barvar` Number of variables
  * - `dim[num_barvar]` (out) Dimension
  */
-typedef MSK120_ResCode (*MSK120_get_barvar_slice_dims_func_t)(MSK120_Task_t task,int32_t first_barvar,int32_t num_barvar,int32_t* dim);
-extern MSK120_get_barvar_slice_dims_func_t MSK120_get_barvar_slice_dims_ptr;
-MSK120_ResCode MSK120_get_barvar_slice_dims(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_barvar_slice_dims_func_t)(MSK12_Task_t task,int32_t first_barvar,int32_t num_barvar,int32_t* dim);
+extern MSK12_get_barvar_slice_dims_func_t MSK12_get_barvar_slice_dims_ptr;
+MSK12_ResCode MSK12_get_barvar_slice_dims(
+    MSK12_Task_t task,
     int32_t first_barvar,
     int32_t num_barvar,
     int32_t* dim);
@@ -929,11 +929,11 @@ MSK120_ResCode MSK120_get_barvar_slice_dims(
  * - `alpha[dim]` (out) Array if alpha values for power cone domain
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_func_t)(MSK120_Task_t task,MSK120_DomainType dom_type,int64_t dim,int32_t num_alpha,double* alpha,int64_t dom_idx[1]);
-extern MSK120_get_domain_func_t MSK120_get_domain_ptr;
-MSK120_ResCode MSK120_get_domain(
-    MSK120_Task_t task,
-    MSK120_DomainType dom_type,
+typedef MSK12_ResCode (*MSK12_get_domain_func_t)(MSK12_Task_t task,MSK12_DomainType dom_type,int64_t dim,int32_t num_alpha,double* alpha,int64_t dom_idx[1]);
+extern MSK12_get_domain_func_t MSK12_get_domain_ptr;
+MSK12_ResCode MSK12_get_domain(
+    MSK12_Task_t task,
+    MSK12_DomainType dom_type,
     int64_t dim,
     int32_t num_alpha,
     double* alpha,
@@ -947,10 +947,10 @@ MSK120_ResCode MSK120_get_domain(
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_empty_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_empty_func_t MSK120_get_domain_empty_ptr;
-MSK120_ResCode MSK120_get_domain_empty(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_empty_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_empty_func_t MSK12_get_domain_empty_ptr;
+MSK12_ResCode MSK12_get_domain_empty(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
@@ -961,10 +961,10 @@ MSK120_ResCode MSK120_get_domain_empty(
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_rzero_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_rzero_func_t MSK120_get_domain_rzero_ptr;
-MSK120_ResCode MSK120_get_domain_rzero(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_rzero_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_rzero_func_t MSK12_get_domain_rzero_ptr;
+MSK12_ResCode MSK12_get_domain_rzero(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
@@ -975,10 +975,10 @@ MSK120_ResCode MSK120_get_domain_rzero(
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_rplus_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_rplus_func_t MSK120_get_domain_rplus_ptr;
-MSK120_ResCode MSK120_get_domain_rplus(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_rplus_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_rplus_func_t MSK12_get_domain_rplus_ptr;
+MSK12_ResCode MSK12_get_domain_rplus(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
@@ -989,10 +989,10 @@ MSK120_ResCode MSK120_get_domain_rplus(
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_rminus_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_rminus_func_t MSK120_get_domain_rminus_ptr;
-MSK120_ResCode MSK120_get_domain_rminus(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_rminus_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_rminus_func_t MSK12_get_domain_rminus_ptr;
+MSK12_ResCode MSK12_get_domain_rminus(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
@@ -1003,25 +1003,30 @@ MSK120_ResCode MSK120_get_domain_rminus(
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_r_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_r_func_t MSK120_get_domain_r_ptr;
-MSK120_ResCode MSK120_get_domain_r(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_r_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_r_func_t MSK12_get_domain_r_ptr;
+MSK12_ResCode MSK12_get_domain_r(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
 
  * Return the index of a quadratic cone domain of the given size.
  * 
+ * The quadratic cone of size \\(n\\) is defined as
+ * $$
+ * \\left\\{x\\in\\real^n~:~x_0 \\geq \\sqrt{\\sum_{i=1}^{n-1} x_i^2}\\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `n` 
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_quadratic_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t dom_idx[1]);
-extern MSK120_get_domain_quadratic_cone_func_t MSK120_get_domain_quadratic_cone_ptr;
-MSK120_ResCode MSK120_get_domain_quadratic_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_quadratic_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t dom_idx[1]);
+extern MSK12_get_domain_quadratic_cone_func_t MSK12_get_domain_quadratic_cone_ptr;
+MSK12_ResCode MSK12_get_domain_quadratic_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t dom_idx[1]);
 
@@ -1029,15 +1034,20 @@ MSK120_ResCode MSK120_get_domain_quadratic_cone(
 
  * Return the index of a rotated quadratic cone domain of the given size.
  * 
+ * The rotated quadratic cone of size \\(n\\) is defined as
+ * $$
+ * \\left\{ x\\in \\real^3 ~:~ x_0 \\geq x_1 e^{x_2/x_1},\\ x_0,x_1\\geq; 0 \\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `n` 
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_rotated_quadratic_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t dom_idx[1]);
-extern MSK120_get_domain_rotated_quadratic_cone_func_t MSK120_get_domain_rotated_quadratic_cone_ptr;
-MSK120_ResCode MSK120_get_domain_rotated_quadratic_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_rotated_quadratic_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t dom_idx[1]);
+extern MSK12_get_domain_rotated_quadratic_cone_func_t MSK12_get_domain_rotated_quadratic_cone_ptr;
+MSK12_ResCode MSK12_get_domain_rotated_quadratic_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t dom_idx[1]);
 
@@ -1045,16 +1055,21 @@ MSK120_ResCode MSK120_get_domain_rotated_quadratic_cone(
 
  * Return index if an `primal_exponential` domain. Only one
  * `primal_exponential` domain is created, so if one already exists,
- * that one is returned instead of creating a new domain
+ * that one is returned instead of creating a new domain.
+ * 
+ * The primal exponential cone is defined as
+ * $$
+ * \\left\{ x\\in \\real^3 ~:~ x_0 \\geq x_1 e^{x_2/x_1},\\ x_0,x_1> 0 \\right\\}
+ * $$
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_primal_exponential_cone_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_primal_exponential_cone_func_t MSK120_get_domain_primal_exponential_cone_ptr;
-MSK120_ResCode MSK120_get_domain_primal_exponential_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_primal_exponential_cone_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_primal_exponential_cone_func_t MSK12_get_domain_primal_exponential_cone_ptr;
+MSK12_ResCode MSK12_get_domain_primal_exponential_cone(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
@@ -1063,19 +1078,32 @@ MSK120_ResCode MSK120_get_domain_primal_exponential_cone(
  * `dual_exponential` domain is created, so if one already exists, that
  * one is returned instead of creating a new domain
  * 
+ * The dual exponential cone is defined as
+ * $$
+ * \\left\\{ x\\in \\real^3 ~:~ x_0 \\geq -x_2 e^{-1} e^{x_1/x_2},\\ x_0> 0,\\ x_2< 0 \\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_dual_exponential_cone_func_t)(MSK120_Task_t task,int64_t dom_idx[1]);
-extern MSK120_get_domain_dual_exponential_cone_func_t MSK120_get_domain_dual_exponential_cone_ptr;
-MSK120_ResCode MSK120_get_domain_dual_exponential_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_dual_exponential_cone_func_t)(MSK12_Task_t task,int64_t dom_idx[1]);
+extern MSK12_get_domain_dual_exponential_cone_func_t MSK12_get_domain_dual_exponential_cone_ptr;
+MSK12_ResCode MSK12_get_domain_dual_exponential_cone(
+    MSK12_Task_t task,
     int64_t dom_idx[1]);
 
 /**
 
  * Return the index of a new primal power cone.
+ * 
+ * The primal power cone domain of dimension \\(n\\), with \\(n_\ell\\) variables appearing on the left-hand side, where \\(n_\ell\\) is the length of \\(\alpha\\), and with a homogenous sequence of exponents \\(\alpha_0,\ldots,\alpha_{n_\ell-1}\\).
+ * 
+ * Formally, let \\(s = \\sum_i \\alpha_i\\) and \\(\\beta_i = \\alpha_i / s\\), so that \\(\\sum_i \\beta_i=1\\). Then the primal power cone is defined as follows:
+ * 
+ * $$
+ * \\left\\{ x\\in \\real^n ~:~ \\prod_{i=0}^{n_\\ell-1} x_i^{\\beta_i} \\geq \\sqrt{\\sum_{j=n_\\ell}^{n-1}x_j^2},\\ x_0\\ldots,x_{n_\\ell-1}\\geq 0 \\right\\}
+ * $$
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -1084,10 +1112,10 @@ MSK120_ResCode MSK120_get_domain_dual_exponential_cone(
  * - `alpha[num_alpha]` (in) Array if alpha values for power cone domain
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_primal_power_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t num_alpha,const double* alpha,int64_t dom_idx[1]);
-extern MSK120_get_domain_primal_power_cone_func_t MSK120_get_domain_primal_power_cone_ptr;
-MSK120_ResCode MSK120_get_domain_primal_power_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_primal_power_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t num_alpha,const double* alpha,int64_t dom_idx[1]);
+extern MSK12_get_domain_primal_power_cone_func_t MSK12_get_domain_primal_power_cone_ptr;
+MSK12_ResCode MSK12_get_domain_primal_power_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t num_alpha,
     const double* alpha,
@@ -1097,6 +1125,14 @@ MSK120_ResCode MSK120_get_domain_primal_power_cone(
 
  * Return the index of a new dual power cone.
  * 
+ * Appends the dual power cone domain of dimension :math:`n`, with :math:`n_\\ell` variables appearing on the left-hand side, where :math:`n_\\ell` is the length of :math:`\\alpha`, and with a homogenous sequence of exponents :math:`\\alpha_0,\\ldots,\\alpha_{n_\\ell-1}`.
+ * 
+ * Formally, let :math:`s = \\sum_i \\alpha_i` and :math:`\\beta_i = \\alpha_i / s`, so that :math:`\\sum_i \\beta_i=1`. Then the dual power cone is defined as follows:
+ * 
+ * $$
+ * \\left\\{ x\\in \\real^n ~:~ \\prod_{i=0}^{n_\\ell-1} \\left(\\frac{x_i}{\\beta_i}\\right)^{\\beta_i} \\geq \\sqrt{\\sum_{j=n_\\ell}^{n-1}x_j^2},\\ x_0\\ldots,x_{n_\\ell-1}\\geq 0 \\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `n` 
@@ -1104,10 +1140,10 @@ MSK120_ResCode MSK120_get_domain_primal_power_cone(
  * - `alpha[num_alpha]` (in) Array if alpha values for power cone domain
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_dual_power_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t num_alpha,const double* alpha,int64_t dom_idx[1]);
-extern MSK120_get_domain_dual_power_cone_func_t MSK120_get_domain_dual_power_cone_ptr;
-MSK120_ResCode MSK120_get_domain_dual_power_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_dual_power_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t num_alpha,const double* alpha,int64_t dom_idx[1]);
+extern MSK12_get_domain_dual_power_cone_func_t MSK12_get_domain_dual_power_cone_ptr;
+MSK12_ResCode MSK12_get_domain_dual_power_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t num_alpha,
     const double* alpha,
@@ -1117,15 +1153,20 @@ MSK120_ResCode MSK120_get_domain_dual_power_cone(
 
  * Get the index of a new primal geometric mean cone.
  * 
+ * The primal geometric mean cone is defined as
+ * $$
+ * \\left\\{ x\\in \\real^n ~:~ \\left(\\prod_{i=0}^{n-2} x_i\\right)^{1/(n-1)} \\geq |x_{n-1}|,\\ x_0\\ldots,x_{n-2}\\geq 0 \\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `n` 
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_primal_geometric_mean_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t dom_idx[1]);
-extern MSK120_get_domain_primal_geometric_mean_cone_func_t MSK120_get_domain_primal_geometric_mean_cone_ptr;
-MSK120_ResCode MSK120_get_domain_primal_geometric_mean_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_primal_geometric_mean_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t dom_idx[1]);
+extern MSK12_get_domain_primal_geometric_mean_cone_func_t MSK12_get_domain_primal_geometric_mean_cone_ptr;
+MSK12_ResCode MSK12_get_domain_primal_geometric_mean_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t dom_idx[1]);
 
@@ -1133,15 +1174,20 @@ MSK120_ResCode MSK120_get_domain_primal_geometric_mean_cone(
 
  * Get the index of a new dual geometric mean cone.
  * 
+ * The dual geometric mean cone is defined as
+ * $$
+ * \\left\\{ x\\in \\real^n ~:~ (n-1) \\left(\\prod_{i=0}^{n-2} x_i\\right)^{1/(n-1)} \\geq |x_{n-1}|,\\ x_0,\\ldots,x_{n-2}\\geq 0 \\right\\}
+ * $$
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `n` 
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_dual_geometric_mean_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t dom_idx[1]);
-extern MSK120_get_domain_dual_geometric_mean_cone_func_t MSK120_get_domain_dual_geometric_mean_cone_ptr;
-MSK120_ResCode MSK120_get_domain_dual_geometric_mean_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_dual_geometric_mean_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t dom_idx[1]);
+extern MSK12_get_domain_dual_geometric_mean_cone_func_t MSK12_get_domain_dual_geometric_mean_cone_ptr;
+MSK12_ResCode MSK12_get_domain_dual_geometric_mean_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t dom_idx[1]);
 
@@ -1149,15 +1195,42 @@ MSK120_ResCode MSK120_get_domain_dual_geometric_mean_cone(
 
  * Get the index of a new scaled vectorized PSD cone.
  * 
+ * The domain consisting of vectors of length \\(n=d(d+1)/2\\) defined as follows
+ * 
+ * $$
+ * \\{(x_1,\\ldots,x_{d(d+1)/2})\\in \\real^n~:~ \\mathrm{sMat}(x)\\in\\PSD^d\\} = \\{\\mathrm{sVec}(X)~:~X\\in\\PSD^d\\},
+ * $$
+ * 
+ * where
+ * 
+ * $$
+ * \\mathrm{sVec}(X) = (X_{11},\\sqrt{2}X_{21},\\ldots,\\sqrt{2}X_{d1},X_{22},\\sqrt{2}X_{32},\\ldots,X_{dd}),
+ * $$
+ * 
+ * and
+ * 
+ * $$
+ *     \\mathrm{sMat}(x) = \\left[\\begin{array}{cccc}
+ *         x_1             & x_2/\\sqrt{2}      & \\cdots & x_{d}/\\sqrt{2} \\\\
+ *         x_2/\\sqrt{2}   & x_{d+1}            & \\cdots & x_{2d-1}/\\sqrt{2} \\\\
+ *         \\cdots         & \\cdots            & \\cdots & \\cdots \\\\
+ *         x_{d}/\\sqrt{2} & x_{2d-1}/\\sqrt{2} & \\cdots & x_{d(d+1)/2}
+ *     \\end{array}\\right].
+ * $$
+ * 
+ * In other words, the domain consists of vectorizations of the lower-triangular part of a positive semidefinite matrix, with the non-diagonal elements additionally rescaled.
+ * 
+ * This domain is a self-dual cone.
+ * 
  * # Arguments
  * - `task` The optimizatioj task object
- * - `n` 
+ * - `n` The cone dimension. Note that only values such that \\(n\\cdot(n+1)/2\\) for some integer \\(d\\) are valid.
  * - `dom_idx[1]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_svecpsd_cone_func_t)(MSK120_Task_t task,int64_t n,int64_t dom_idx[1]);
-extern MSK120_get_domain_svecpsd_cone_func_t MSK120_get_domain_svecpsd_cone_ptr;
-MSK120_ResCode MSK120_get_domain_svecpsd_cone(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_svecpsd_cone_func_t)(MSK12_Task_t task,int64_t n,int64_t dom_idx[1]);
+extern MSK12_get_domain_svecpsd_cone_func_t MSK12_get_domain_svecpsd_cone_ptr;
+MSK12_ResCode MSK12_get_domain_svecpsd_cone(
+    MSK12_Task_t task,
     int64_t n,
     int64_t dom_idx[1]);
 
@@ -1172,12 +1245,12 @@ MSK120_ResCode MSK120_get_domain_svecpsd_cone(
  * - `size[1]` (out) 
  * - `num_alpha[1]` (out) Number of alpha values in array
  */
-typedef MSK120_ResCode (*MSK120_get_domain_info_func_t)(MSK120_Task_t task,int64_t dom_idx,MSK120_DomainType dom_type[1],int64_t size[1],int32_t num_alpha[1]);
-extern MSK120_get_domain_info_func_t MSK120_get_domain_info_ptr;
-MSK120_ResCode MSK120_get_domain_info(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_info_func_t)(MSK12_Task_t task,int64_t dom_idx,MSK12_DomainType dom_type[1],int64_t size[1],int32_t num_alpha[1]);
+extern MSK12_get_domain_info_func_t MSK12_get_domain_info_ptr;
+MSK12_ResCode MSK12_get_domain_info(
+    MSK12_Task_t task,
     int64_t dom_idx,
-    MSK120_DomainType dom_type[1],
+    MSK12_DomainType dom_type[1],
     int64_t size[1],
     int32_t num_alpha[1]);
 
@@ -1191,10 +1264,10 @@ MSK120_ResCode MSK120_get_domain_info(
  * - `num_alpha` Number of alpha values in array
  * - `alpha[num_alpha]` (out) Array if alpha values for power cone domain
  */
-typedef MSK120_ResCode (*MSK120_get_domain_alpha_func_t)(MSK120_Task_t task,int64_t dom_idx,int64_t num_alpha,double* alpha);
-extern MSK120_get_domain_alpha_func_t MSK120_get_domain_alpha_ptr;
-MSK120_ResCode MSK120_get_domain_alpha(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_domain_alpha_func_t)(MSK12_Task_t task,int64_t dom_idx,int64_t num_alpha,double* alpha);
+extern MSK12_get_domain_alpha_func_t MSK12_get_domain_alpha_ptr;
+MSK12_ResCode MSK12_get_domain_alpha(
+    MSK12_Task_t task,
     int64_t dom_idx,
     int64_t num_alpha,
     double* alpha);
@@ -1210,10 +1283,10 @@ MSK120_ResCode MSK120_get_domain_alpha(
  * - `subj[num_nz]` (in) Column indexes
  * - `cof[num_nz]` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_row_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t num_nz,const int32_t* subj,const double* cof);
-extern MSK120_put_row_func_t MSK120_put_row_ptr;
-MSK120_ResCode MSK120_put_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t num_nz,const int32_t* subj,const double* cof);
+extern MSK12_put_row_func_t MSK12_put_row_ptr;
+MSK12_ResCode MSK12_put_row(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t num_nz,
     const int32_t* subj,
@@ -1231,10 +1304,10 @@ MSK120_ResCode MSK120_put_row(
  * - `subj` (in) Column subscripts
  * - `cof` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_row_slice_func_t)(MSK120_Task_t task,int64_t first_row,int64_t num_row,const int32_t* row_num_nz,const int32_t* subj,const double* cof);
-extern MSK120_put_row_slice_func_t MSK120_put_row_slice_ptr;
-MSK120_ResCode MSK120_put_row_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_slice_func_t)(MSK12_Task_t task,int64_t first_row,int64_t num_row,const int32_t* row_num_nz,const int32_t* subj,const double* cof);
+extern MSK12_put_row_slice_func_t MSK12_put_row_slice_ptr;
+MSK12_ResCode MSK12_put_row_slice(
+    MSK12_Task_t task,
     int64_t first_row,
     int64_t num_row,
     const int32_t* row_num_nz,
@@ -1253,10 +1326,10 @@ MSK120_ResCode MSK120_put_row_slice(
  * - `subj` (in) List of pointers to subscripts.
  * - `cof` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_row_list_func_t)(MSK120_Task_t task,int64_t num_row,int64_t* row_idxs,const int32_t* row_num_nz,const int32_t** subj,const double** cof);
-extern MSK120_put_row_list_func_t MSK120_put_row_list_ptr;
-MSK120_ResCode MSK120_put_row_list(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_list_func_t)(MSK12_Task_t task,int64_t num_row,int64_t* row_idxs,const int32_t* row_num_nz,const int32_t** subj,const double** cof);
+extern MSK12_put_row_list_func_t MSK12_put_row_list_ptr;
+MSK12_ResCode MSK12_put_row_list(
+    MSK12_Task_t task,
     int64_t num_row,
     int64_t* row_idxs,
     const int32_t* row_num_nz,
@@ -1272,10 +1345,10 @@ MSK120_ResCode MSK120_put_row_list(
  * - `row_idx` Index of the affine row
  * - `g` Row fixed term
  */
-typedef MSK120_ResCode (*MSK120_put_row_g_func_t)(MSK120_Task_t task,int64_t row_idx,double g);
-extern MSK120_put_row_g_func_t MSK120_put_row_g_ptr;
-MSK120_ResCode MSK120_put_row_g(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_g_func_t)(MSK12_Task_t task,int64_t row_idx,double g);
+extern MSK12_put_row_g_func_t MSK12_put_row_g_ptr;
+MSK12_ResCode MSK12_put_row_g(
+    MSK12_Task_t task,
     int64_t row_idx,
     double g);
 
@@ -1289,10 +1362,10 @@ MSK120_ResCode MSK120_put_row_g(
  * - `num_row` Number of affine rows
  * - `g[num_row]` (in) Row fixed term
  */
-typedef MSK120_ResCode (*MSK120_put_row_slice_g_func_t)(MSK120_Task_t task,int64_t first_row,int64_t num_row,const double* g);
-extern MSK120_put_row_slice_g_func_t MSK120_put_row_slice_g_ptr;
-MSK120_ResCode MSK120_put_row_slice_g(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_slice_g_func_t)(MSK12_Task_t task,int64_t first_row,int64_t num_row,const double* g);
+extern MSK12_put_row_slice_g_func_t MSK12_put_row_slice_g_ptr;
+MSK12_ResCode MSK12_put_row_slice_g(
+    MSK12_Task_t task,
     int64_t first_row,
     int64_t num_row,
     const double* g);
@@ -1307,10 +1380,10 @@ MSK120_ResCode MSK120_put_row_slice_g(
  * - `row_idxs[num_row]` (out) Array of row indexes
  * - `g[num_row]` (in) Row fixed term
  */
-typedef MSK120_ResCode (*MSK120_put_row_list_g_func_t)(MSK120_Task_t task,int64_t num_row,int64_t* row_idxs,const double* g);
-extern MSK120_put_row_list_g_func_t MSK120_put_row_list_g_ptr;
-MSK120_ResCode MSK120_put_row_list_g(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_row_list_g_func_t)(MSK12_Task_t task,int64_t num_row,int64_t* row_idxs,const double* g);
+extern MSK12_put_row_list_g_func_t MSK12_put_row_list_g_ptr;
+MSK12_ResCode MSK12_put_row_list_g(
+    MSK12_Task_t task,
     int64_t num_row,
     int64_t* row_idxs,
     const double* g);
@@ -1326,10 +1399,10 @@ MSK120_ResCode MSK120_put_row_list_g(
  * - `row_idxs[num_nz]` (in) Array of row indexes
  * - `cof[num_nz]` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_col_func_t)(MSK120_Task_t task,int32_t col_idx,int64_t num_nz,const int64_t* row_idxs,const double* cof);
-extern MSK120_put_col_func_t MSK120_put_col_ptr;
-MSK120_ResCode MSK120_put_col(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_col_func_t)(MSK12_Task_t task,int32_t col_idx,int64_t num_nz,const int64_t* row_idxs,const double* cof);
+extern MSK12_put_col_func_t MSK12_put_col_ptr;
+MSK12_ResCode MSK12_put_col(
+    MSK12_Task_t task,
     int32_t col_idx,
     int64_t num_nz,
     const int64_t* row_idxs,
@@ -1347,10 +1420,10 @@ MSK120_ResCode MSK120_put_col(
  * - `row_idxs` (in) Array of row indexes
  * - `cof` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_col_slice_func_t)(MSK120_Task_t task,int32_t first_col,int32_t num_col,const int64_t* col_len,const int64_t* row_idxs,const double* cof);
-extern MSK120_put_col_slice_func_t MSK120_put_col_slice_ptr;
-MSK120_ResCode MSK120_put_col_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_col_slice_func_t)(MSK12_Task_t task,int32_t first_col,int32_t num_col,const int64_t* col_len,const int64_t* row_idxs,const double* cof);
+extern MSK12_put_col_slice_func_t MSK12_put_col_slice_ptr;
+MSK12_ResCode MSK12_put_col_slice(
+    MSK12_Task_t task,
     int32_t first_col,
     int32_t num_col,
     const int64_t* col_len,
@@ -1369,10 +1442,10 @@ MSK120_ResCode MSK120_put_col_slice(
  * - `row_idxs` (in) Array of row indexes
  * - `cof` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_col_list_func_t)(MSK120_Task_t task,int32_t num_col,const int32_t* col_idxs,const int64_t* col_lens,const int64_t** row_idxs,const double** cof);
-extern MSK120_put_col_list_func_t MSK120_put_col_list_ptr;
-MSK120_ResCode MSK120_put_col_list(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_col_list_func_t)(MSK12_Task_t task,int32_t num_col,const int32_t* col_idxs,const int64_t* col_lens,const int64_t** row_idxs,const double** cof);
+extern MSK12_put_col_list_func_t MSK12_put_col_list_ptr;
+MSK12_ResCode MSK12_put_col_list(
+    MSK12_Task_t task,
     int32_t num_col,
     const int32_t* col_idxs,
     const int64_t* col_lens,
@@ -1389,10 +1462,10 @@ MSK120_ResCode MSK120_put_col_list(
  * - `var_idx` Variable index
  * - `cof` Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_ijc_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t var_idx,double cof);
-extern MSK120_put_ijc_func_t MSK120_put_ijc_ptr;
-MSK120_ResCode MSK120_put_ijc(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_ijc_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t var_idx,double cof);
+extern MSK12_put_ijc_func_t MSK12_put_ijc_ptr;
+MSK12_ResCode MSK12_put_ijc(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t var_idx,
     double cof);
@@ -1408,10 +1481,10 @@ MSK120_ResCode MSK120_put_ijc(
  * - `col_idxs[num_nz]` (in) Array of variable indexes
  * - `cof[num_nz]` (in) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_put_ijc_list_func_t)(MSK120_Task_t task,int64_t num_nz,const int64_t* row_idxs,const int32_t* col_idxs,const double* cof);
-extern MSK120_put_ijc_list_func_t MSK120_put_ijc_list_ptr;
-MSK120_ResCode MSK120_put_ijc_list(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_ijc_list_func_t)(MSK12_Task_t task,int64_t num_nz,const int64_t* row_idxs,const int32_t* col_idxs,const double* cof);
+extern MSK12_put_ijc_list_func_t MSK12_put_ijc_list_ptr;
+MSK12_ResCode MSK12_put_ijc_list(
+    MSK12_Task_t task,
     int64_t num_nz,
     const int64_t* row_idxs,
     const int32_t* col_idxs,
@@ -1425,10 +1498,10 @@ MSK120_ResCode MSK120_put_ijc_list(
  * - `row_idx` Index of the affine row
  * - `num_nz[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_row_num_nz_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t num_nz[1]);
-extern MSK120_get_row_num_nz_func_t MSK120_get_row_num_nz_ptr;
-MSK120_ResCode MSK120_get_row_num_nz(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_row_num_nz_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t num_nz[1]);
+extern MSK12_get_row_num_nz_func_t MSK12_get_row_num_nz_ptr;
+MSK12_ResCode MSK12_get_row_num_nz(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t num_nz[1]);
 
@@ -1441,10 +1514,10 @@ MSK120_ResCode MSK120_get_row_num_nz(
  * - `num_row` Number of affine rows
  * - `num_nz[num_row]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_row_slice_num_nz_func_t)(MSK120_Task_t task,int64_t first_row,int64_t num_row,int64_t* num_nz);
-extern MSK120_get_row_slice_num_nz_func_t MSK120_get_row_slice_num_nz_ptr;
-MSK120_ResCode MSK120_get_row_slice_num_nz(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_row_slice_num_nz_func_t)(MSK12_Task_t task,int64_t first_row,int64_t num_row,int64_t* num_nz);
+extern MSK12_get_row_slice_num_nz_func_t MSK12_get_row_slice_num_nz_ptr;
+MSK12_ResCode MSK12_get_row_slice_num_nz(
+    MSK12_Task_t task,
     int64_t first_row,
     int64_t num_row,
     int64_t* num_nz);
@@ -1460,10 +1533,10 @@ MSK120_ResCode MSK120_get_row_slice_num_nz(
  * - `subj[nnz]` (out) Variable indexes
  * - `cof[nnz]` (out) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_get_row_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t nnz,int32_t* subj,double* cof);
-extern MSK120_get_row_func_t MSK120_get_row_ptr;
-MSK120_ResCode MSK120_get_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_row_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t nnz,int32_t* subj,double* cof);
+extern MSK12_get_row_func_t MSK12_get_row_ptr;
+MSK12_ResCode MSK12_get_row(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t nnz,
     int32_t* subj,
@@ -1482,10 +1555,10 @@ MSK120_ResCode MSK120_get_row(
  * - `subj[nnz]` (out) Variable indexes
  * - `cof[nnz]` (out) Coefficients
  */
-typedef MSK120_ResCode (*MSK120_get_row_slice_func_t)(MSK120_Task_t task,int64_t first_row,int64_t num_row,int64_t nnz,int32_t* row_len,int32_t* subj,double* cof);
-extern MSK120_get_row_slice_func_t MSK120_get_row_slice_ptr;
-MSK120_ResCode MSK120_get_row_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_row_slice_func_t)(MSK12_Task_t task,int64_t first_row,int64_t num_row,int64_t nnz,int32_t* row_len,int32_t* subj,double* cof);
+extern MSK12_get_row_slice_func_t MSK12_get_row_slice_ptr;
+MSK12_ResCode MSK12_get_row_slice(
+    MSK12_Task_t task,
     int64_t first_row,
     int64_t num_row,
     int64_t nnz,
@@ -1505,10 +1578,10 @@ MSK120_ResCode MSK120_get_row_slice(
  * - `matrix_idx[num_weight]` (out) 
  * - `weight[num_weight]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_put_bar_entry_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t barvar_idx,int64_t num_weight,int64_t* matrix_idx,double* weight);
-extern MSK120_put_bar_entry_func_t MSK120_put_bar_entry_ptr;
-MSK120_ResCode MSK120_put_bar_entry(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_bar_entry_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t barvar_idx,int64_t num_weight,int64_t* matrix_idx,double* weight);
+extern MSK12_put_bar_entry_func_t MSK12_put_bar_entry_ptr;
+MSK12_ResCode MSK12_put_bar_entry(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t barvar_idx,
     int64_t num_weight,
@@ -1528,10 +1601,10 @@ MSK120_ResCode MSK120_put_bar_entry(
  * - `matrix_idx` (in) Matrix indexes
  * - `weight` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_bar_entry_list_func_t)(MSK120_Task_t task,int64_t num_bar_entry,const int64_t* row_idx,const int32_t* barvar_idx,const int64_t* num_weight,const int64_t* matrix_idx,const double* weight);
-extern MSK120_put_bar_entry_list_func_t MSK120_put_bar_entry_list_ptr;
-MSK120_ResCode MSK120_put_bar_entry_list(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_bar_entry_list_func_t)(MSK12_Task_t task,int64_t num_bar_entry,const int64_t* row_idx,const int32_t* barvar_idx,const int64_t* num_weight,const int64_t* matrix_idx,const double* weight);
+extern MSK12_put_bar_entry_list_func_t MSK12_put_bar_entry_list_ptr;
+MSK12_ResCode MSK12_put_bar_entry_list(
+    MSK12_Task_t task,
     int64_t num_bar_entry,
     const int64_t* row_idx,
     const int32_t* barvar_idx,
@@ -1552,10 +1625,10 @@ MSK120_ResCode MSK120_put_bar_entry_list(
  * - `matrix_idx` (in) 
  * - `weight` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_bar_row_func_t)(MSK120_Task_t task,int64_t row_idx,int32_t num_bar_entry,const int32_t* barvar_idx,const int64_t* num_weight,const int64_t* matrix_idx,const double* weight);
-extern MSK120_put_bar_row_func_t MSK120_put_bar_row_ptr;
-MSK120_ResCode MSK120_put_bar_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_bar_row_func_t)(MSK12_Task_t task,int64_t row_idx,int32_t num_bar_entry,const int32_t* barvar_idx,const int64_t* num_weight,const int64_t* matrix_idx,const double* weight);
+extern MSK12_put_bar_row_func_t MSK12_put_bar_row_ptr;
+MSK12_ResCode MSK12_put_bar_row(
+    MSK12_Task_t task,
     int64_t row_idx,
     int32_t num_bar_entry,
     const int32_t* barvar_idx,
@@ -1573,10 +1646,10 @@ MSK120_ResCode MSK120_put_bar_row(
  * - `dim[1]` (out) Dimension
  * - `nnz[1]` (out) Number of nonzeros
  */
-typedef MSK120_ResCode (*MSK120_get_symmat_info_func_t)(MSK120_Task_t task,int64_t symmat_idx,int32_t dim[1],int64_t nnz[1]);
-extern MSK120_get_symmat_info_func_t MSK120_get_symmat_info_ptr;
-MSK120_ResCode MSK120_get_symmat_info(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_symmat_info_func_t)(MSK12_Task_t task,int64_t symmat_idx,int32_t dim[1],int64_t nnz[1]);
+extern MSK12_get_symmat_info_func_t MSK12_get_symmat_info_ptr;
+MSK12_ResCode MSK12_get_symmat_info(
+    MSK12_Task_t task,
     int64_t symmat_idx,
     int32_t dim[1],
     int64_t nnz[1]);
@@ -1593,10 +1666,10 @@ MSK120_ResCode MSK120_get_symmat_info(
  * - `symmat_j[nnz]` (out) Symmetric matrix column subscripts
  * - `symmat_val[nnz]` (out) Symmetric matrix values
  */
-typedef MSK120_ResCode (*MSK120_get_symmat_func_t)(MSK120_Task_t task,int64_t symmat_idx,int64_t nnz,int32_t* symmat_i,int32_t* symmat_j,double* symmat_val);
-extern MSK120_get_symmat_func_t MSK120_get_symmat_ptr;
-MSK120_ResCode MSK120_get_symmat(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_symmat_func_t)(MSK12_Task_t task,int64_t symmat_idx,int64_t nnz,int32_t* symmat_i,int32_t* symmat_j,double* symmat_val);
+extern MSK12_get_symmat_func_t MSK12_get_symmat_ptr;
+MSK12_ResCode MSK12_get_symmat(
+    MSK12_Task_t task,
     int64_t symmat_idx,
     int64_t nnz,
     int32_t* symmat_i,
@@ -1614,10 +1687,10 @@ MSK120_ResCode MSK120_get_symmat(
  * - `dim[num_symmat]` (out) Dimension
  * - `nnz[num_symmat]` (out) Number of nonzeros
  */
-typedef MSK120_ResCode (*MSK120_get_symmat_slice_info_func_t)(MSK120_Task_t task,int64_t first_symmat,int64_t num_symmat,int32_t* dim,int64_t* nnz);
-extern MSK120_get_symmat_slice_info_func_t MSK120_get_symmat_slice_info_ptr;
-MSK120_ResCode MSK120_get_symmat_slice_info(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_symmat_slice_info_func_t)(MSK12_Task_t task,int64_t first_symmat,int64_t num_symmat,int32_t* dim,int64_t* nnz);
+extern MSK12_get_symmat_slice_info_func_t MSK12_get_symmat_slice_info_ptr;
+MSK12_ResCode MSK12_get_symmat_slice_info(
+    MSK12_Task_t task,
     int64_t first_symmat,
     int64_t num_symmat,
     int32_t* dim,
@@ -1636,10 +1709,10 @@ MSK120_ResCode MSK120_get_symmat_slice_info(
  * - `symmat_j[total_nnz]` (out) Symmetric matrix column subscripts
  * - `symmat_val[total_nnz]` (out) Symmetric matrix values
  */
-typedef MSK120_ResCode (*MSK120_get_symmat_slice_func_t)(MSK120_Task_t task,int64_t first_symmat,int64_t num_symmat,int64_t total_nnz,int32_t* symmat_i,int32_t* symmat_j,double* symmat_val);
-extern MSK120_get_symmat_slice_func_t MSK120_get_symmat_slice_ptr;
-MSK120_ResCode MSK120_get_symmat_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_symmat_slice_func_t)(MSK12_Task_t task,int64_t first_symmat,int64_t num_symmat,int64_t total_nnz,int32_t* symmat_i,int32_t* symmat_j,double* symmat_val);
+extern MSK12_get_symmat_slice_func_t MSK12_get_symmat_slice_ptr;
+MSK12_ResCode MSK12_get_symmat_slice(
+    MSK12_Task_t task,
     int64_t first_symmat,
     int64_t num_symmat,
     int64_t total_nnz,
@@ -1658,10 +1731,10 @@ MSK120_ResCode MSK120_get_symmat_slice(
  * - `row_idxs[num_rows]` (in) Array of row indexes
  * - `con_offset[num_rows]` (in, nullable) Constraint right-hand-side offset vector, where NULL means all zeros 
  */
-typedef MSK120_ResCode (*MSK120_append_con_func_t)(MSK120_Task_t task,int64_t dom_idx,int64_t num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
-extern MSK120_append_con_func_t MSK120_append_con_ptr;
-MSK120_ResCode MSK120_append_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_con_func_t)(MSK12_Task_t task,int64_t dom_idx,int64_t num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
+extern MSK12_append_con_func_t MSK12_append_con_ptr;
+MSK12_ResCode MSK12_append_con(
+    MSK12_Task_t task,
     int64_t dom_idx,
     int64_t num_rows,
     const int64_t* row_idxs,
@@ -1679,10 +1752,10 @@ MSK120_ResCode MSK120_append_con(
  * - `row_idxs` (in) Array of row indexes
  * - `con_offset` (in, nullable) Constraint right-hand-side offset vector, where NULL means all zeros 
  */
-typedef MSK120_ResCode (*MSK120_append_cons_func_t)(MSK120_Task_t task,int64_t num_con,const int64_t* dom_idxs,const int64_t* num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
-extern MSK120_append_cons_func_t MSK120_append_cons_ptr;
-MSK120_ResCode MSK120_append_cons(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_cons_func_t)(MSK12_Task_t task,int64_t num_con,const int64_t* dom_idxs,const int64_t* num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
+extern MSK12_append_cons_func_t MSK12_append_cons_ptr;
+MSK12_ResCode MSK12_append_cons(
+    MSK12_Task_t task,
     int64_t num_con,
     const int64_t* dom_idxs,
     const int64_t* num_rows,
@@ -1701,10 +1774,10 @@ MSK120_ResCode MSK120_append_cons(
  * - `row_idxs[num_rows]` (in) Array of row indexes
  * - `rhs_offset[num_rows]` (in, nullable) Domain offset
  */
-typedef MSK120_ResCode (*MSK120_put_con_func_t)(MSK120_Task_t task,int64_t con_idx,int64_t num_rows,int64_t dom_idx,const int64_t* row_idxs,NULLABLE const double* rhs_offset);
-extern MSK120_put_con_func_t MSK120_put_con_ptr;
-MSK120_ResCode MSK120_put_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_con_func_t)(MSK12_Task_t task,int64_t con_idx,int64_t num_rows,int64_t dom_idx,const int64_t* row_idxs,NULLABLE const double* rhs_offset);
+extern MSK12_put_con_func_t MSK12_put_con_ptr;
+MSK12_ResCode MSK12_put_con(
+    MSK12_Task_t task,
     int64_t con_idx,
     int64_t num_rows,
     int64_t dom_idx,
@@ -1722,10 +1795,10 @@ MSK120_ResCode MSK120_put_con(
  * - `row_idx` Index of the affine row
  * - `rhs_offset` Domain offset
  */
-typedef MSK120_ResCode (*MSK120_put_scalar_con_func_t)(MSK120_Task_t task,int64_t con_idx,int64_t dom_idx,int64_t row_idx,double rhs_offset);
-extern MSK120_put_scalar_con_func_t MSK120_put_scalar_con_ptr;
-MSK120_ResCode MSK120_put_scalar_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_scalar_con_func_t)(MSK12_Task_t task,int64_t con_idx,int64_t dom_idx,int64_t row_idx,double rhs_offset);
+extern MSK12_put_scalar_con_func_t MSK12_put_scalar_con_ptr;
+MSK12_ResCode MSK12_put_scalar_con(
+    MSK12_Task_t task,
     int64_t con_idx,
     int64_t dom_idx,
     int64_t row_idx,
@@ -1744,10 +1817,10 @@ MSK120_ResCode MSK120_put_scalar_con(
  * - `row_idx[num_rows]` (in) Indexes of the scalar affine rows
  * - `rhs_offset[num_rows]` (in, nullable) Domain offset
  */
-typedef MSK120_ResCode (*MSK120_put_con_slice_func_t)(MSK120_Task_t task,int64_t first_con,int64_t num_con,int64_t num_rows,const int64_t* dom_idx,const int64_t* row_idx,NULLABLE const double* rhs_offset);
-extern MSK120_put_con_slice_func_t MSK120_put_con_slice_ptr;
-MSK120_ResCode MSK120_put_con_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_con_slice_func_t)(MSK12_Task_t task,int64_t first_con,int64_t num_con,int64_t num_rows,const int64_t* dom_idx,const int64_t* row_idx,NULLABLE const double* rhs_offset);
+extern MSK12_put_con_slice_func_t MSK12_put_con_slice_ptr;
+MSK12_ResCode MSK12_put_con_slice(
+    MSK12_Task_t task,
     int64_t first_con,
     int64_t num_con,
     int64_t num_rows,
@@ -1765,10 +1838,10 @@ MSK120_ResCode MSK120_put_con_slice(
  * - `num_con` Number of constraints
  * - `dom_idx[num_con]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_con_slice_domains_func_t)(MSK120_Task_t task,int64_t first_con,int64_t num_con,int64_t* dom_idx);
-extern MSK120_get_con_slice_domains_func_t MSK120_get_con_slice_domains_ptr;
-MSK120_ResCode MSK120_get_con_slice_domains(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_con_slice_domains_func_t)(MSK12_Task_t task,int64_t first_con,int64_t num_con,int64_t* dom_idx);
+extern MSK12_get_con_slice_domains_func_t MSK12_get_con_slice_domains_ptr;
+MSK12_ResCode MSK12_get_con_slice_domains(
+    MSK12_Task_t task,
     int64_t first_con,
     int64_t num_con,
     int64_t* dom_idx);
@@ -1783,10 +1856,10 @@ MSK120_ResCode MSK120_get_con_slice_domains(
  * - `num_con` Number of constraints
  * - `num_row[1]` (out) Number of affine rows
  */
-typedef MSK120_ResCode (*MSK120_get_con_slice_num_row_func_t)(MSK120_Task_t task,int64_t first_con,int64_t num_con,int64_t num_row[1]);
-extern MSK120_get_con_slice_num_row_func_t MSK120_get_con_slice_num_row_ptr;
-MSK120_ResCode MSK120_get_con_slice_num_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_con_slice_num_row_func_t)(MSK12_Task_t task,int64_t first_con,int64_t num_con,int64_t num_row[1]);
+extern MSK12_get_con_slice_num_row_func_t MSK12_get_con_slice_num_row_ptr;
+MSK12_ResCode MSK12_get_con_slice_num_row(
+    MSK12_Task_t task,
     int64_t first_con,
     int64_t num_con,
     int64_t num_row[1]);
@@ -1804,10 +1877,10 @@ MSK120_ResCode MSK120_get_con_slice_num_row(
  * - `rhs_offset[num_row]` (out) Domain offset
  * - `dom_idx[num_con]` (out) Index of the domain
  */
-typedef MSK120_ResCode (*MSK120_get_con_slice_func_t)(MSK120_Task_t task,int64_t first_con,int64_t num_con,int64_t num_row,int64_t* row_idx,double* rhs_offset,int64_t* dom_idx);
-extern MSK120_get_con_slice_func_t MSK120_get_con_slice_ptr;
-MSK120_ResCode MSK120_get_con_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_con_slice_func_t)(MSK12_Task_t task,int64_t first_con,int64_t num_con,int64_t num_row,int64_t* row_idx,double* rhs_offset,int64_t* dom_idx);
+extern MSK12_get_con_slice_func_t MSK12_get_con_slice_ptr;
+MSK12_ResCode MSK12_get_con_slice(
+    MSK12_Task_t task,
     int64_t first_con,
     int64_t num_con,
     int64_t num_row,
@@ -1829,10 +1902,10 @@ MSK120_ResCode MSK120_get_con_slice(
  * - `row_idx[num_rows]` (in) Indexes of the scalar affine rows
  * - `rhs_offset[num_rows]` (in) Domain offset
  */
-typedef MSK120_ResCode (*MSK120_append_djc_func_t)(MSK120_Task_t task,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset);
-extern MSK120_append_djc_func_t MSK120_append_djc_ptr;
-MSK120_ResCode MSK120_append_djc(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_append_djc_func_t)(MSK12_Task_t task,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset);
+extern MSK12_append_djc_func_t MSK12_append_djc_ptr;
+MSK12_ResCode MSK12_append_djc(
+    MSK12_Task_t task,
     int64_t num_rows,
     int64_t num_dom,
     int64_t num_terms,
@@ -1856,10 +1929,10 @@ MSK120_ResCode MSK120_append_djc(
  * - `row_idx[num_rows]` (in) Indexes of the scalar affine rows
  * - `rhs_offset[num_rows]` (in) Domain offset
  */
-typedef MSK120_ResCode (*MSK120_put_djc_func_t)(MSK120_Task_t task,int64_t djc_idx,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset);
-extern MSK120_put_djc_func_t MSK120_put_djc_ptr;
-MSK120_ResCode MSK120_put_djc(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_djc_func_t)(MSK12_Task_t task,int64_t djc_idx,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset);
+extern MSK12_put_djc_func_t MSK12_put_djc_ptr;
+MSK12_ResCode MSK12_put_djc(
+    MSK12_Task_t task,
     int64_t djc_idx,
     int64_t num_rows,
     int64_t num_dom,
@@ -1886,10 +1959,10 @@ MSK120_ResCode MSK120_put_djc(
  * - `rhs_offset[num_rows]` (in) Right-hand-side offset
  * - `djc_numterm[num_djc]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_djc_slice_func_t)(MSK120_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset,const int64_t* djc_numterm);
-extern MSK120_put_djc_slice_func_t MSK120_put_djc_slice_ptr;
-MSK120_ResCode MSK120_put_djc_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_djc_slice_func_t)(MSK12_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_rows,int64_t num_dom,int64_t num_terms,const int64_t* dom_idx,const int64_t* term_size,const int64_t* row_idx,const double* rhs_offset,const int64_t* djc_numterm);
+extern MSK12_put_djc_slice_func_t MSK12_put_djc_slice_ptr;
+MSK12_ResCode MSK12_put_djc_slice(
+    MSK12_Task_t task,
     int64_t first_djc,
     int64_t num_djc,
     int64_t num_rows,
@@ -1912,10 +1985,10 @@ MSK120_ResCode MSK120_put_djc_slice(
  * - `num_dom[1]` (out) Number of domains
  * - `num_row[1]` (out) Number of affine rows
  */
-typedef MSK120_ResCode (*MSK120_get_djc_info_func_t)(MSK120_Task_t task,int64_t djc_idx,int64_t num_term[1],int64_t num_dom[1],int64_t num_row[1]);
-extern MSK120_get_djc_info_func_t MSK120_get_djc_info_ptr;
-MSK120_ResCode MSK120_get_djc_info(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_info_func_t)(MSK12_Task_t task,int64_t djc_idx,int64_t num_term[1],int64_t num_dom[1],int64_t num_row[1]);
+extern MSK12_get_djc_info_func_t MSK12_get_djc_info_ptr;
+MSK12_ResCode MSK12_get_djc_info(
+    MSK12_Task_t task,
     int64_t djc_idx,
     int64_t num_term[1],
     int64_t num_dom[1],
@@ -1936,10 +2009,10 @@ MSK120_ResCode MSK120_get_djc_info(
  * - `row_idx[num_row]` (out) Index of the affine row
  * - `rhs_offset[num_row]` (out) Domain offset
  */
-typedef MSK120_ResCode (*MSK120_get_djc_func_t)(MSK120_Task_t task,int64_t djc_idx,int64_t num_terms,int64_t num_dom,int64_t num_row,int64_t* term_size,int64_t* dom_idx,int64_t* row_idx,double* rhs_offset);
-extern MSK120_get_djc_func_t MSK120_get_djc_ptr;
-MSK120_ResCode MSK120_get_djc(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_func_t)(MSK12_Task_t task,int64_t djc_idx,int64_t num_terms,int64_t num_dom,int64_t num_row,int64_t* term_size,int64_t* dom_idx,int64_t* row_idx,double* rhs_offset);
+extern MSK12_get_djc_func_t MSK12_get_djc_ptr;
+MSK12_ResCode MSK12_get_djc(
+    MSK12_Task_t task,
     int64_t djc_idx,
     int64_t num_terms,
     int64_t num_dom,
@@ -1961,10 +2034,10 @@ MSK120_ResCode MSK120_get_djc(
  * - `num_dom[1]` (out) total number of clauses/domains
  * - `num_row[1]` (out) total number of rows
  */
-typedef MSK120_ResCode (*MSK120_get_djc_slice_info_func_t)(MSK120_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_term[1],int64_t num_dom[1],int64_t num_row[1]);
-extern MSK120_get_djc_slice_info_func_t MSK120_get_djc_slice_info_ptr;
-MSK120_ResCode MSK120_get_djc_slice_info(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_slice_info_func_t)(MSK12_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_term[1],int64_t num_dom[1],int64_t num_row[1]);
+extern MSK12_get_djc_slice_info_func_t MSK12_get_djc_slice_info_ptr;
+MSK12_ResCode MSK12_get_djc_slice_info(
+    MSK12_Task_t task,
     int64_t first_djc,
     int64_t num_djc,
     int64_t num_term[1],
@@ -1988,10 +2061,10 @@ MSK120_ResCode MSK120_get_djc_slice_info(
  * - `rhs_offset[num_row]` (out) Domain offset
  * - `djc_num_term[num_djc]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_djc_slice_func_t)(MSK120_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_term,int64_t num_dom,int64_t num_row,int64_t* term_size,int64_t* dom_idx,int64_t* row_idx,double* rhs_offset,int64_t* djc_num_term);
-extern MSK120_get_djc_slice_func_t MSK120_get_djc_slice_ptr;
-MSK120_ResCode MSK120_get_djc_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_slice_func_t)(MSK12_Task_t task,int64_t first_djc,int64_t num_djc,int64_t num_term,int64_t num_dom,int64_t num_row,int64_t* term_size,int64_t* dom_idx,int64_t* row_idx,double* rhs_offset,int64_t* djc_num_term);
+extern MSK12_get_djc_slice_func_t MSK12_get_djc_slice_ptr;
+MSK12_ResCode MSK12_get_djc_slice(
+    MSK12_Task_t task,
     int64_t first_djc,
     int64_t num_djc,
     int64_t num_term,
@@ -2011,11 +2084,11 @@ MSK120_ResCode MSK120_get_djc_slice(
  * - `task` The optimizatioj task object
  * - `sense` 
  */
-typedef void (*MSK120_put_obj_sense_func_t)(MSK120_Task_t task,MSK120_ObjSense sense);
-extern MSK120_put_obj_sense_func_t MSK120_put_obj_sense_ptr;
-void MSK120_put_obj_sense(
-    MSK120_Task_t task,
-    MSK120_ObjSense sense);
+typedef void (*MSK12_put_obj_sense_func_t)(MSK12_Task_t task,MSK12_ObjSense sense);
+extern MSK12_put_obj_sense_func_t MSK12_put_obj_sense_ptr;
+void MSK12_put_obj_sense(
+    MSK12_Task_t task,
+    MSK12_ObjSense sense);
 
 /**
 
@@ -2024,9 +2097,9 @@ void MSK120_put_obj_sense(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef MSK120_ObjSense (*MSK120_get_obj_sense_func_t)(MSK120_Task_t task);
-extern MSK120_get_obj_sense_func_t MSK120_get_obj_sense_ptr;
-MSK120_ObjSense MSK120_get_obj_sense(MSK120_Task_t task);
+typedef MSK12_ObjSense (*MSK12_get_obj_sense_func_t)(MSK12_Task_t task);
+extern MSK12_get_obj_sense_func_t MSK12_get_obj_sense_ptr;
+MSK12_ObjSense MSK12_get_obj_sense(MSK12_Task_t task);
 
 /**
 
@@ -2036,10 +2109,10 @@ MSK120_ObjSense MSK120_get_obj_sense(MSK120_Task_t task);
  * - `task` The optimizatioj task object
  * - `row_idx` Index of the affine row
  */
-typedef MSK120_ResCode (*MSK120_put_obj_row_func_t)(MSK120_Task_t task,int64_t row_idx);
-extern MSK120_put_obj_row_func_t MSK120_put_obj_row_ptr;
-MSK120_ResCode MSK120_put_obj_row(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_obj_row_func_t)(MSK12_Task_t task,int64_t row_idx);
+extern MSK12_put_obj_row_func_t MSK12_put_obj_row_ptr;
+MSK12_ResCode MSK12_put_obj_row(
+    MSK12_Task_t task,
     int64_t row_idx);
 
 /**
@@ -2051,10 +2124,10 @@ MSK120_ResCode MSK120_put_obj_row(
  * - `row_idx[1]` (out) Index of the affine row
  * - `asgn[1]` (out) Returns non-zero to indicate that a value was assigned, or zero if it was not
  */
-typedef void (*MSK120_get_obj_row_func_t)(MSK120_Task_t task,int64_t row_idx[1],int asgn[1]);
-extern MSK120_get_obj_row_func_t MSK120_get_obj_row_ptr;
-void MSK120_get_obj_row(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_obj_row_func_t)(MSK12_Task_t task,int64_t row_idx[1],int asgn[1]);
+extern MSK12_get_obj_row_func_t MSK12_get_obj_row_ptr;
+void MSK12_get_obj_row(
+    MSK12_Task_t task,
     int64_t row_idx[1],
     int asgn[1]);
 
@@ -2066,11 +2139,11 @@ void MSK120_get_obj_row(
  * - `task` The optimizatioj task object
  * - `trm[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_optimize_func_t)(MSK120_Task_t task,MSK120_TrmCode trm[1]);
-extern MSK120_optimize_func_t MSK120_optimize_ptr;
-MSK120_ResCode MSK120_optimize(
-    MSK120_Task_t task,
-    MSK120_TrmCode trm[1]);
+typedef MSK12_ResCode (*MSK12_optimize_func_t)(MSK12_Task_t task,MSK12_TrmCode trm[1]);
+extern MSK12_optimize_func_t MSK12_optimize_ptr;
+MSK12_ResCode MSK12_optimize(
+    MSK12_Task_t task,
+    MSK12_TrmCode trm[1]);
 
 /**
 
@@ -2080,11 +2153,11 @@ MSK120_ResCode MSK120_optimize(
  * - `task` The optimizatioj task object
  * - `whichstream` 
  */
-typedef MSK120_ResCode (*MSK120_solution_summary_func_t)(MSK120_Task_t task,MSK120_StreamType whichstream);
-extern MSK120_solution_summary_func_t MSK120_solution_summary_ptr;
-MSK120_ResCode MSK120_solution_summary(
-    MSK120_Task_t task,
-    MSK120_StreamType whichstream);
+typedef MSK12_ResCode (*MSK12_solution_summary_func_t)(MSK12_Task_t task,MSK12_StreamType whichstream);
+extern MSK12_solution_summary_func_t MSK12_solution_summary_ptr;
+MSK12_ResCode MSK12_solution_summary(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream);
 
 /**
 
@@ -2098,15 +2171,15 @@ MSK120_ResCode MSK120_solution_summary(
  * - `int_cb_handle` 
  * - `int_cb_func` 
  */
-typedef MSK120_ResCode (*MSK120_optimize_callback_func_t)(MSK120_Task_t task,MSK120_TrmCode trm[1],MSK120_CallbackHandle cb_handle,MSK120_CallbackFunc cb_func,MSK120_CallbackHandle int_cb_handle,MSK120_IntSolCallbackFunc int_cb_func);
-extern MSK120_optimize_callback_func_t MSK120_optimize_callback_ptr;
-MSK120_ResCode MSK120_optimize_callback(
-    MSK120_Task_t task,
-    MSK120_TrmCode trm[1],
-    MSK120_CallbackHandle cb_handle,
-    MSK120_CallbackFunc cb_func,
-    MSK120_CallbackHandle int_cb_handle,
-    MSK120_IntSolCallbackFunc int_cb_func);
+typedef MSK12_ResCode (*MSK12_optimize_callback_func_t)(MSK12_Task_t task,MSK12_TrmCode trm[1],MSK12_CallbackHandle cb_handle,MSK12_CallbackFunc cb_func,MSK12_CallbackHandle int_cb_handle,MSK12_IntSolCallbackFunc int_cb_func);
+extern MSK12_optimize_callback_func_t MSK12_optimize_callback_ptr;
+MSK12_ResCode MSK12_optimize_callback(
+    MSK12_Task_t task,
+    MSK12_TrmCode trm[1],
+    MSK12_CallbackHandle cb_handle,
+    MSK12_CallbackFunc cb_func,
+    MSK12_CallbackHandle int_cb_handle,
+    MSK12_IntSolCallbackFunc int_cb_func);
 
 /**
 
@@ -2117,10 +2190,10 @@ MSK120_ResCode MSK120_optimize_callback(
  * - `server[.cstring]` (in) Server name with protocol and port, e.g. `https://optserver.mydomain:9876`.
  * - `cert[.cstring]` (in, nullable) 
  */
-typedef void (*MSK120_put_remote_solver_func_t)(MSK120_Task_t task,const char* server,NULLABLE const char* cert);
-extern MSK120_put_remote_solver_func_t MSK120_put_remote_solver_ptr;
-void MSK120_put_remote_solver(
-    MSK120_Task_t task,
+typedef void (*MSK12_put_remote_solver_func_t)(MSK12_Task_t task,const char* server,NULLABLE const char* cert);
+extern MSK12_put_remote_solver_func_t MSK12_put_remote_solver_ptr;
+void MSK12_put_remote_solver(
+    MSK12_Task_t task,
     const char* server,
     NULLABLE const char* cert);
 
@@ -2132,10 +2205,10 @@ void MSK120_put_remote_solver(
  * - `task` The optimizatioj task object
  * - `token[.cstring]` (in, nullable) 
  */
-typedef void (*MSK120_put_optserver_access_token_func_t)(MSK120_Task_t task,NULLABLE const char* token);
-extern MSK120_put_optserver_access_token_func_t MSK120_put_optserver_access_token_ptr;
-void MSK120_put_optserver_access_token(
-    MSK120_Task_t task,
+typedef void (*MSK12_put_optserver_access_token_func_t)(MSK12_Task_t task,NULLABLE const char* token);
+extern MSK12_put_optserver_access_token_func_t MSK12_put_optserver_access_token_ptr;
+void MSK12_put_optserver_access_token(
+    MSK12_Task_t task,
     NULLABLE const char* token);
 
 /**
@@ -2145,9 +2218,9 @@ void MSK120_put_optserver_access_token(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_num_sol_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_sol_func_t MSK120_get_num_sol_ptr;
-int32_t MSK120_get_num_sol(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_num_sol_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_sol_func_t MSK12_get_num_sol_ptr;
+int32_t MSK12_get_num_sol(MSK12_Task_t task);
 
 /**
 
@@ -2157,12 +2230,12 @@ int32_t MSK120_get_num_sol(MSK120_Task_t task);
  * - `sol_idx` Solution index
  * - `sol_type[1]` (out) Returns the type of the solution requested
  */
-typedef MSK120_ResCode (*MSK120_get_sol_type_func_t)(MSK120_Task_t task,int32_t sol_idx,MSK120_SolType sol_type[1]);
-extern MSK120_get_sol_type_func_t MSK120_get_sol_type_ptr;
-MSK120_ResCode MSK120_get_sol_type(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_type_func_t)(MSK12_Task_t task,int32_t sol_idx,MSK12_SolType sol_type[1]);
+extern MSK12_get_sol_type_func_t MSK12_get_sol_type_ptr;
+MSK12_ResCode MSK12_get_sol_type(
+    MSK12_Task_t task,
     int32_t sol_idx,
-    MSK120_SolType sol_type[1]);
+    MSK12_SolType sol_type[1]);
 
 /**
 
@@ -2173,13 +2246,13 @@ MSK120_ResCode MSK120_get_sol_type(
  * - `primal_sol_sta[1]` (out) 
  * - `dual_sol_sta[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_status_func_t)(MSK120_Task_t task,int32_t sol_idx,MSK120_SolSta primal_sol_sta[1],MSK120_SolSta dual_sol_sta[1]);
-extern MSK120_get_sol_status_func_t MSK120_get_sol_status_ptr;
-MSK120_ResCode MSK120_get_sol_status(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_status_func_t)(MSK12_Task_t task,int32_t sol_idx,MSK12_SolSta primal_sol_sta[1],MSK12_SolSta dual_sol_sta[1]);
+extern MSK12_get_sol_status_func_t MSK12_get_sol_status_ptr;
+MSK12_ResCode MSK12_get_sol_status(
+    MSK12_Task_t task,
     int32_t sol_idx,
-    MSK120_SolSta primal_sol_sta[1],
-    MSK120_SolSta dual_sol_sta[1]);
+    MSK12_SolSta primal_sol_sta[1],
+    MSK12_SolSta dual_sol_sta[1]);
 
 /**
 
@@ -2189,12 +2262,12 @@ MSK120_ResCode MSK120_get_sol_status(
  * - `sol_idx` Solution index
  * - `pro_sta[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_problem_status_func_t)(MSK120_Task_t task,int32_t sol_idx,MSK120_ProSta pro_sta[1]);
-extern MSK120_get_problem_status_func_t MSK120_get_problem_status_ptr;
-MSK120_ResCode MSK120_get_problem_status(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_problem_status_func_t)(MSK12_Task_t task,int32_t sol_idx,MSK12_ProSta pro_sta[1]);
+extern MSK12_get_problem_status_func_t MSK12_get_problem_status_ptr;
+MSK12_ResCode MSK12_get_problem_status(
+    MSK12_Task_t task,
     int32_t sol_idx,
-    MSK120_ProSta pro_sta[1]);
+    MSK12_ProSta pro_sta[1]);
 
 /**
 
@@ -2205,10 +2278,10 @@ MSK120_ResCode MSK120_get_problem_status(
  * - `sol_idx` Solution index
  * - `obj_val[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_primal_obj_func_t)(MSK120_Task_t task,int32_t sol_idx,double obj_val[1]);
-extern MSK120_get_primal_obj_func_t MSK120_get_primal_obj_ptr;
-MSK120_ResCode MSK120_get_primal_obj(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_primal_obj_func_t)(MSK12_Task_t task,int32_t sol_idx,double obj_val[1]);
+extern MSK12_get_primal_obj_func_t MSK12_get_primal_obj_ptr;
+MSK12_ResCode MSK12_get_primal_obj(
+    MSK12_Task_t task,
     int32_t sol_idx,
     double obj_val[1]);
 
@@ -2221,10 +2294,10 @@ MSK120_ResCode MSK120_get_primal_obj(
  * - `sol_idx` Solution index
  * - `obj_val[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_dual_obj_func_t)(MSK120_Task_t task,int32_t sol_idx,double obj_val[1]);
-extern MSK120_get_dual_obj_func_t MSK120_get_dual_obj_ptr;
-MSK120_ResCode MSK120_get_dual_obj(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_dual_obj_func_t)(MSK12_Task_t task,int32_t sol_idx,double obj_val[1]);
+extern MSK12_get_dual_obj_func_t MSK12_get_dual_obj_ptr;
+MSK12_ResCode MSK12_get_dual_obj(
+    MSK12_Task_t task,
     int32_t sol_idx,
     double obj_val[1]);
 
@@ -2239,10 +2312,10 @@ MSK120_ResCode MSK120_get_dual_obj(
  * - `num_var` Number of elements in slice.
  * - `xx[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_xx_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* xx);
-extern MSK120_get_sol_xx_slice_func_t MSK120_get_sol_xx_slice_ptr;
-MSK120_ResCode MSK120_get_sol_xx_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_xx_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* xx);
+extern MSK12_get_sol_xx_slice_func_t MSK12_get_sol_xx_slice_ptr;
+MSK12_ResCode MSK12_get_sol_xx_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2258,10 +2331,10 @@ MSK120_ResCode MSK120_get_sol_xx_slice(
  * - `num_var` Number of variables
  * - `slx[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_slx_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* slx);
-extern MSK120_get_sol_slx_slice_func_t MSK120_get_sol_slx_slice_ptr;
-MSK120_ResCode MSK120_get_sol_slx_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_slx_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* slx);
+extern MSK12_get_sol_slx_slice_func_t MSK12_get_sol_slx_slice_ptr;
+MSK12_ResCode MSK12_get_sol_slx_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2277,10 +2350,10 @@ MSK120_ResCode MSK120_get_sol_slx_slice(
  * - `num_var` Number of variables
  * - `sux[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sux_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* sux);
-extern MSK120_get_sol_sux_slice_func_t MSK120_get_sol_sux_slice_ptr;
-MSK120_ResCode MSK120_get_sol_sux_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sux_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,double* sux);
+extern MSK12_get_sol_sux_slice_func_t MSK12_get_sol_sux_slice_ptr;
+MSK12_ResCode MSK12_get_sol_sux_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2296,10 +2369,10 @@ MSK120_ResCode MSK120_get_sol_sux_slice(
  * - `num_var` Number of variables
  * - `barx[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_barxj_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t barvar_idx,int64_t num_var,double* barx);
-extern MSK120_get_sol_barxj_func_t MSK120_get_sol_barxj_ptr;
-MSK120_ResCode MSK120_get_sol_barxj(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_barxj_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t barvar_idx,int64_t num_var,double* barx);
+extern MSK12_get_sol_barxj_func_t MSK12_get_sol_barxj_ptr;
+MSK12_ResCode MSK12_get_sol_barxj(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t barvar_idx,
     int64_t num_var,
@@ -2315,10 +2388,10 @@ MSK120_ResCode MSK120_get_sol_barxj(
  * - `num_elm` Number of positive semidefinite non-zero entries
  * - `bars[num_elm]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_barsj_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t barvar_idx,int64_t num_elm,double* bars);
-extern MSK120_get_sol_barsj_func_t MSK120_get_sol_barsj_ptr;
-MSK120_ResCode MSK120_get_sol_barsj(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_barsj_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t barvar_idx,int64_t num_elm,double* bars);
+extern MSK12_get_sol_barsj_func_t MSK12_get_sol_barsj_ptr;
+MSK12_ResCode MSK12_get_sol_barsj(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t barvar_idx,
     int64_t num_elm,
@@ -2336,10 +2409,10 @@ MSK120_ResCode MSK120_get_sol_barsj(
  * - `num_elm` Number of positive semidefinite non-zero entries
  * - `barx[num_elm]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_barx_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int64_t num_elm,double* barx);
-extern MSK120_get_sol_barx_slice_func_t MSK120_get_sol_barx_slice_ptr;
-MSK120_ResCode MSK120_get_sol_barx_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_barx_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int64_t num_elm,double* barx);
+extern MSK12_get_sol_barx_slice_func_t MSK12_get_sol_barx_slice_ptr;
+MSK12_ResCode MSK12_get_sol_barx_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_barvar,
     int32_t num_barvar,
@@ -2357,10 +2430,10 @@ MSK120_ResCode MSK120_get_sol_barx_slice(
  * - `num_elm` Number of positive semidefinite non-zero entries
  * - `bars[num_elm]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_bars_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int64_t num_elm,double* bars);
-extern MSK120_get_sol_bars_slice_func_t MSK120_get_sol_bars_slice_ptr;
-MSK120_ResCode MSK120_get_sol_bars_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_bars_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int64_t num_elm,double* bars);
+extern MSK12_get_sol_bars_slice_func_t MSK12_get_sol_bars_slice_ptr;
+MSK12_ResCode MSK12_get_sol_bars_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_barvar,
     int32_t num_barvar,
@@ -2377,10 +2450,10 @@ MSK120_ResCode MSK120_get_sol_bars_slice(
  * - `var_idx` index of the variable
  * - `basic[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_xj_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t var_idx,int basic[1]);
-extern MSK120_get_sol_basic_xj_func_t MSK120_get_sol_basic_xj_ptr;
-MSK120_ResCode MSK120_get_sol_basic_xj(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_xj_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t var_idx,int basic[1]);
+extern MSK12_get_sol_basic_xj_func_t MSK12_get_sol_basic_xj_ptr;
+MSK12_ResCode MSK12_get_sol_basic_xj(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t var_idx,
     int basic[1]);
@@ -2395,10 +2468,10 @@ MSK120_ResCode MSK120_get_sol_basic_xj(
  * - `barvar_idx` index of the variable
  * - `basic[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_barx_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t barvar_idx,int basic[1]);
-extern MSK120_get_sol_basic_barx_func_t MSK120_get_sol_basic_barx_ptr;
-MSK120_ResCode MSK120_get_sol_basic_barx(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_barx_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t barvar_idx,int basic[1]);
+extern MSK12_get_sol_basic_barx_func_t MSK12_get_sol_basic_barx_ptr;
+MSK12_ResCode MSK12_get_sol_basic_barx(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t barvar_idx,
     int basic[1]);
@@ -2412,10 +2485,10 @@ MSK120_ResCode MSK120_get_sol_basic_barx(
  * - `con_idx` Constraint index 
  * - `basic[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_con_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t con_idx,int basic[1]);
-extern MSK120_get_sol_basic_con_func_t MSK120_get_sol_basic_con_ptr;
-MSK120_ResCode MSK120_get_sol_basic_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_con_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t con_idx,int basic[1]);
+extern MSK12_get_sol_basic_con_func_t MSK12_get_sol_basic_con_ptr;
+MSK12_ResCode MSK12_get_sol_basic_con(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t con_idx,
     int basic[1]);
@@ -2431,10 +2504,10 @@ MSK120_ResCode MSK120_get_sol_basic_con(
  * - `low_binding[1]` (out) 
  * - `upr_binding[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_x_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t var_idx,int low_binding[1],int upr_binding[1]);
-extern MSK120_get_sol_sta_x_func_t MSK120_get_sol_sta_x_ptr;
-MSK120_ResCode MSK120_get_sol_sta_x(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_x_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t var_idx,int low_binding[1],int upr_binding[1]);
+extern MSK12_get_sol_sta_x_func_t MSK12_get_sol_sta_x_ptr;
+MSK12_ResCode MSK12_get_sol_sta_x(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t var_idx,
     int low_binding[1],
@@ -2450,10 +2523,10 @@ MSK120_ResCode MSK120_get_sol_sta_x(
  * - `barvar_idx` Index of the variable
  * - `binding[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_barx_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t barvar_idx,int binding[1]);
-extern MSK120_get_sol_sta_barx_func_t MSK120_get_sol_sta_barx_ptr;
-MSK120_ResCode MSK120_get_sol_sta_barx(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_barx_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t barvar_idx,int binding[1]);
+extern MSK12_get_sol_sta_barx_func_t MSK12_get_sol_sta_barx_ptr;
+MSK12_ResCode MSK12_get_sol_sta_barx(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t barvar_idx,
     int binding[1]);
@@ -2467,10 +2540,10 @@ MSK120_ResCode MSK120_get_sol_sta_barx(
  * - `con_idx` Constraint index 
  * - `binding[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_con_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t con_idx,int binding[1]);
-extern MSK120_get_sol_sta_con_func_t MSK120_get_sol_sta_con_ptr;
-MSK120_ResCode MSK120_get_sol_sta_con(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_con_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t con_idx,int binding[1]);
+extern MSK12_get_sol_sta_con_func_t MSK12_get_sol_sta_con_ptr;
+MSK12_ResCode MSK12_get_sol_sta_con(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t con_idx,
     int binding[1]);
@@ -2485,10 +2558,10 @@ MSK120_ResCode MSK120_get_sol_sta_con(
  * - `num_var` Number of variables
  * - `basic[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_x_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* basic);
-extern MSK120_get_sol_basic_x_slice_func_t MSK120_get_sol_basic_x_slice_ptr;
-MSK120_ResCode MSK120_get_sol_basic_x_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_x_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* basic);
+extern MSK12_get_sol_basic_x_slice_func_t MSK12_get_sol_basic_x_slice_ptr;
+MSK12_ResCode MSK12_get_sol_basic_x_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2504,10 +2577,10 @@ MSK120_ResCode MSK120_get_sol_basic_x_slice(
  * - `num_var` Number of variables
  * - `basic[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_barx_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* basic);
-extern MSK120_get_sol_basic_barx_slice_func_t MSK120_get_sol_basic_barx_slice_ptr;
-MSK120_ResCode MSK120_get_sol_basic_barx_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_barx_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* basic);
+extern MSK12_get_sol_basic_barx_slice_func_t MSK12_get_sol_basic_barx_slice_ptr;
+MSK12_ResCode MSK12_get_sol_basic_barx_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2523,10 +2596,10 @@ MSK120_ResCode MSK120_get_sol_basic_barx_slice(
  * - `num_con` Number of constraints
  * - `basic[num_con]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_basic_con_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int* basic);
-extern MSK120_get_sol_basic_con_slice_func_t MSK120_get_sol_basic_con_slice_ptr;
-MSK120_ResCode MSK120_get_sol_basic_con_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_basic_con_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int* basic);
+extern MSK12_get_sol_basic_con_slice_func_t MSK12_get_sol_basic_con_slice_ptr;
+MSK12_ResCode MSK12_get_sol_basic_con_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t first_con,
     int64_t num_con,
@@ -2543,10 +2616,10 @@ MSK120_ResCode MSK120_get_sol_basic_con_slice(
  * - `low_binding[num_var]` (out) 
  * - `upr_binding[num_var]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_x_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* low_binding,int* upr_binding);
-extern MSK120_get_sol_sta_x_slice_func_t MSK120_get_sol_sta_x_slice_ptr;
-MSK120_ResCode MSK120_get_sol_sta_x_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_x_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_var,int32_t num_var,int* low_binding,int* upr_binding);
+extern MSK12_get_sol_sta_x_slice_func_t MSK12_get_sol_sta_x_slice_ptr;
+MSK12_ResCode MSK12_get_sol_sta_x_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_var,
     int32_t num_var,
@@ -2563,10 +2636,10 @@ MSK120_ResCode MSK120_get_sol_sta_x_slice(
  * - `num_barvar` Number of variables
  * - `bindnig[num_barvar]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_barx_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int* bindnig);
-extern MSK120_get_sol_sta_barx_slice_func_t MSK120_get_sol_sta_barx_slice_ptr;
-MSK120_ResCode MSK120_get_sol_sta_barx_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_barx_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t first_barvar,int32_t num_barvar,int* bindnig);
+extern MSK12_get_sol_sta_barx_slice_func_t MSK12_get_sol_sta_barx_slice_ptr;
+MSK12_ResCode MSK12_get_sol_sta_barx_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t first_barvar,
     int32_t num_barvar,
@@ -2582,10 +2655,10 @@ MSK120_ResCode MSK120_get_sol_sta_barx_slice(
  * - `num_con` Number of constraints
  * - `binding[num_con]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_sta_con_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int* binding);
-extern MSK120_get_sol_sta_con_slice_func_t MSK120_get_sol_sta_con_slice_ptr;
-MSK120_ResCode MSK120_get_sol_sta_con_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_sta_con_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int* binding);
+extern MSK12_get_sol_sta_con_slice_func_t MSK12_get_sol_sta_con_slice_ptr;
+MSK12_ResCode MSK12_get_sol_sta_con_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t first_con,
     int64_t num_con,
@@ -2603,10 +2676,10 @@ MSK120_ResCode MSK120_get_sol_sta_con_slice(
  * - `num_elm` Total number of scalar elements in constraint slice.
  * - `y[num_elm]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_sol_y_slice_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int64_t num_elm,double* y);
-extern MSK120_get_sol_y_slice_func_t MSK120_get_sol_y_slice_ptr;
-MSK120_ResCode MSK120_get_sol_y_slice(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_sol_y_slice_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t first_con,int64_t num_con,int64_t num_elm,double* y);
+extern MSK12_get_sol_y_slice_func_t MSK12_get_sol_y_slice_ptr;
+MSK12_ResCode MSK12_get_sol_y_slice(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t first_con,
     int64_t num_con,
@@ -2620,9 +2693,9 @@ MSK120_ResCode MSK120_get_sol_y_slice(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_num_input_solutions_func_t)(MSK120_Task_t task);
-extern MSK120_get_num_input_solutions_func_t MSK120_get_num_input_solutions_ptr;
-int32_t MSK120_get_num_input_solutions(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_num_input_solutions_func_t)(MSK12_Task_t task);
+extern MSK12_get_num_input_solutions_func_t MSK12_get_num_input_solutions_ptr;
+int32_t MSK12_get_num_input_solutions(MSK12_Task_t task);
 
 /**
 
@@ -2632,10 +2705,10 @@ int32_t MSK120_get_num_input_solutions(MSK120_Task_t task);
  * - `task` The optimizatioj task object
  * - `sol_idx` Solution index
  */
-typedef MSK120_ResCode (*MSK120_copy_sol_to_input_func_t)(MSK120_Task_t task,int32_t sol_idx);
-extern MSK120_copy_sol_to_input_func_t MSK120_copy_sol_to_input_ptr;
-MSK120_ResCode MSK120_copy_sol_to_input(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_copy_sol_to_input_func_t)(MSK12_Task_t task,int32_t sol_idx);
+extern MSK12_copy_sol_to_input_func_t MSK12_copy_sol_to_input_ptr;
+MSK12_ResCode MSK12_copy_sol_to_input(
+    MSK12_Task_t task,
     int32_t sol_idx);
 
 /**
@@ -2646,11 +2719,11 @@ MSK120_ResCode MSK120_copy_sol_to_input(
  * - `task` The optimizatioj task object
  * - `soltype` 
  */
-typedef MSK120_ResCode (*MSK120_append_sol_func_t)(MSK120_Task_t task,MSK120_SolType soltype);
-extern MSK120_append_sol_func_t MSK120_append_sol_ptr;
-MSK120_ResCode MSK120_append_sol(
-    MSK120_Task_t task,
-    MSK120_SolType soltype);
+typedef MSK12_ResCode (*MSK12_append_sol_func_t)(MSK12_Task_t task,MSK12_SolType soltype);
+extern MSK12_append_sol_func_t MSK12_append_sol_ptr;
+MSK12_ResCode MSK12_append_sol(
+    MSK12_Task_t task,
+    MSK12_SolType soltype);
 
 /**
 
@@ -2661,10 +2734,10 @@ MSK120_ResCode MSK120_append_sol(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_xx_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t num,const double* val);
-extern MSK120_put_sol_xx_func_t MSK120_put_sol_xx_ptr;
-MSK120_ResCode MSK120_put_sol_xx(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_xx_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t num,const double* val);
+extern MSK12_put_sol_xx_func_t MSK12_put_sol_xx_ptr;
+MSK12_ResCode MSK12_put_sol_xx(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t num,
     const double* val);
@@ -2678,10 +2751,10 @@ MSK120_ResCode MSK120_put_sol_xx(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_slx_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t num,const double* val);
-extern MSK120_put_sol_slx_func_t MSK120_put_sol_slx_ptr;
-MSK120_ResCode MSK120_put_sol_slx(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_slx_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t num,const double* val);
+extern MSK12_put_sol_slx_func_t MSK12_put_sol_slx_ptr;
+MSK12_ResCode MSK12_put_sol_slx(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t num,
     const double* val);
@@ -2695,10 +2768,10 @@ MSK120_ResCode MSK120_put_sol_slx(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_sux_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t num,const double* val);
-extern MSK120_put_sol_sux_func_t MSK120_put_sol_sux_ptr;
-MSK120_ResCode MSK120_put_sol_sux(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_sux_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t num,const double* val);
+extern MSK12_put_sol_sux_func_t MSK12_put_sol_sux_ptr;
+MSK12_ResCode MSK12_put_sol_sux(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t num,
     const double* val);
@@ -2712,10 +2785,10 @@ MSK120_ResCode MSK120_put_sol_sux(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_basic_x_func_t)(MSK120_Task_t task,int32_t sol_idx,int32_t num,const int32_t* val);
-extern MSK120_put_sol_basic_x_func_t MSK120_put_sol_basic_x_ptr;
-MSK120_ResCode MSK120_put_sol_basic_x(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_basic_x_func_t)(MSK12_Task_t task,int32_t sol_idx,int32_t num,const int32_t* val);
+extern MSK12_put_sol_basic_x_func_t MSK12_put_sol_basic_x_ptr;
+MSK12_ResCode MSK12_put_sol_basic_x(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int32_t num,
     const int32_t* val);
@@ -2729,10 +2802,10 @@ MSK120_ResCode MSK120_put_sol_basic_x(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_barx_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t num,const double* val);
-extern MSK120_put_sol_barx_func_t MSK120_put_sol_barx_ptr;
-MSK120_ResCode MSK120_put_sol_barx(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_barx_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t num,const double* val);
+extern MSK12_put_sol_barx_func_t MSK12_put_sol_barx_ptr;
+MSK12_ResCode MSK12_put_sol_barx(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t num,
     const double* val);
@@ -2746,10 +2819,10 @@ MSK120_ResCode MSK120_put_sol_barx(
  * - `num` Number of items
  * - `xx[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_bars_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t num,const double* xx);
-extern MSK120_put_sol_bars_func_t MSK120_put_sol_bars_ptr;
-MSK120_ResCode MSK120_put_sol_bars(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_bars_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t num,const double* xx);
+extern MSK12_put_sol_bars_func_t MSK12_put_sol_bars_ptr;
+MSK12_ResCode MSK12_put_sol_bars(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t num,
     const double* xx);
@@ -2764,10 +2837,10 @@ MSK120_ResCode MSK120_put_sol_bars(
  * - `num` Number of items
  * - `xx[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_yi_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t i,int64_t num,const double* xx);
-extern MSK120_put_sol_yi_func_t MSK120_put_sol_yi_ptr;
-MSK120_ResCode MSK120_put_sol_yi(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_yi_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t i,int64_t num,const double* xx);
+extern MSK12_put_sol_yi_func_t MSK12_put_sol_yi_ptr;
+MSK12_ResCode MSK12_put_sol_yi(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t i,
     int64_t num,
@@ -2782,25 +2855,25 @@ MSK120_ResCode MSK120_put_sol_yi(
  * - `num` Number of items
  * - `val[num]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_sol_basic_c_func_t)(MSK120_Task_t task,int32_t sol_idx,int64_t num,const int32_t* val);
-extern MSK120_put_sol_basic_c_func_t MSK120_put_sol_basic_c_ptr;
-MSK120_ResCode MSK120_put_sol_basic_c(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_sol_basic_c_func_t)(MSK12_Task_t task,int32_t sol_idx,int64_t num,const int32_t* val);
+extern MSK12_put_sol_basic_c_func_t MSK12_put_sol_basic_c_ptr;
+MSK12_ResCode MSK12_put_sol_basic_c(
+    MSK12_Task_t task,
     int32_t sol_idx,
     int64_t num,
     const int32_t* val);
 
-typedef int32_t (*MSK120_get_num_iinf_func_t)();
-extern MSK120_get_num_iinf_func_t MSK120_get_num_iinf_ptr;
-int32_t MSK120_get_num_iinf();
+typedef int32_t (*MSK12_get_num_iinf_func_t)();
+extern MSK12_get_num_iinf_func_t MSK12_get_num_iinf_ptr;
+int32_t MSK12_get_num_iinf();
 
-typedef int32_t (*MSK120_get_num_liinf_func_t)();
-extern MSK120_get_num_liinf_func_t MSK120_get_num_liinf_ptr;
-int32_t MSK120_get_num_liinf();
+typedef int32_t (*MSK12_get_num_liinf_func_t)();
+extern MSK12_get_num_liinf_func_t MSK12_get_num_liinf_ptr;
+int32_t MSK12_get_num_liinf();
 
-typedef int32_t (*MSK120_get_num_dinf_func_t)();
-extern MSK120_get_num_dinf_func_t MSK120_get_num_dinf_ptr;
-int32_t MSK120_get_num_dinf();
+typedef int32_t (*MSK12_get_num_dinf_func_t)();
+extern MSK12_get_num_dinf_func_t MSK12_get_num_dinf_ptr;
+int32_t MSK12_get_num_dinf();
 
 /**
 
@@ -2810,10 +2883,10 @@ int32_t MSK120_get_num_dinf();
  * - `par_idx` 
  * - `value[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_iinf_func_t)(MSK120_Task_t task,int32_t par_idx,int32_t value[1]);
-extern MSK120_get_iinf_func_t MSK120_get_iinf_ptr;
-MSK120_ResCode MSK120_get_iinf(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_iinf_func_t)(MSK12_Task_t task,int32_t par_idx,int32_t value[1]);
+extern MSK12_get_iinf_func_t MSK12_get_iinf_ptr;
+MSK12_ResCode MSK12_get_iinf(
+    MSK12_Task_t task,
     int32_t par_idx,
     int32_t value[1]);
 
@@ -2825,10 +2898,10 @@ MSK120_ResCode MSK120_get_iinf(
  * - `par_idx` 
  * - `value[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_liinf_func_t)(MSK120_Task_t task,int32_t par_idx,int64_t value[1]);
-extern MSK120_get_liinf_func_t MSK120_get_liinf_ptr;
-MSK120_ResCode MSK120_get_liinf(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_liinf_func_t)(MSK12_Task_t task,int32_t par_idx,int64_t value[1]);
+extern MSK12_get_liinf_func_t MSK12_get_liinf_ptr;
+MSK12_ResCode MSK12_get_liinf(
+    MSK12_Task_t task,
     int32_t par_idx,
     int64_t value[1]);
 
@@ -2840,10 +2913,10 @@ MSK120_ResCode MSK120_get_liinf(
  * - `par_idx` 
  * - `value[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_dinf_func_t)(MSK120_Task_t task,int32_t par_idx,double value[1]);
-extern MSK120_get_dinf_func_t MSK120_get_dinf_ptr;
-MSK120_ResCode MSK120_get_dinf(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_dinf_func_t)(MSK12_Task_t task,int32_t par_idx,double value[1]);
+extern MSK12_get_dinf_func_t MSK12_get_dinf_ptr;
+MSK12_ResCode MSK12_get_dinf(
+    MSK12_Task_t task,
     int32_t par_idx,
     double value[1]);
 
@@ -2854,9 +2927,9 @@ MSK120_ResCode MSK120_get_dinf(
  * # Arguments
  * - `par_idx` 
  */
-typedef const char* (*MSK120_get_iinf_name_func_t)(int32_t par_idx);
-extern MSK120_get_iinf_name_func_t MSK120_get_iinf_name_ptr;
-const char* MSK120_get_iinf_name(int32_t par_idx);
+typedef const char* (*MSK12_get_iinf_name_func_t)(int32_t par_idx);
+extern MSK12_get_iinf_name_func_t MSK12_get_iinf_name_ptr;
+const char* MSK12_get_iinf_name(int32_t par_idx);
 
 /**
 
@@ -2865,9 +2938,9 @@ const char* MSK120_get_iinf_name(int32_t par_idx);
  * # Arguments
  * - `par_idx` 
  */
-typedef const char* (*MSK120_get_liinf_name_func_t)(int32_t par_idx);
-extern MSK120_get_liinf_name_func_t MSK120_get_liinf_name_ptr;
-const char* MSK120_get_liinf_name(int32_t par_idx);
+typedef const char* (*MSK12_get_liinf_name_func_t)(int32_t par_idx);
+extern MSK12_get_liinf_name_func_t MSK12_get_liinf_name_ptr;
+const char* MSK12_get_liinf_name(int32_t par_idx);
 
 /**
 
@@ -2876,9 +2949,9 @@ const char* MSK120_get_liinf_name(int32_t par_idx);
  * # Arguments
  * - `par_idx` 
  */
-typedef const char* (*MSK120_get_dinf_name_func_t)(int32_t par_idx);
-extern MSK120_get_dinf_name_func_t MSK120_get_dinf_name_ptr;
-const char* MSK120_get_dinf_name(int32_t par_idx);
+typedef const char* (*MSK12_get_dinf_name_func_t)(int32_t par_idx);
+extern MSK12_get_dinf_name_func_t MSK12_get_dinf_name_ptr;
+const char* MSK12_get_dinf_name(int32_t par_idx);
 
 /**
 
@@ -2887,9 +2960,9 @@ const char* MSK120_get_dinf_name(int32_t par_idx);
  * # Arguments
  * - `par_name[.cstring]` (in) Name of the parameter
  */
-typedef int32_t (*MSK120_get_iinf_index_func_t)(const char* par_name);
-extern MSK120_get_iinf_index_func_t MSK120_get_iinf_index_ptr;
-int32_t MSK120_get_iinf_index(const char* par_name);
+typedef int32_t (*MSK12_get_iinf_index_func_t)(const char* par_name);
+extern MSK12_get_iinf_index_func_t MSK12_get_iinf_index_ptr;
+int32_t MSK12_get_iinf_index(const char* par_name);
 
 /**
 
@@ -2898,9 +2971,9 @@ int32_t MSK120_get_iinf_index(const char* par_name);
  * # Arguments
  * - `par_name[.cstring]` (in) Name of the parameter
  */
-typedef int32_t (*MSK120_get_liinf_index_func_t)(const char* par_name);
-extern MSK120_get_liinf_index_func_t MSK120_get_liinf_index_ptr;
-int32_t MSK120_get_liinf_index(const char* par_name);
+typedef int32_t (*MSK12_get_liinf_index_func_t)(const char* par_name);
+extern MSK12_get_liinf_index_func_t MSK12_get_liinf_index_ptr;
+int32_t MSK12_get_liinf_index(const char* par_name);
 
 /**
 
@@ -2909,9 +2982,9 @@ int32_t MSK120_get_liinf_index(const char* par_name);
  * # Arguments
  * - `name[.cstring]` (in) 
  */
-typedef int32_t (*MSK120_get_dinf_index_func_t)(const char* name);
-extern MSK120_get_dinf_index_func_t MSK120_get_dinf_index_ptr;
-int32_t MSK120_get_dinf_index(const char* name);
+typedef int32_t (*MSK12_get_dinf_index_func_t)(const char* name);
+extern MSK12_get_dinf_index_func_t MSK12_get_dinf_index_ptr;
+int32_t MSK12_get_dinf_index(const char* name);
 
 /**
 
@@ -2922,10 +2995,10 @@ int32_t MSK120_get_dinf_index(const char* name);
  * - `par_name[.cstring]` (in) Name of the parameter
  * - `value[1]` (out) 
  */
-typedef int32_t (*MSK120_get_double_param_func_t)(MSK120_Task_t task,const char* par_name,double value[1]);
-extern MSK120_get_double_param_func_t MSK120_get_double_param_ptr;
-int32_t MSK120_get_double_param(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_double_param_func_t)(MSK12_Task_t task,const char* par_name,double value[1]);
+extern MSK12_get_double_param_func_t MSK12_get_double_param_ptr;
+int32_t MSK12_get_double_param(
+    MSK12_Task_t task,
     const char* par_name,
     double value[1]);
 
@@ -2936,9 +3009,9 @@ int32_t MSK120_get_double_param(
  * # Arguments
  * - `par_name[.cstring]` (in) Name of the parameter
  */
-typedef int32_t (*MSK120_get_double_param_index_func_t)(const char* par_name);
-extern MSK120_get_double_param_index_func_t MSK120_get_double_param_index_ptr;
-int32_t MSK120_get_double_param_index(const char* par_name);
+typedef int32_t (*MSK12_get_double_param_index_func_t)(const char* par_name);
+extern MSK12_get_double_param_index_func_t MSK12_get_double_param_index_ptr;
+int32_t MSK12_get_double_param_index(const char* par_name);
 
 /**
 
@@ -2947,17 +3020,17 @@ int32_t MSK120_get_double_param_index(const char* par_name);
  * # Arguments
  * - `par_idx` 
  */
-typedef const char* (*MSK120_get_double_param_name_func_t)(int32_t par_idx);
-extern MSK120_get_double_param_name_func_t MSK120_get_double_param_name_ptr;
-const char* MSK120_get_double_param_name(int32_t par_idx);
+typedef const char* (*MSK12_get_double_param_name_func_t)(int32_t par_idx);
+extern MSK12_get_double_param_name_func_t MSK12_get_double_param_name_ptr;
+const char* MSK12_get_double_param_name(int32_t par_idx);
 
 /**
 
  * Get the index corresponding to a double parameter name.
  */
-typedef int32_t (*MSK120_get_num_double_param_func_t)();
-extern MSK120_get_num_double_param_func_t MSK120_get_num_double_param_ptr;
-int32_t MSK120_get_num_double_param();
+typedef int32_t (*MSK12_get_num_double_param_func_t)();
+extern MSK12_get_num_double_param_func_t MSK12_get_num_double_param_ptr;
+int32_t MSK12_get_num_double_param();
 
 /**
 
@@ -2968,10 +3041,10 @@ int32_t MSK120_get_num_double_param();
  * - `buflen` 
  * - `buf[buflen]` (out) Target buffer
  */
-typedef void (*MSK120_get_all_double_params_func_t)(MSK120_Task_t task,int32_t buflen,double* buf);
-extern MSK120_get_all_double_params_func_t MSK120_get_all_double_params_ptr;
-void MSK120_get_all_double_params(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_all_double_params_func_t)(MSK12_Task_t task,int32_t buflen,double* buf);
+extern MSK12_get_all_double_params_func_t MSK12_get_all_double_params_ptr;
+void MSK12_get_all_double_params(
+    MSK12_Task_t task,
     int32_t buflen,
     double* buf);
 
@@ -2984,10 +3057,10 @@ void MSK120_get_all_double_params(
  * - `num_par` 
  * - `params[num_par]` (in) 
  */
-typedef void (*MSK120_put_all_double_params_func_t)(MSK120_Task_t task,int32_t num_par,const double* params);
-extern MSK120_put_all_double_params_func_t MSK120_put_all_double_params_ptr;
-void MSK120_put_all_double_params(
-    MSK120_Task_t task,
+typedef void (*MSK12_put_all_double_params_func_t)(MSK12_Task_t task,int32_t num_par,const double* params);
+extern MSK12_put_all_double_params_func_t MSK12_put_all_double_params_ptr;
+void MSK12_put_all_double_params(
+    MSK12_Task_t task,
     int32_t num_par,
     const double* params);
 
@@ -2998,9 +3071,9 @@ void MSK120_put_all_double_params(
  * # Arguments
  * - `par_name[.cstring]` (in) Name of the parameter
  */
-typedef int32_t (*MSK120_get_int_param_index_func_t)(const char* par_name);
-extern MSK120_get_int_param_index_func_t MSK120_get_int_param_index_ptr;
-int32_t MSK120_get_int_param_index(const char* par_name);
+typedef int32_t (*MSK12_get_int_param_index_func_t)(const char* par_name);
+extern MSK12_get_int_param_index_func_t MSK12_get_int_param_index_ptr;
+int32_t MSK12_get_int_param_index(const char* par_name);
 
 /**
 
@@ -3009,17 +3082,17 @@ int32_t MSK120_get_int_param_index(const char* par_name);
  * # Arguments
  * - `par_idx` 
  */
-typedef const char* (*MSK120_get_int_param_name_func_t)(int32_t par_idx);
-extern MSK120_get_int_param_name_func_t MSK120_get_int_param_name_ptr;
-const char* MSK120_get_int_param_name(int32_t par_idx);
+typedef const char* (*MSK12_get_int_param_name_func_t)(int32_t par_idx);
+extern MSK12_get_int_param_name_func_t MSK12_get_int_param_name_ptr;
+const char* MSK12_get_int_param_name(int32_t par_idx);
 
 /**
 
  * Get the index corresponding to a double parameter name.
  */
-typedef int32_t (*MSK120_get_num_int_param_func_t)();
-extern MSK120_get_num_int_param_func_t MSK120_get_num_int_param_ptr;
-int32_t MSK120_get_num_int_param();
+typedef int32_t (*MSK12_get_num_int_param_func_t)();
+extern MSK12_get_num_int_param_func_t MSK12_get_num_int_param_ptr;
+int32_t MSK12_get_num_int_param();
 
 /**
 
@@ -3030,10 +3103,10 @@ int32_t MSK120_get_num_int_param();
  * - `buflen` 
  * - `buf[buflen]` (out) Target buffer
  */
-typedef void (*MSK120_get_all_int_params_func_t)(MSK120_Task_t task,int32_t buflen,int32_t* buf);
-extern MSK120_get_all_int_params_func_t MSK120_get_all_int_params_ptr;
-void MSK120_get_all_int_params(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_all_int_params_func_t)(MSK12_Task_t task,int32_t buflen,int32_t* buf);
+extern MSK12_get_all_int_params_func_t MSK12_get_all_int_params_ptr;
+void MSK12_get_all_int_params(
+    MSK12_Task_t task,
     int32_t buflen,
     int32_t* buf);
 
@@ -3046,10 +3119,10 @@ void MSK120_get_all_int_params(
  * - `num_par` 
  * - `params[num_par]` (in) 
  */
-typedef void (*MSK120_put_all_int_params_func_t)(MSK120_Task_t task,int32_t num_par,const int32_t* params);
-extern MSK120_put_all_int_params_func_t MSK120_put_all_int_params_ptr;
-void MSK120_put_all_int_params(
-    MSK120_Task_t task,
+typedef void (*MSK12_put_all_int_params_func_t)(MSK12_Task_t task,int32_t num_par,const int32_t* params);
+extern MSK12_put_all_int_params_func_t MSK12_put_all_int_params_ptr;
+void MSK12_put_all_int_params(
+    MSK12_Task_t task,
     int32_t num_par,
     const int32_t* params);
 
@@ -3062,10 +3135,10 @@ void MSK120_put_all_int_params(
  * - `par_name[.cstring]` (in) Name of the parameter
  * - `value[1]` (out) 
  */
-typedef int32_t (*MSK120_get_int_param_func_t)(MSK120_Task_t task,const char* par_name,int32_t value[1]);
-extern MSK120_get_int_param_func_t MSK120_get_int_param_ptr;
-int32_t MSK120_get_int_param(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_int_param_func_t)(MSK12_Task_t task,const char* par_name,int32_t value[1]);
+extern MSK12_get_int_param_func_t MSK12_get_int_param_ptr;
+int32_t MSK12_get_int_param(
+    MSK12_Task_t task,
     const char* par_name,
     int32_t value[1]);
 
@@ -3077,10 +3150,10 @@ int32_t MSK120_get_int_param(
  * - `task` The optimizatioj task object
  * - `par_name[.cstring]` (in) Name of the parameter
  */
-typedef int32_t (*MSK120_get_param_str_len_func_t)(MSK120_Task_t task,const char* par_name);
-extern MSK120_get_param_str_len_func_t MSK120_get_param_str_len_ptr;
-int32_t MSK120_get_param_str_len(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_param_str_len_func_t)(MSK12_Task_t task,const char* par_name);
+extern MSK12_get_param_str_len_func_t MSK12_get_param_str_len_ptr;
+int32_t MSK12_get_param_str_len(
+    MSK12_Task_t task,
     const char* par_name);
 
 /**
@@ -3093,10 +3166,10 @@ int32_t MSK120_get_param_str_len(
  * - `length` 
  * - `buf[length]` (out) If the parameter is not recognized, the returned string is 0.
  */
-typedef void (*MSK120_get_param_str_func_t)(MSK120_Task_t task,const char* name,int32_t length,char* buf);
-extern MSK120_get_param_str_func_t MSK120_get_param_str_ptr;
-void MSK120_get_param_str(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_param_str_func_t)(MSK12_Task_t task,const char* name,int32_t length,char* buf);
+extern MSK12_get_param_str_func_t MSK12_get_param_str_ptr;
+void MSK12_get_param_str(
+    MSK12_Task_t task,
     const char* name,
     int32_t length,
     char* buf);
@@ -3110,10 +3183,10 @@ void MSK120_get_param_str(
  * - `par_name[.cstring]` (in) The parameter name is the lower case name of the MOSEK parameter without "MSK_" prefix
  * - `value` 
  */
-typedef int32_t (*MSK120_put_double_param_func_t)(MSK120_Task_t task,const char* par_name,double value);
-extern MSK120_put_double_param_func_t MSK120_put_double_param_ptr;
-int32_t MSK120_put_double_param(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_put_double_param_func_t)(MSK12_Task_t task,const char* par_name,double value);
+extern MSK12_put_double_param_func_t MSK12_put_double_param_ptr;
+int32_t MSK12_put_double_param(
+    MSK12_Task_t task,
     const char* par_name,
     double value);
 
@@ -3126,10 +3199,10 @@ int32_t MSK120_put_double_param(
  * - `par_name[.cstring]` (in) The parameter name is the lower case name of the MOSEK parameter without "MSK_" prefix
  * - `value` 
  */
-typedef int32_t (*MSK120_put_int_param_func_t)(MSK120_Task_t task,const char* par_name,int32_t value);
-extern MSK120_put_int_param_func_t MSK120_put_int_param_ptr;
-int32_t MSK120_put_int_param(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_put_int_param_func_t)(MSK12_Task_t task,const char* par_name,int32_t value);
+extern MSK12_put_int_param_func_t MSK12_put_int_param_ptr;
+int32_t MSK12_put_int_param(
+    MSK12_Task_t task,
     const char* par_name,
     int32_t value);
 
@@ -3147,10 +3220,10 @@ either the ascii representation of the integer value or, for
 parameters that accept symbolic values, the lower case value
 name without "MSK_" prefix.
  */
-typedef int32_t (*MSK120_put_param_str_func_t)(MSK120_Task_t task,const char* par_name,const char* value);
-extern MSK120_put_param_str_func_t MSK120_put_param_str_ptr;
-int32_t MSK120_put_param_str(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_put_param_str_func_t)(MSK12_Task_t task,const char* par_name,const char* value);
+extern MSK12_put_param_str_func_t MSK12_put_param_str_ptr;
+int32_t MSK12_put_param_str(
+    MSK12_Task_t task,
     const char* par_name,
     const char* value);
 
@@ -3160,9 +3233,9 @@ int32_t MSK120_put_param_str(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_task_name_len_func_t)(MSK120_Task_t task);
-extern MSK120_get_task_name_len_func_t MSK120_get_task_name_len_ptr;
-int32_t MSK120_get_task_name_len(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_task_name_len_func_t)(MSK12_Task_t task);
+extern MSK12_get_task_name_len_func_t MSK12_get_task_name_len_ptr;
+int32_t MSK12_get_task_name_len(MSK12_Task_t task);
 
 /**
 
@@ -3170,9 +3243,9 @@ int32_t MSK120_get_task_name_len(MSK120_Task_t task);
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef int32_t (*MSK120_get_obj_name_len_func_t)(MSK120_Task_t task);
-extern MSK120_get_obj_name_len_func_t MSK120_get_obj_name_len_ptr;
-int32_t MSK120_get_obj_name_len(MSK120_Task_t task);
+typedef int32_t (*MSK12_get_obj_name_len_func_t)(MSK12_Task_t task);
+extern MSK12_get_obj_name_len_func_t MSK12_get_obj_name_len_ptr;
+int32_t MSK12_get_obj_name_len(MSK12_Task_t task);
 
 /**
 
@@ -3182,10 +3255,10 @@ int32_t MSK120_get_obj_name_len(MSK120_Task_t task);
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef void (*MSK120_get_task_name_func_t)(MSK120_Task_t task,int32_t capacity,char* buf);
-extern MSK120_get_task_name_func_t MSK120_get_task_name_ptr;
-void MSK120_get_task_name(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_task_name_func_t)(MSK12_Task_t task,int32_t capacity,char* buf);
+extern MSK12_get_task_name_func_t MSK12_get_task_name_ptr;
+void MSK12_get_task_name(
+    MSK12_Task_t task,
     int32_t capacity,
     char* buf);
 
@@ -3197,10 +3270,10 @@ void MSK120_get_task_name(
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef void (*MSK120_get_obj_name_func_t)(MSK120_Task_t task,int32_t capacity,char* buf);
-extern MSK120_get_obj_name_func_t MSK120_get_obj_name_ptr;
-void MSK120_get_obj_name(
-    MSK120_Task_t task,
+typedef void (*MSK12_get_obj_name_func_t)(MSK12_Task_t task,int32_t capacity,char* buf);
+extern MSK12_get_obj_name_func_t MSK12_get_obj_name_ptr;
+void MSK12_get_obj_name(
+    MSK12_Task_t task,
     int32_t capacity,
     char* buf);
 
@@ -3211,10 +3284,10 @@ void MSK120_get_obj_name(
  * - `task` The optimizatioj task object
  * - `name[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_task_name_func_t)(MSK120_Task_t task,const char* name);
-extern MSK120_put_task_name_func_t MSK120_put_task_name_ptr;
-MSK120_ResCode MSK120_put_task_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_task_name_func_t)(MSK12_Task_t task,const char* name);
+extern MSK12_put_task_name_func_t MSK12_put_task_name_ptr;
+MSK12_ResCode MSK12_put_task_name(
+    MSK12_Task_t task,
     const char* name);
 
 /**
@@ -3224,10 +3297,10 @@ MSK120_ResCode MSK120_put_task_name(
  * - `task` The optimizatioj task object
  * - `name[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_obj_name_func_t)(MSK120_Task_t task,const char* name);
-extern MSK120_put_obj_name_func_t MSK120_put_obj_name_ptr;
-MSK120_ResCode MSK120_put_obj_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_obj_name_func_t)(MSK12_Task_t task,const char* name);
+extern MSK12_put_obj_name_func_t MSK12_put_obj_name_ptr;
+MSK12_ResCode MSK12_put_obj_name(
+    MSK12_Task_t task,
     const char* name);
 
 /**
@@ -3238,10 +3311,10 @@ MSK120_ResCode MSK120_put_obj_name(
  * - `var_idx` Variable index
  * - `name_len[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_var_name_len_func_t)(MSK120_Task_t task,int32_t var_idx,int32_t name_len[1]);
-extern MSK120_get_var_name_len_func_t MSK120_get_var_name_len_ptr;
-MSK120_ResCode MSK120_get_var_name_len(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_name_len_func_t)(MSK12_Task_t task,int32_t var_idx,int32_t name_len[1]);
+extern MSK12_get_var_name_len_func_t MSK12_get_var_name_len_ptr;
+MSK12_ResCode MSK12_get_var_name_len(
+    MSK12_Task_t task,
     int32_t var_idx,
     int32_t name_len[1]);
 
@@ -3252,10 +3325,10 @@ MSK120_ResCode MSK120_get_var_name_len(
  * - `task` The optimizatioj task object
  * - `var_idx` Variable index
  */
-typedef int32_t (*MSK120_get_var_name_len2_func_t)(MSK120_Task_t task,int32_t var_idx);
-extern MSK120_get_var_name_len2_func_t MSK120_get_var_name_len2_ptr;
-int32_t MSK120_get_var_name_len2(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_var_name_len2_func_t)(MSK12_Task_t task,int32_t var_idx);
+extern MSK12_get_var_name_len2_func_t MSK12_get_var_name_len2_ptr;
+int32_t MSK12_get_var_name_len2(
+    MSK12_Task_t task,
     int32_t var_idx);
 
 /**
@@ -3266,10 +3339,10 @@ int32_t MSK120_get_var_name_len2(
  * - `barvar_idx` Positive semi-definite variable index
  * - `name_len[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_barvar_name_len_func_t)(MSK120_Task_t task,int32_t barvar_idx,int32_t name_len[1]);
-extern MSK120_get_barvar_name_len_func_t MSK120_get_barvar_name_len_ptr;
-MSK120_ResCode MSK120_get_barvar_name_len(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_barvar_name_len_func_t)(MSK12_Task_t task,int32_t barvar_idx,int32_t name_len[1]);
+extern MSK12_get_barvar_name_len_func_t MSK12_get_barvar_name_len_ptr;
+MSK12_ResCode MSK12_get_barvar_name_len(
+    MSK12_Task_t task,
     int32_t barvar_idx,
     int32_t name_len[1]);
 
@@ -3280,10 +3353,10 @@ MSK120_ResCode MSK120_get_barvar_name_len(
  * - `task` The optimizatioj task object
  * - `barvar_idx` Positive semi-definite variable index
  */
-typedef int32_t (*MSK120_get_barvar_name_len2_func_t)(MSK120_Task_t task,int32_t barvar_idx);
-extern MSK120_get_barvar_name_len2_func_t MSK120_get_barvar_name_len2_ptr;
-int32_t MSK120_get_barvar_name_len2(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_barvar_name_len2_func_t)(MSK12_Task_t task,int32_t barvar_idx);
+extern MSK12_get_barvar_name_len2_func_t MSK12_get_barvar_name_len2_ptr;
+int32_t MSK12_get_barvar_name_len2(
+    MSK12_Task_t task,
     int32_t barvar_idx);
 
 /**
@@ -3295,10 +3368,10 @@ int32_t MSK120_get_barvar_name_len2(
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_get_var_name_func_t)(MSK120_Task_t task,int32_t var_idx,int32_t capacity,char* buf);
-extern MSK120_get_var_name_func_t MSK120_get_var_name_ptr;
-MSK120_ResCode MSK120_get_var_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_var_name_func_t)(MSK12_Task_t task,int32_t var_idx,int32_t capacity,char* buf);
+extern MSK12_get_var_name_func_t MSK12_get_var_name_ptr;
+MSK12_ResCode MSK12_get_var_name(
+    MSK12_Task_t task,
     int32_t var_idx,
     int32_t capacity,
     char* buf);
@@ -3312,10 +3385,10 @@ MSK120_ResCode MSK120_get_var_name(
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_get_barvar_name_func_t)(MSK120_Task_t task,int32_t barvar_idx,int32_t capacity,char* buf);
-extern MSK120_get_barvar_name_func_t MSK120_get_barvar_name_ptr;
-MSK120_ResCode MSK120_get_barvar_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_barvar_name_func_t)(MSK12_Task_t task,int32_t barvar_idx,int32_t capacity,char* buf);
+extern MSK12_get_barvar_name_func_t MSK12_get_barvar_name_ptr;
+MSK12_ResCode MSK12_get_barvar_name(
+    MSK12_Task_t task,
     int32_t barvar_idx,
     int32_t capacity,
     char* buf);
@@ -3328,10 +3401,10 @@ MSK120_ResCode MSK120_get_barvar_name(
  * - `var_idx` Variable index
  * - `name[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_var_name_func_t)(MSK120_Task_t task,int32_t var_idx,const char* name);
-extern MSK120_put_var_name_func_t MSK120_put_var_name_ptr;
-MSK120_ResCode MSK120_put_var_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_var_name_func_t)(MSK12_Task_t task,int32_t var_idx,const char* name);
+extern MSK12_put_var_name_func_t MSK12_put_var_name_ptr;
+MSK12_ResCode MSK12_put_var_name(
+    MSK12_Task_t task,
     int32_t var_idx,
     const char* name);
 
@@ -3343,10 +3416,10 @@ MSK120_ResCode MSK120_put_var_name(
  * - `barvar_idx` Positive semi-definite variable index
  * - `name[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_put_barvar_name_func_t)(MSK120_Task_t task,int32_t barvar_idx,const char* name);
-extern MSK120_put_barvar_name_func_t MSK120_put_barvar_name_ptr;
-MSK120_ResCode MSK120_put_barvar_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_barvar_name_func_t)(MSK12_Task_t task,int32_t barvar_idx,const char* name);
+extern MSK12_put_barvar_name_func_t MSK12_put_barvar_name_ptr;
+MSK12_ResCode MSK12_put_barvar_name(
+    MSK12_Task_t task,
     int32_t barvar_idx,
     const char* name);
 
@@ -3358,10 +3431,10 @@ MSK120_ResCode MSK120_put_barvar_name(
  * - `con_idx` Constraint index 
  * - `len[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_con_name_len_func_t)(MSK120_Task_t task,int64_t con_idx,int32_t len[1]);
-extern MSK120_get_con_name_len_func_t MSK120_get_con_name_len_ptr;
-MSK120_ResCode MSK120_get_con_name_len(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_con_name_len_func_t)(MSK12_Task_t task,int64_t con_idx,int32_t len[1]);
+extern MSK12_get_con_name_len_func_t MSK12_get_con_name_len_ptr;
+MSK12_ResCode MSK12_get_con_name_len(
+    MSK12_Task_t task,
     int64_t con_idx,
     int32_t len[1]);
 
@@ -3373,10 +3446,10 @@ MSK120_ResCode MSK120_get_con_name_len(
  * - `djc_idx` Disjunctive constraint index
  * - `len[1]` (out) 
  */
-typedef MSK120_ResCode (*MSK120_get_djc_name_len_func_t)(MSK120_Task_t task,int64_t djc_idx,int32_t len[1]);
-extern MSK120_get_djc_name_len_func_t MSK120_get_djc_name_len_ptr;
-MSK120_ResCode MSK120_get_djc_name_len(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_name_len_func_t)(MSK12_Task_t task,int64_t djc_idx,int32_t len[1]);
+extern MSK12_get_djc_name_len_func_t MSK12_get_djc_name_len_ptr;
+MSK12_ResCode MSK12_get_djc_name_len(
+    MSK12_Task_t task,
     int64_t djc_idx,
     int32_t len[1]);
 
@@ -3387,10 +3460,10 @@ MSK120_ResCode MSK120_get_djc_name_len(
  * - `task` The optimizatioj task object
  * - `con_idx` Constraint index 
  */
-typedef int32_t (*MSK120_get_con_name_len2_func_t)(MSK120_Task_t task,int64_t con_idx);
-extern MSK120_get_con_name_len2_func_t MSK120_get_con_name_len2_ptr;
-int32_t MSK120_get_con_name_len2(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_con_name_len2_func_t)(MSK12_Task_t task,int64_t con_idx);
+extern MSK12_get_con_name_len2_func_t MSK12_get_con_name_len2_ptr;
+int32_t MSK12_get_con_name_len2(
+    MSK12_Task_t task,
     int64_t con_idx);
 
 /**
@@ -3400,10 +3473,10 @@ int32_t MSK120_get_con_name_len2(
  * - `task` The optimizatioj task object
  * - `djc_idx` Disjunctive constraint index
  */
-typedef int32_t (*MSK120_get_djc_name_len2_func_t)(MSK120_Task_t task,int64_t djc_idx);
-extern MSK120_get_djc_name_len2_func_t MSK120_get_djc_name_len2_ptr;
-int32_t MSK120_get_djc_name_len2(
-    MSK120_Task_t task,
+typedef int32_t (*MSK12_get_djc_name_len2_func_t)(MSK12_Task_t task,int64_t djc_idx);
+extern MSK12_get_djc_name_len2_func_t MSK12_get_djc_name_len2_ptr;
+int32_t MSK12_get_djc_name_len2(
+    MSK12_Task_t task,
     int64_t djc_idx);
 
 /**
@@ -3415,10 +3488,10 @@ int32_t MSK120_get_djc_name_len2(
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_get_con_name_func_t)(MSK120_Task_t task,int64_t con_idx,int32_t capacity,char* buf);
-extern MSK120_get_con_name_func_t MSK120_get_con_name_ptr;
-MSK120_ResCode MSK120_get_con_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_con_name_func_t)(MSK12_Task_t task,int64_t con_idx,int32_t capacity,char* buf);
+extern MSK12_get_con_name_func_t MSK12_get_con_name_ptr;
+MSK12_ResCode MSK12_get_con_name(
+    MSK12_Task_t task,
     int64_t con_idx,
     int32_t capacity,
     char* buf);
@@ -3432,10 +3505,10 @@ MSK120_ResCode MSK120_get_con_name(
  * - `capacity` 
  * - `buf[capacity]` (out) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_get_djc_name_func_t)(MSK120_Task_t task,int64_t djc_idx,int32_t capacity,char* buf);
-extern MSK120_get_djc_name_func_t MSK120_get_djc_name_ptr;
-MSK120_ResCode MSK120_get_djc_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_get_djc_name_func_t)(MSK12_Task_t task,int64_t djc_idx,int32_t capacity,char* buf);
+extern MSK12_get_djc_name_func_t MSK12_get_djc_name_ptr;
+MSK12_ResCode MSK12_get_djc_name(
+    MSK12_Task_t task,
     int64_t djc_idx,
     int32_t capacity,
     char* buf);
@@ -3448,10 +3521,10 @@ MSK120_ResCode MSK120_get_djc_name(
  * - `con_idx` Constraint index 
  * - `buf[.cstring]` (in) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_put_con_name_func_t)(MSK120_Task_t task,int64_t con_idx,const char* buf);
-extern MSK120_put_con_name_func_t MSK120_put_con_name_ptr;
-MSK120_ResCode MSK120_put_con_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_con_name_func_t)(MSK12_Task_t task,int64_t con_idx,const char* buf);
+extern MSK12_put_con_name_func_t MSK12_put_con_name_ptr;
+MSK12_ResCode MSK12_put_con_name(
+    MSK12_Task_t task,
     int64_t con_idx,
     const char* buf);
 
@@ -3463,10 +3536,10 @@ MSK120_ResCode MSK120_put_con_name(
  * - `djc_idx` Disjunctive constraint index
  * - `buf[.cstring]` (in) Target buffer
  */
-typedef MSK120_ResCode (*MSK120_put_djc_name_func_t)(MSK120_Task_t task,int64_t djc_idx,const char* buf);
-extern MSK120_put_djc_name_func_t MSK120_put_djc_name_ptr;
-MSK120_ResCode MSK120_put_djc_name(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_put_djc_name_func_t)(MSK12_Task_t task,int64_t djc_idx,const char* buf);
+extern MSK12_put_djc_name_func_t MSK12_put_djc_name_ptr;
+MSK12_ResCode MSK12_put_djc_name(
+    MSK12_Task_t task,
     int64_t djc_idx,
     const char* buf);
 
@@ -3478,10 +3551,10 @@ MSK120_ResCode MSK120_put_djc_name(
  * - `task` The optimizatioj task object
  * - `filename[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_write_task_to_file_func_t)(MSK120_Task_t task,const char* filename);
-extern MSK120_write_task_to_file_func_t MSK120_write_task_to_file_ptr;
-MSK120_ResCode MSK120_write_task_to_file(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_write_task_to_file_func_t)(MSK12_Task_t task,const char* filename);
+extern MSK12_write_task_to_file_func_t MSK12_write_task_to_file_ptr;
+MSK12_ResCode MSK12_write_task_to_file(
+    MSK12_Task_t task,
     const char* filename);
 
 /**
@@ -3495,14 +3568,14 @@ MSK120_ResCode MSK120_write_task_to_file(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_write_task_to_handle_func_t)(MSK120_Task_t task,MSK120_Format format,MSK120_Compression compress,MSK120_WriteHandle handle,MSK120_WriteFunc func);
-extern MSK120_write_task_to_handle_func_t MSK120_write_task_to_handle_ptr;
-MSK120_ResCode MSK120_write_task_to_handle(
-    MSK120_Task_t task,
-    MSK120_Format format,
-    MSK120_Compression compress,
-    MSK120_WriteHandle handle,
-    MSK120_WriteFunc func);
+typedef MSK12_ResCode (*MSK12_write_task_to_handle_func_t)(MSK12_Task_t task,MSK12_Format format,MSK12_Compression compress,MSK12_WriteHandle handle,MSK12_WriteFunc func);
+extern MSK12_write_task_to_handle_func_t MSK12_write_task_to_handle_ptr;
+MSK12_ResCode MSK12_write_task_to_handle(
+    MSK12_Task_t task,
+    MSK12_Format format,
+    MSK12_Compression compress,
+    MSK12_WriteHandle handle,
+    MSK12_WriteFunc func);
 
 /**
 
@@ -3512,10 +3585,10 @@ MSK120_ResCode MSK120_write_task_to_handle(
  * - `task` The optimizatioj task object
  * - `filename[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_write_solution_to_file_func_t)(MSK120_Task_t task,const char* filename);
-extern MSK120_write_solution_to_file_func_t MSK120_write_solution_to_file_ptr;
-MSK120_ResCode MSK120_write_solution_to_file(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_write_solution_to_file_func_t)(MSK12_Task_t task,const char* filename);
+extern MSK12_write_solution_to_file_func_t MSK12_write_solution_to_file_ptr;
+MSK12_ResCode MSK12_write_solution_to_file(
+    MSK12_Task_t task,
     const char* filename);
 
 /**
@@ -3529,14 +3602,14 @@ MSK120_ResCode MSK120_write_solution_to_file(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_write_solution_to_handle_func_t)(MSK120_Task_t task,MSK120_SolutionFormat format,MSK120_Compression compress,MSK120_WriteHandle handle,MSK120_WriteFunc func);
-extern MSK120_write_solution_to_handle_func_t MSK120_write_solution_to_handle_ptr;
-MSK120_ResCode MSK120_write_solution_to_handle(
-    MSK120_Task_t task,
-    MSK120_SolutionFormat format,
-    MSK120_Compression compress,
-    MSK120_WriteHandle handle,
-    MSK120_WriteFunc func);
+typedef MSK12_ResCode (*MSK12_write_solution_to_handle_func_t)(MSK12_Task_t task,MSK12_SolutionFormat format,MSK12_Compression compress,MSK12_WriteHandle handle,MSK12_WriteFunc func);
+extern MSK12_write_solution_to_handle_func_t MSK12_write_solution_to_handle_ptr;
+MSK12_ResCode MSK12_write_solution_to_handle(
+    MSK12_Task_t task,
+    MSK12_SolutionFormat format,
+    MSK12_Compression compress,
+    MSK12_WriteHandle handle,
+    MSK12_WriteFunc func);
 
 /**
 
@@ -3546,10 +3619,10 @@ MSK120_ResCode MSK120_write_solution_to_handle(
  * - `task` The optimizatioj task object
  * - `filename[.cstring]` (in) 
  */
-typedef MSK120_ResCode (*MSK120_read_from_file_func_t)(MSK120_Task_t task,const char* filename);
-extern MSK120_read_from_file_func_t MSK120_read_from_file_ptr;
-MSK120_ResCode MSK120_read_from_file(
-    MSK120_Task_t task,
+typedef MSK12_ResCode (*MSK12_read_from_file_func_t)(MSK12_Task_t task,const char* filename);
+extern MSK12_read_from_file_func_t MSK12_read_from_file_ptr;
+MSK12_ResCode MSK12_read_from_file(
+    MSK12_Task_t task,
     const char* filename);
 
 /**
@@ -3563,14 +3636,14 @@ MSK120_ResCode MSK120_read_from_file(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_read_from_handle_func_t)(MSK120_Task_t task,MSK120_Format format,MSK120_Compression compress,MSK120_ReadHandle handle,MSK120_ReadFunc func);
-extern MSK120_read_from_handle_func_t MSK120_read_from_handle_ptr;
-MSK120_ResCode MSK120_read_from_handle(
-    MSK120_Task_t task,
-    MSK120_Format format,
-    MSK120_Compression compress,
-    MSK120_ReadHandle handle,
-    MSK120_ReadFunc func);
+typedef MSK12_ResCode (*MSK12_read_from_handle_func_t)(MSK12_Task_t task,MSK12_Format format,MSK12_Compression compress,MSK12_ReadHandle handle,MSK12_ReadFunc func);
+extern MSK12_read_from_handle_func_t MSK12_read_from_handle_ptr;
+MSK12_ResCode MSK12_read_from_handle(
+    MSK12_Task_t task,
+    MSK12_Format format,
+    MSK12_Compression compress,
+    MSK12_ReadHandle handle,
+    MSK12_ReadFunc func);
 
 /**
 
@@ -3587,13 +3660,13 @@ MSK120_ResCode MSK120_read_from_handle(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_put_stream_callback_func_t)(MSK120_Task_t task,MSK120_StreamType whichstream,MSK120_WriteHandle handle,MSK120_StreamFunc func);
-extern MSK120_put_stream_callback_func_t MSK120_put_stream_callback_ptr;
-MSK120_ResCode MSK120_put_stream_callback(
-    MSK120_Task_t task,
-    MSK120_StreamType whichstream,
-    MSK120_WriteHandle handle,
-    MSK120_StreamFunc func);
+typedef MSK12_ResCode (*MSK12_put_stream_callback_func_t)(MSK12_Task_t task,MSK12_StreamType whichstream,MSK12_WriteHandle handle,MSK12_StreamFunc func);
+extern MSK12_put_stream_callback_func_t MSK12_put_stream_callback_ptr;
+MSK12_ResCode MSK12_put_stream_callback(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream,
+    MSK12_WriteHandle handle,
+    MSK12_StreamFunc func);
 
 /**
 
@@ -3602,11 +3675,11 @@ MSK120_ResCode MSK120_put_stream_callback(
  * - `task` The optimizatioj task object
  * - `whichstream` 
  */
-typedef MSK120_ResCode (*MSK120_clear_stream_callback_func_t)(MSK120_Task_t task,MSK120_StreamType whichstream);
-extern MSK120_clear_stream_callback_func_t MSK120_clear_stream_callback_ptr;
-MSK120_ResCode MSK120_clear_stream_callback(
-    MSK120_Task_t task,
-    MSK120_StreamType whichstream);
+typedef MSK12_ResCode (*MSK12_clear_stream_callback_func_t)(MSK12_Task_t task,MSK12_StreamType whichstream);
+extern MSK12_clear_stream_callback_func_t MSK12_clear_stream_callback_ptr;
+MSK12_ResCode MSK12_clear_stream_callback(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream);
 
 /**
 
@@ -3619,12 +3692,12 @@ MSK120_ResCode MSK120_clear_stream_callback(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_put_error_callback_func_t)(MSK120_Task_t task,MSK120_ErrorCallbackHandle handle,MSK120_ErrorCallbackFunc func);
-extern MSK120_put_error_callback_func_t MSK120_put_error_callback_ptr;
-MSK120_ResCode MSK120_put_error_callback(
-    MSK120_Task_t task,
-    MSK120_ErrorCallbackHandle handle,
-    MSK120_ErrorCallbackFunc func);
+typedef MSK12_ResCode (*MSK12_put_error_callback_func_t)(MSK12_Task_t task,MSK12_ErrorCallbackHandle handle,MSK12_ErrorCallbackFunc func);
+extern MSK12_put_error_callback_func_t MSK12_put_error_callback_ptr;
+MSK12_ResCode MSK12_put_error_callback(
+    MSK12_Task_t task,
+    MSK12_ErrorCallbackHandle handle,
+    MSK12_ErrorCallbackFunc func);
 
 /**
 
@@ -3637,12 +3710,12 @@ MSK120_ResCode MSK120_put_error_callback(
  * - `handle` Callback handle specified when inputting the callback function
  * - `func` 
  */
-typedef MSK120_ResCode (*MSK120_put_warning_callback_func_t)(MSK120_Task_t task,MSK120_ErrorCallbackHandle handle,MSK120_ErrorCallbackFunc func);
-extern MSK120_put_warning_callback_func_t MSK120_put_warning_callback_ptr;
-MSK120_ResCode MSK120_put_warning_callback(
-    MSK120_Task_t task,
-    MSK120_ErrorCallbackHandle handle,
-    MSK120_ErrorCallbackFunc func);
+typedef MSK12_ResCode (*MSK12_put_warning_callback_func_t)(MSK12_Task_t task,MSK12_ErrorCallbackHandle handle,MSK12_ErrorCallbackFunc func);
+extern MSK12_put_warning_callback_func_t MSK12_put_warning_callback_ptr;
+MSK12_ResCode MSK12_put_warning_callback(
+    MSK12_Task_t task,
+    MSK12_ErrorCallbackHandle handle,
+    MSK12_ErrorCallbackFunc func);
 
 /**
 
@@ -3650,9 +3723,9 @@ MSK120_ResCode MSK120_put_warning_callback(
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef MSK120_ResCode (*MSK120_clear_error_callback_func_t)(MSK120_Task_t task);
-extern MSK120_clear_error_callback_func_t MSK120_clear_error_callback_ptr;
-MSK120_ResCode MSK120_clear_error_callback(MSK120_Task_t task);
+typedef MSK12_ResCode (*MSK12_clear_error_callback_func_t)(MSK12_Task_t task);
+extern MSK12_clear_error_callback_func_t MSK12_clear_error_callback_ptr;
+MSK12_ResCode MSK12_clear_error_callback(MSK12_Task_t task);
 
 /**
 
@@ -3660,9 +3733,9 @@ MSK120_ResCode MSK120_clear_error_callback(MSK120_Task_t task);
  * # Arguments
  * - `task` The optimizatioj task object
  */
-typedef MSK120_ResCode (*MSK120_clear_warning_callback_func_t)(MSK120_Task_t task);
-extern MSK120_clear_warning_callback_func_t MSK120_clear_warning_callback_ptr;
-MSK120_ResCode MSK120_clear_warning_callback(MSK120_Task_t task);
+typedef MSK12_ResCode (*MSK12_clear_warning_callback_func_t)(MSK12_Task_t task);
+extern MSK12_clear_warning_callback_func_t MSK12_clear_warning_callback_ptr;
+MSK12_ResCode MSK12_clear_warning_callback(MSK12_Task_t task);
 
 /**
 
@@ -3670,9 +3743,9 @@ MSK120_ResCode MSK120_clear_warning_callback(MSK120_Task_t task);
  * function is called, it must be called as the last |mosek| API call. No other
  * |mosek| API calls are valid after this.
  */
-typedef void (*MSK120_license_cleanup_func_t)();
-extern MSK120_license_cleanup_func_t MSK120_license_cleanup_ptr;
-void MSK120_license_cleanup();
+typedef void (*MSK12_license_cleanup_func_t)();
+extern MSK12_license_cleanup_func_t MSK12_license_cleanup_ptr;
+void MSK12_license_cleanup();
 
 /**
 
@@ -3680,9 +3753,9 @@ void MSK120_license_cleanup();
  * this down. If there are currently jobs running, this will do
  * nothing.
  */
-typedef void (*MSK120_shutdown_global_threadpool_func_t)();
-extern MSK120_shutdown_global_threadpool_func_t MSK120_shutdown_global_threadpool_ptr;
-void MSK120_shutdown_global_threadpool();
+typedef void (*MSK12_shutdown_global_threadpool_func_t)();
+extern MSK12_shutdown_global_threadpool_func_t MSK12_shutdown_global_threadpool_ptr;
+void MSK12_shutdown_global_threadpool();
 
 /**
 
@@ -3694,9 +3767,9 @@ void MSK120_shutdown_global_threadpool();
  * - `x[n]` (in) The x vector. 
  * - `y[n]` (in-out) The y vector. 
  */
-typedef MSK120_ResCode (*MSK120_axpy_func_t)(int32_t n,double alpha,const double* x,double* y);
-extern MSK120_axpy_func_t MSK120_axpy_ptr;
-MSK120_ResCode MSK120_axpy(
+typedef MSK12_ResCode (*MSK12_axpy_func_t)(int32_t n,double alpha,const double* x,double* y);
+extern MSK12_axpy_func_t MSK12_axpy_ptr;
+MSK12_ResCode MSK12_axpy(
     int32_t n,
     double alpha,
     const double* x,
@@ -3712,9 +3785,9 @@ MSK120_ResCode MSK120_axpy(
  * - `y[n]` (in) The y vector. 
  * - `xty[1]` (out) The result of the inner product. 
  */
-typedef MSK120_ResCode (*MSK120_dot_func_t)(int32_t n,const double* x,const double* y,double xty[1]);
-extern MSK120_dot_func_t MSK120_dot_ptr;
-MSK120_ResCode MSK120_dot(
+typedef MSK12_ResCode (*MSK12_dot_func_t)(int32_t n,const double* x,const double* y,double xty[1]);
+extern MSK12_dot_func_t MSK12_dot_ptr;
+MSK12_ResCode MSK12_dot(
     int32_t n,
     const double* x,
     const double* y,
@@ -3744,9 +3817,9 @@ MSK120_ResCode MSK120_dot(
  * - `beta` A scalar value multiplying the vector y. 
  * - `y` (in-out) A pointer to the array storing the vector y. 
  */
-typedef MSK120_ResCode (*MSK120_gemv_func_t)(int transa,int32_t m,int32_t n,double alpha,const double* a,const double* x,double beta,double* y);
-extern MSK120_gemv_func_t MSK120_gemv_ptr;
-MSK120_ResCode MSK120_gemv(
+typedef MSK12_ResCode (*MSK12_gemv_func_t)(int transa,int32_t m,int32_t n,double alpha,const double* a,const double* x,double beta,double* y);
+extern MSK12_gemv_func_t MSK12_gemv_ptr;
+MSK12_ResCode MSK12_gemv(
     int transa,
     int32_t m,
     int32_t n,
@@ -3783,9 +3856,9 @@ MSK120_ResCode MSK120_gemv(
  * - `beta` A scalar value that multiplies C. 
  * - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
  */
-typedef MSK120_ResCode (*MSK120_gemm_func_t)(int transa,int transb,int32_t m,int32_t n,int32_t k,double alpha,const double* a,const double* b,double beta,double* c);
-extern MSK120_gemm_func_t MSK120_gemm_ptr;
-MSK120_ResCode MSK120_gemm(
+typedef MSK12_ResCode (*MSK12_gemm_func_t)(int transa,int transb,int32_t m,int32_t n,int32_t k,double alpha,const double* a,const double* b,double beta,double* c);
+extern MSK12_gemm_func_t MSK12_gemm_ptr;
+MSK12_ResCode MSK12_gemm(
     int transa,
     int transb,
     int32_t m,
@@ -3825,9 +3898,9 @@ MSK120_ResCode MSK120_gemm(
  * - `beta` A scalar value that multiplies C. 
  * - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
  */
-typedef MSK120_ResCode (*MSK120_syrk_func_t)(int is_upr,int trans,int32_t n,int32_t k,double alpha,const double* a,double beta,double* c);
-extern MSK120_syrk_func_t MSK120_syrk_ptr;
-MSK120_ResCode MSK120_syrk(
+typedef MSK12_ResCode (*MSK12_syrk_func_t)(int is_upr,int trans,int32_t n,int32_t k,double alpha,const double* a,double beta,double* c);
+extern MSK12_syrk_func_t MSK12_syrk_ptr;
+MSK12_ResCode MSK12_syrk(
     int is_upr,
     int trans,
     int32_t n,
@@ -3852,16 +3925,16 @@ MSK120_ResCode MSK120_syrk(
  * # Arguments
  * - `transposed` Controls whether the solve is with L or the transposed L. 
  * - `n` Specifies the dimension of L. 
- * - `lnzc[n]` (in) lnzc[j] is the number of nonzeros in column j. 
- * - `lptrc[n]` (in) lptrc[j] is a pointer to the first row index and value in column j. 
+ * - `lnzc[n]` (in) `lnzc[j]` is the number of nonzeros in column j. 
+ * - `lptrc[n]` (in) `lptrc[j]` is a pointer to the first row index and value in column j. 
  * - `nnz` Number of elements in lsubc and lvalc. 
  * - `lsubc[nnz]` (in) Row indexes for each column stored sequentially. 
  * - `lvalc[nnz]` (in) The value corresponding to row indexed stored lsubc. 
  * - `b[n]` (in-out) The right-hand side of linear equation system to be solved as a dense vector. 
  */
-typedef MSK120_ResCode (*MSK120_sparse_triangular_solve_dense_func_t)(int transposed,int32_t n,const int32_t* lnzc,const int64_t* lptrc,int64_t nnz,const int32_t* lsubc,const double* lvalc,double* b);
-extern MSK120_sparse_triangular_solve_dense_func_t MSK120_sparse_triangular_solve_dense_ptr;
-MSK120_ResCode MSK120_sparse_triangular_solve_dense(
+typedef MSK12_ResCode (*MSK12_sparse_triangular_solve_dense_func_t)(int transposed,int32_t n,const int32_t* lnzc,const int64_t* lptrc,int64_t nnz,const int32_t* lsubc,const double* lvalc,double* b);
+extern MSK12_sparse_triangular_solve_dense_func_t MSK12_sparse_triangular_solve_dense_ptr;
+MSK12_ResCode MSK12_sparse_triangular_solve_dense(
     int transposed,
     int32_t n,
     const int32_t* lnzc,
@@ -3880,9 +3953,9 @@ MSK120_ResCode MSK120_sparse_triangular_solve_dense(
  * - `n` Dimension of the symmetric matrix. 
  * - `a` (in-out) A symmetric matrix stored in column-major order. 
  */
-typedef MSK120_ResCode (*MSK120_potrf_func_t)(int is_upr,int32_t n,double* a);
-extern MSK120_potrf_func_t MSK120_potrf_ptr;
-MSK120_ResCode MSK120_potrf(
+typedef MSK12_ResCode (*MSK12_potrf_func_t)(int is_upr,int32_t n,double* a);
+extern MSK12_potrf_func_t MSK12_potrf_ptr;
+MSK12_ResCode MSK12_potrf(
     int is_upr,
     int32_t n,
     double* a);
@@ -3897,9 +3970,9 @@ MSK120_ResCode MSK120_potrf(
  * - `a` (in) Input matrix A. 
  * - `w[n]` (out) Array of length at least n containing the eigenvalues of A. 
  */
-typedef MSK120_ResCode (*MSK120_syeig_func_t)(int is_upr,int32_t n,const double* a,double* w);
-extern MSK120_syeig_func_t MSK120_syeig_ptr;
-MSK120_ResCode MSK120_syeig(
+typedef MSK12_ResCode (*MSK12_syeig_func_t)(int is_upr,int32_t n,const double* a,double* w);
+extern MSK12_syeig_func_t MSK12_syeig_ptr;
+MSK12_ResCode MSK12_syeig(
     int is_upr,
     int32_t n,
     const double* a,
@@ -3924,9 +3997,9 @@ MSK120_ResCode MSK120_syeig(
  * - `a` (in-out) Input matrix A. 
  * - `w[n]` (in-out) Array of length at least n containing the eigenvalues of A. 
  */
-typedef MSK120_ResCode (*MSK120_syevd_func_t)(int is_upr,int32_t n,double* a,double* w);
-extern MSK120_syevd_func_t MSK120_syevd_ptr;
-MSK120_ResCode MSK120_syevd(
+typedef MSK12_ResCode (*MSK12_syevd_func_t)(int is_upr,int32_t n,double* a,double* w);
+extern MSK12_syevd_func_t MSK12_syevd_ptr;
+MSK12_ResCode MSK12_syevd(
     int is_upr,
     int32_t n,
     double* a,
@@ -3951,16 +4024,16 @@ MSK120_ResCode MSK120_syevd(
  * - `trm_code[num_task]` (out) The termination code for each task. 
  * - `res_code[num_task]` (out) The response code for each task. 
  */
-typedef MSK120_ResCode (*MSK120_optimize_batch_func_t)(int is_race,double max_time_sec,int32_t num_threads,int64_t num_task,const MSK120_Task_t* tasks,MSK120_TrmCode* trm_code,MSK120_ResCode* res_code);
-extern MSK120_optimize_batch_func_t MSK120_optimize_batch_ptr;
-MSK120_ResCode MSK120_optimize_batch(
+typedef MSK12_ResCode (*MSK12_optimize_batch_func_t)(int is_race,double max_time_sec,int32_t num_threads,int64_t num_task,const MSK12_Task_t* tasks,MSK12_TrmCode* trm_code,MSK12_ResCode* res_code);
+extern MSK12_optimize_batch_func_t MSK12_optimize_batch_ptr;
+MSK12_ResCode MSK12_optimize_batch(
     int is_race,
     double max_time_sec,
     int32_t num_threads,
     int64_t num_task,
-    const MSK120_Task_t* tasks,
-    MSK120_TrmCode* trm_code,
-    MSK120_ResCode* res_code);
+    const MSK12_Task_t* tasks,
+    MSK12_TrmCode* trm_code,
+    MSK12_ResCode* res_code);
 
 /**
 
@@ -3977,9 +4050,9 @@ MSK120_ResCode MSK120_optimize_batch(
  * # Arguments
  * - `feature` Feature to check out from the license system. 
  */
-typedef MSK120_ResCode (*MSK120_check_out_license_func_t)(MSK120_Feature feature);
-extern MSK120_check_out_license_func_t MSK120_check_out_license_ptr;
-MSK120_ResCode MSK120_check_out_license(MSK120_Feature feature);
+typedef MSK12_ResCode (*MSK12_check_out_license_func_t)(MSK12_Feature feature);
+extern MSK12_check_out_license_func_t MSK12_check_out_license_ptr;
+MSK12_ResCode MSK12_check_out_license(MSK12_Feature feature);
 
 /**
 
@@ -3997,17 +4070,17 @@ MSK120_ResCode MSK120_check_out_license(MSK120_Feature feature);
  * # Arguments
  * - `feature` Feature to check in to the license system. 
  */
-typedef MSK120_ResCode (*MSK120_check_in_license_func_t)(MSK120_Feature feature);
-extern MSK120_check_in_license_func_t MSK120_check_in_license_ptr;
-MSK120_ResCode MSK120_check_in_license(MSK120_Feature feature);
+typedef MSK12_ResCode (*MSK12_check_in_license_func_t)(MSK12_Feature feature);
+extern MSK12_check_in_license_func_t MSK12_check_in_license_ptr;
+MSK12_ResCode MSK12_check_in_license(MSK12_Feature feature);
 
 /**
 
  * Check in all unused license features to the license token server. 
  */
-typedef MSK120_ResCode (*MSK120_check_in_all_func_t)();
-extern MSK120_check_in_all_func_t MSK120_check_in_all_ptr;
-MSK120_ResCode MSK120_check_in_all();
+typedef MSK12_ResCode (*MSK12_check_in_all_func_t)();
+extern MSK12_check_in_all_func_t MSK12_check_in_all_ptr;
+MSK12_ResCode MSK12_check_in_all();
 
 /**
 
@@ -4016,9 +4089,9 @@ MSK120_ResCode MSK120_check_in_all();
  * # Arguments
  * - `long_ver` If non-zero, then the intro is slightly longer. 
  */
-typedef MSK120_ResCode (*MSK120_echo_intro_func_t)(int long_ver);
-extern MSK120_echo_intro_func_t MSK120_echo_intro_ptr;
-MSK120_ResCode MSK120_echo_intro(int long_ver);
+typedef MSK12_ResCode (*MSK12_echo_intro_func_t)(int long_ver);
+extern MSK12_echo_intro_func_t MSK12_echo_intro_ptr;
+MSK12_ResCode MSK12_echo_intro(int long_ver);
 
 /**
 
@@ -4029,9 +4102,9 @@ MSK120_ResCode MSK120_echo_intro(int long_ver);
  * - `minor[1]` (out) Minor version number. 
  * - `revision[1]` (out) Revision number. 
  */
-typedef void (*MSK120_get_version_func_t)(int32_t major[1],int32_t minor[1],int32_t revision[1]);
-extern MSK120_get_version_func_t MSK120_get_version_ptr;
-void MSK120_get_version(
+typedef void (*MSK12_get_version_func_t)(int32_t major[1],int32_t minor[1],int32_t revision[1]);
+extern MSK12_get_version_func_t MSK12_get_version_ptr;
+void MSK12_get_version(
     int32_t major[1],
     int32_t minor[1],
     int32_t revision[1]);
@@ -4043,9 +4116,9 @@ void MSK120_get_version(
  * # Arguments
  * - `lic_debug` Whether license checkout debug info should be printed.  
  */
-typedef MSK120_ResCode (*MSK120_put_license_debug_func_t)(int lic_debug);
-extern MSK120_put_license_debug_func_t MSK120_put_license_debug_ptr;
-MSK120_ResCode MSK120_put_license_debug(int lic_debug);
+typedef MSK12_ResCode (*MSK12_put_license_debug_func_t)(int lic_debug);
+extern MSK12_put_license_debug_func_t MSK12_put_license_debug_ptr;
+MSK12_ResCode MSK12_put_license_debug(int lic_debug);
 
 /**
 
@@ -4054,9 +4127,9 @@ MSK120_ResCode MSK120_put_license_debug(int lic_debug);
  * # Arguments
  * - `code[21]` (in, nullable) A license key string. 
  */
-typedef MSK120_ResCode (*MSK120_put_license_code_func_t)(NULLABLE const int32_t code[21]);
-extern MSK120_put_license_code_func_t MSK120_put_license_code_ptr;
-MSK120_ResCode MSK120_put_license_code(NULLABLE const int32_t code[21]);
+typedef MSK12_ResCode (*MSK12_put_license_code_func_t)(NULLABLE const int32_t code[21]);
+extern MSK12_put_license_code_func_t MSK12_put_license_code_ptr;
+MSK12_ResCode MSK12_put_license_code(NULLABLE const int32_t code[21]);
 
 /**
 
@@ -4065,9 +4138,9 @@ MSK120_ResCode MSK120_put_license_code(NULLABLE const int32_t code[21]);
  * # Arguments
  * - `lic_wait` Enable waiting for a license until it is available. 
  */
-typedef MSK120_ResCode (*MSK120_put_license_wait_func_t)(int lic_wait);
-extern MSK120_put_license_wait_func_t MSK120_put_license_wait_ptr;
-MSK120_ResCode MSK120_put_license_wait(int lic_wait);
+typedef MSK12_ResCode (*MSK12_put_license_wait_func_t)(int lic_wait);
+extern MSK12_put_license_wait_func_t MSK12_put_license_wait_ptr;
+MSK12_ResCode MSK12_put_license_wait(int lic_wait);
 
 /**
 
@@ -4076,14 +4149,14 @@ MSK120_ResCode MSK120_put_license_wait(int lic_wait);
  * # Arguments
  * - `license_path[.cstring]` (in, nullable) A path specifying where to search for the license. 
  */
-typedef MSK120_ResCode (*MSK120_put_license_path_func_t)(NULLABLE const char* license_path);
-extern MSK120_put_license_path_func_t MSK120_put_license_path_ptr;
-MSK120_ResCode MSK120_put_license_path(NULLABLE const char* license_path);
+typedef MSK12_ResCode (*MSK12_put_license_path_func_t)(NULLABLE const char* license_path);
+extern MSK12_put_license_path_func_t MSK12_put_license_path_ptr;
+MSK12_ResCode MSK12_put_license_path(NULLABLE const char* license_path);
 
 
-int MSK120_initialize_library_with_paths(const char * paths[]);
-int MSK120_library_initialized();
-int MSK120_initialize_library();
+int MSK12_initialize_library_with_paths(const char * paths[]);
+int MSK12_library_initialized();
+int MSK12_initialize_library();
 
 #ifdef __cplusplus
 } // extern "C"

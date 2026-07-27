@@ -32,6 +32,7 @@ fn lo1() -> Result<(),moco::APIError> {
     // implementation
     msk.task()?
         .with_stream_callback(
+            moco::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task : &mut moco::Task| {
                 task.append_vars(numvar)?;
