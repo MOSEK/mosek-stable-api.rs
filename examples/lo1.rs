@@ -14,8 +14,8 @@ fn main() {
 fn lo1() -> Result<(),moco::APIError> {
     let msk = moco::initialize()?;
     // All the normal lo1 data:
-    const numvar : i32 = 4;
-    const numcon : i64 = 3;
+    const NUMVAR : i32 = 4;
+    const NUMCON : i64 = 3;
     let cj : &[i32] = &[0,   1,   2,   3];
     let c  : &[f64] = &[3.0, 1.0, 5.0, 1.0];
     let rownum : &[i32]  = &[3, 4, 2 ];
@@ -35,11 +35,11 @@ fn lo1() -> Result<(),moco::APIError> {
             moco::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task : &mut moco::Task| {
-                task.append_vars(numvar)?;
+                task.append_vars(NUMVAR)?;
                 task.append_rows(4)?;
                 task.put_var_bound_slice(0,blx,bux)?;
                 task.put_row_slice(1,rownum, subj, valj)?;
-                task.append_vars(numvar)?;
+                task.append_vars(NUMVAR)?;
                 task.append_rows(4)?;
                 task.put_var_bound_slice(0,blx,bux)?;
                 task.put_row_slice(1,rownum,subj,valj)?;
@@ -58,14 +58,14 @@ fn lo1() -> Result<(),moco::APIError> {
                 task.put_row(0, cj, c)?;
                 task.put_obj_row(0)?;
 
-                let trmcode = task.optimize()?;
+                let _trmcode = task.optimize()?;
 
                 task.solution_summary(moco::StreamType::MSG)?;
 
-                const solidx : i32 = 0;
-                match task.get_sol_status(solidx)? {
+                const SOLIDX : i32 = 0;
+                match task.get_sol_status(SOLIDX)? {
                     (moco::SolSta::OPTIMAL,_) => {
-                        let xx = task.get_sol_xx_slice(solidx, 0, numvar)?;
+                        let xx = task.get_sol_xx_slice(SOLIDX, 0, NUMVAR)?;
                         println!("xx: {:?}\n", xx);
                     },
                     (moco::SolSta::INFEAS_CERT,_)|(_,moco::SolSta::INFEAS_CERT) => {
