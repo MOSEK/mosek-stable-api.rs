@@ -504,6 +504,18 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_put_var_bound_slice_value(task : Task_t,first_var : i32,num_var : i32,low : f64,upr : f64) -> i32;
     #[allow(unused)]
+    fn MSK12_put_var_low_bound(task : Task_t,var_idx : i32,low : f64) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_var_low_bound_slice(task : Task_t,first_var : i32,num_var : i32,low : *const f64) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_var_low_bound_slice_value(task : Task_t,first_var : i32,num_var : i32,low : f64) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_var_upr_bound(task : Task_t,var_idx : i32,upr : f64) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_var_upr_bound_slice(task : Task_t,first_var : i32,num_var : i32,upr : *const f64) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_var_upr_bound_slice_value(task : Task_t,first_var : i32,num_var : i32,upr : f64) -> i32;
+    #[allow(unused)]
     fn MSK12_get_var_bound(task : Task_t,var_idx : i32,low : *mut f64,upr : *mut f64) -> i32;
     #[allow(unused)]
     fn MSK12_get_var_bound_slice(task : Task_t,first_var : i32,num_var : i32,low : *mut f64,upr : *mut f64) -> i32;
@@ -552,13 +564,13 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_put_row_slice(task : Task_t,first_row : i64,num_row : i64,row_num_nz : *const i32,subj : *const i32,cof : *const f64) -> i32;
     #[allow(unused)]
-    fn MSK12_put_row_list(task : Task_t,num_row : i64,row_idxs : *mut i64,row_num_nz : *const i32,subj : *const *const i32,cof : *const *const f64) -> i32;
+    fn MSK12_put_row_list(task : Task_t,num_row : i64,row_idxs : *const i64,row_num_nz : *const i32,subj : *const *const i32,cof : *const *const f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_row_g(task : Task_t,row_idx : i64,g : f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_row_slice_g(task : Task_t,first_row : i64,num_row : i64,g : *const f64) -> i32;
     #[allow(unused)]
-    fn MSK12_put_row_list_g(task : Task_t,num_row : i64,row_idxs : *mut i64,g : *const f64) -> i32;
+    fn MSK12_put_row_list_g(task : Task_t,num_row : i64,row_idxs : *const i64,g : *const f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_col(task : Task_t,col_idx : i32,num_nz : i64,row_idxs : *const i64,cof : *const f64) -> i32;
     #[allow(unused)]
@@ -586,7 +598,7 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_get_col_slice(task : Task_t,first_col : i32,num_col : i32,nnz : i64,col_len : *mut i64,subi : *mut i64,cof : *mut f64) -> i32;
     #[allow(unused)]
-    fn MSK12_put_bar_entry(task : Task_t,row_idx : i64,barvar_idx : i32,num_weight : i64,matrix_idx : *mut i64,weight : *mut f64) -> i32;
+    fn MSK12_put_bar_entry(task : Task_t,row_idx : i64,barvar_idx : i32,num_weight : i64,matrix_idx : *const i64,weight : *const f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_bar_entry_list(task : Task_t,num_bar_entry : i64,row_idx : *const i64,barvar_idx : *const i32,num_weight : *const i64,matrix_idx : *const i64,weight : *const f64) -> i32;
     #[allow(unused)]
@@ -904,6 +916,13 @@ impl std::fmt::Debug for APIError {
         std::fmt::Display::fmt(": ",f)?;
         std::fmt::Display::fmt(self.msg.as_str(),f)
     }
+}
+
+impl From<APIError> for String {
+    fn from(value : APIError) -> Self {
+        format!("{:?}",value)
+    }
+
 }
 
 
@@ -1811,7 +1830,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_var(&mut self) -> i32
+    pub fn get_num_var(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_var(self.task) };
@@ -1822,7 +1841,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_barvar(&mut self) -> i32
+    pub fn get_num_barvar(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_barvar(self.task) };
@@ -1833,7 +1852,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_domain(&mut self) -> i64
+    pub fn get_num_domain(&self) -> i64
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_domain(self.task) };
@@ -1844,7 +1863,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_row(&mut self) -> i64
+    pub fn get_num_row(&self) -> i64
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_row(self.task) };
@@ -1855,7 +1874,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_symmat(&mut self) -> i64
+    pub fn get_num_symmat(&self) -> i64
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_symmat(self.task) };
@@ -1866,7 +1885,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_con(&mut self) -> i64
+    pub fn get_num_con(&self) -> i64
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_con(self.task) };
@@ -1877,7 +1896,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_djc(&mut self) -> i64
+    pub fn get_num_djc(&self) -> i64
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_djc(self.task) };
@@ -2077,7 +2096,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `var_idx` Variable index
     /// - `var_type[1]` (out) 
-    pub fn get_var_type(&mut self,var_idx : i32) -> Result<VariableType,APIError>
+    pub fn get_var_type(&self,var_idx : i32) -> Result<VariableType,APIError>
     {
         // Arg processing order: task,var_idx,var_type
         let mut var_type : i32 = 0;
@@ -2094,7 +2113,7 @@ impl Task {
     /// - `first_var` Variable index
     /// - `num_var` Number of variables
     /// - `var_types[num_var]` (out) 
-    pub fn get_var_type_slice(&mut self,first_var : i32,num_var : i32) -> Result<Vec<VariableType>,APIError>
+    pub fn get_var_type_slice(&self,first_var : i32,num_var : i32) -> Result<Vec<VariableType>,APIError>
     {
         // Arg processing order: task,first_var,num_var,var_types
         let mut var_types : Vec<i32> = Vec::new();
@@ -2154,6 +2173,98 @@ impl Task {
         if 0 != returned_value { self.last_error()?; }
         Ok(())
     }
+    /// Set variable bounds.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `var_idx` Variable index
+    /// - `low` Lower bound
+    pub fn put_var_low_bound(&mut self,var_idx : i32,low : f64) -> Result<(),APIError>
+    {
+        // Arg processing order: task,var_idx,low
+        let returned_value = unsafe{ MSK12_put_var_low_bound(self.task,var_idx,low) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Set variable bounds for a slice.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `first_var` Variable index
+    /// - `num_var` Number of variables
+    /// - `low[num_var]` (in) Lower bound
+    pub fn put_var_low_bound_slice(&mut self,first_var : i32,low : &[f64]) -> Result<(),APIError>
+    {
+        // Arg processing order: task,first_var,num_var,low
+        let num_var : i32 = i32::try_from([Some(low.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let returned_value = unsafe{ MSK12_put_var_low_bound_slice(self.task,first_var,num_var,low.as_ptr()) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Set identical bound for a slice of variables.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `first_var` Variable index
+    /// - `num_var` Number of variables
+    /// - `low` Lower bound
+    pub fn put_var_low_bound_slice_value(&mut self,first_var : i32,num_var : i32,low : f64) -> Result<(),APIError>
+    {
+        // Arg processing order: task,first_var,num_var,low
+        let returned_value = unsafe{ MSK12_put_var_low_bound_slice_value(self.task,first_var,num_var,low) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Set variable bounds.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `var_idx` Variable index
+    /// - `upr` Upper bound
+    pub fn put_var_upr_bound(&mut self,var_idx : i32,upr : f64) -> Result<(),APIError>
+    {
+        // Arg processing order: task,var_idx,upr
+        let returned_value = unsafe{ MSK12_put_var_upr_bound(self.task,var_idx,upr) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Set variable bounds for a slice.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `first_var` Variable index
+    /// - `num_var` Number of variables
+    /// - `upr[num_var]` (in) Upper bound
+    pub fn put_var_upr_bound_slice(&mut self,first_var : i32,upr : &[f64]) -> Result<(),APIError>
+    {
+        // Arg processing order: task,first_var,num_var,upr
+        let num_var : i32 = i32::try_from([Some(upr.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let returned_value = unsafe{ MSK12_put_var_upr_bound_slice(self.task,first_var,num_var,upr.as_ptr()) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Set identical bound for a slice of variables.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `first_var` Variable index
+    /// - `num_var` Number of variables
+    /// - `upr` Upper bound
+    pub fn put_var_upr_bound_slice_value(&mut self,first_var : i32,num_var : i32,upr : f64) -> Result<(),APIError>
+    {
+        // Arg processing order: task,first_var,num_var,upr
+        let returned_value = unsafe{ MSK12_put_var_upr_bound_slice_value(self.task,first_var,num_var,upr) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
     /// Get variable bounds.
     /// 
     /// # Arguments
@@ -2162,7 +2273,7 @@ impl Task {
     /// - `var_idx` Variable index
     /// - `low[1]` (out) Lower bound
     /// - `upr[1]` (out) Upper bound
-    pub fn get_var_bound(&mut self,var_idx : i32) -> Result<(f64,f64),APIError>
+    pub fn get_var_bound(&self,var_idx : i32) -> Result<(f64,f64),APIError>
     {
         // Arg processing order: task,var_idx,low,upr
         let mut low : f64 = Default::default();
@@ -2180,7 +2291,7 @@ impl Task {
     /// - `num_var` Number of variables
     /// - `low[num_var]` (out) Lower bound
     /// - `upr[num_var]` (out) Upper bound
-    pub fn get_var_bound_slice(&mut self,first_var : i32,num_var : i32) -> Result<(Vec<f64>,Vec<f64>),APIError>
+    pub fn get_var_bound_slice(&self,first_var : i32,num_var : i32) -> Result<(Vec<f64>,Vec<f64>),APIError>
     {
         // Arg processing order: task,first_var,num_var,low,upr
         let mut low : Vec<f64> = Vec::new();
@@ -2198,13 +2309,12 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `first_barvar` First semidefinite variable index in a slice
     /// - `num_barvar` Number of variables
-    /// - `num_elm[num_barvar]` (out) Number of positive semidefinite non-zero entries
-    pub fn get_barvar_slice_num_elm(&mut self,first_barvar : i32,num_barvar : i32) -> Result<Vec<i64>,APIError>
+    /// - `num_elm[1]` (out) Number of positive semidefinite non-zero entries
+    pub fn get_barvar_slice_num_elm(&self,first_barvar : i32,num_barvar : i32) -> Result<i64,APIError>
     {
         // Arg processing order: task,first_barvar,num_barvar,num_elm
-        let mut num_elm : Vec<i64> = Vec::new();
-        num_elm.resize(usize::try_from(num_barvar).map_err(|_|APIError::from("err_invalid_array_size","",format!("Invalid array length for argument num_elm")))?,Default::default());
-        let returned_value = unsafe{ MSK12_get_barvar_slice_num_elm(self.task,first_barvar,num_barvar,num_elm.as_mut_slice().as_mut_ptr()) };
+        let mut num_elm : i64 = Default::default();
+        let returned_value = unsafe{ MSK12_get_barvar_slice_num_elm(self.task,first_barvar,num_barvar,std::ptr::from_mut(&mut num_elm)) };
         if 0 != returned_value { self.last_error()?; }
         Ok(num_elm)
     }
@@ -2215,7 +2325,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `barvar_idx` Positive semi-definite variable index
     /// - `dim[1]` (out) Dimension
-    pub fn get_barvar_dim(&mut self,barvar_idx : i32) -> Result<i32,APIError>
+    pub fn get_barvar_dim(&self,barvar_idx : i32) -> Result<i32,APIError>
     {
         // Arg processing order: task,barvar_idx,dim
         let mut dim : i32 = Default::default();
@@ -2231,7 +2341,7 @@ impl Task {
     /// - `first_barvar` First semidefinite variable index in a slice
     /// - `num_barvar` Number of variables
     /// - `dim[num_barvar]` (out) Dimension
-    pub fn get_barvar_slice_dims(&mut self,first_barvar : i32,num_barvar : i32) -> Result<Vec<i32>,APIError>
+    pub fn get_barvar_slice_dims(&self,first_barvar : i32,num_barvar : i32) -> Result<Vec<i32>,APIError>
     {
         // Arg processing order: task,first_barvar,num_barvar,dim
         let mut dim : Vec<i32> = Vec::new();
@@ -2557,7 +2667,7 @@ impl Task {
     /// - `dom_type[1]` (out) 
     /// - `size[1]` (out) 
     /// - `num_alpha[1]` (out) Number of alpha values in array
-    pub fn get_domain_info(&mut self,dom_idx : i64) -> Result<(DomainType,i64,i32),APIError>
+    pub fn get_domain_info(&self,dom_idx : i64) -> Result<(DomainType,i64,i32),APIError>
     {
         // Arg processing order: task,dom_idx,dom_type,size,num_alpha
         let mut dom_type : i32 = 0;
@@ -2576,7 +2686,7 @@ impl Task {
     /// - `dom_idx` Index of the domain
     /// - `num_alpha` Number of alpha values in array
     /// - `alpha[num_alpha]` (out) Array if alpha values for power cone domain
-    pub fn get_domain_alpha(&mut self,dom_idx : i64,num_alpha : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_domain_alpha(&self,dom_idx : i64,num_alpha : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,dom_idx,num_alpha,alpha
         let mut alpha : Vec<f64> = Vec::new();
@@ -2628,22 +2738,20 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `num_row` Number of rows in list
-    /// - `row_idxs[num_row]` (out) Row indexes
+    /// - `row_idxs[num_row]` (in) Row indexes
     /// - `row_num_nz[num_row]` (in) Number of non-zeros per row.
     /// - `subj` (in) List of pointers to subscripts.
     /// - `cof` (in) Coefficients
-    pub fn put_row_list(&mut self,row_num_nz : &[i32],subj : &[&[i32]],cof : &[&[f64]]) -> Result<Vec<i64>,APIError>
+    pub fn put_row_list(&mut self,row_idxs : &[i64],row_num_nz : &[i32],subj : &[&[i32]],cof : &[&[f64]]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_row,row_idxs,row_num_nz,subj,cof
-        let num_row : i64 = i64::try_from([Some(row_num_nz.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
+        let num_row : i64 = i64::try_from([Some(row_idxs.len()),Some(row_num_nz.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let mut row_idxs : Vec<i64> = Vec::new();
-        row_idxs.resize(usize::try_from(num_row).map_err(|_|APIError::from("err_invalid_array_size","",format!("Invalid array length for argument row_idxs")))?,Default::default());
         let subj_ptrs : Vec<*const i32> = subj.iter().map(|entry| entry.as_ptr()).collect();
         let cof_ptrs : Vec<*const f64> = cof.iter().map(|entry| entry.as_ptr()).collect();
-        let returned_value = unsafe{ MSK12_put_row_list(self.task,num_row,row_idxs.as_mut_slice().as_mut_ptr(),row_num_nz.as_ptr(),subj_ptrs.as_ptr(),cof_ptrs.as_ptr()) };
+        let returned_value = unsafe{ MSK12_put_row_list(self.task,num_row,row_idxs.as_ptr(),row_num_nz.as_ptr(),subj_ptrs.as_ptr(),cof_ptrs.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
-        Ok(row_idxs)
+        Ok(())
     }
     /// Input the constant term for a single affine row
     /// 
@@ -2682,18 +2790,16 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `num_row` Number of affine rows
-    /// - `row_idxs[num_row]` (out) Array of row indexes
+    /// - `row_idxs[num_row]` (in) Array of row indexes
     /// - `g[num_row]` (in) Row fixed term
-    pub fn put_row_list_g(&mut self,g : &[f64]) -> Result<Vec<i64>,APIError>
+    pub fn put_row_list_g(&mut self,row_idxs : &[i64],g : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_row,row_idxs,g
-        let num_row : i64 = i64::try_from([Some(g.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
+        let num_row : i64 = i64::try_from([Some(row_idxs.len()),Some(g.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let mut row_idxs : Vec<i64> = Vec::new();
-        row_idxs.resize(usize::try_from(num_row).map_err(|_|APIError::from("err_invalid_array_size","",format!("Invalid array length for argument row_idxs")))?,Default::default());
-        let returned_value = unsafe{ MSK12_put_row_list_g(self.task,num_row,row_idxs.as_mut_slice().as_mut_ptr(),g.as_ptr()) };
+        let returned_value = unsafe{ MSK12_put_row_list_g(self.task,num_row,row_idxs.as_ptr(),g.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
-        Ok(row_idxs)
+        Ok(())
     }
     /// Put a single column.
     /// 
@@ -2942,18 +3048,16 @@ impl Task {
     /// - `row_idx` Index of the affine row
     /// - `barvar_idx` Positive semi-definite variable index
     /// - `num_weight` 
-    /// - `matrix_idx[num_weight]` (out) 
-    /// - `weight[num_weight]` (out) 
-    pub fn put_bar_entry(&mut self,row_idx : i64,barvar_idx : i32,num_weight : i64) -> Result<(Vec<i64>,Vec<f64>),APIError>
+    /// - `matrix_idx[num_weight]` (in) 
+    /// - `weight[num_weight]` (in) 
+    pub fn put_bar_entry(&mut self,row_idx : i64,barvar_idx : i32,matrix_idx : &[i64],weight : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,row_idx,barvar_idx,num_weight,matrix_idx,weight
-        let mut matrix_idx : Vec<i64> = Vec::new();
-        matrix_idx.resize(usize::try_from(num_weight).map_err(|_|APIError::from("err_invalid_array_size","",format!("Invalid array length for argument matrix_idx")))?,Default::default());
-        let mut weight : Vec<f64> = Vec::new();
-        weight.resize(usize::try_from(num_weight).map_err(|_|APIError::from("err_invalid_array_size","",format!("Invalid array length for argument weight")))?,Default::default());
-        let returned_value = unsafe{ MSK12_put_bar_entry(self.task,row_idx,barvar_idx,num_weight,matrix_idx.as_mut_slice().as_mut_ptr(),weight.as_mut_slice().as_mut_ptr()) };
+        let num_weight : i64 = i64::try_from([Some(matrix_idx.len()),Some(weight.len())].into_iter().filter_map(|v|v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let returned_value = unsafe{ MSK12_put_bar_entry(self.task,row_idx,barvar_idx,num_weight,matrix_idx.as_ptr(),weight.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
-        Ok((matrix_idx,weight))
+        Ok(())
     }
     /// Input a list of bar entries.
     /// 
@@ -2975,7 +3079,7 @@ impl Task {
         if 0 != returned_value { self.last_error()?; }
         Ok(())
     }
-    /// Put bar entries for a single row
+    /// Put bar entries for a single row, replacing all existing entries
     /// 
     /// # Arguments
     /// 
@@ -3003,7 +3107,7 @@ impl Task {
     /// - `symmat_idx` Symmetric matrix index
     /// - `dim[1]` (out) Dimension
     /// - `nnz[1]` (out) Number of nonzeros
-    pub fn get_symmat_info(&mut self,symmat_idx : i64) -> Result<(i32,i64),APIError>
+    pub fn get_symmat_info(&self,symmat_idx : i64) -> Result<(i32,i64),APIError>
     {
         // Arg processing order: task,symmat_idx,dim,nnz
         let mut dim : i32 = Default::default();
@@ -3022,7 +3126,7 @@ impl Task {
     /// - `symmat_i[nnz]` (out) Symmetric matrix row subscripts
     /// - `symmat_j[nnz]` (out) Symmetric matrix column subscripts
     /// - `symmat_val[nnz]` (out) Symmetric matrix values
-    pub fn get_symmat(&mut self,symmat_idx : i64,nnz : i64) -> Result<(Vec<i32>,Vec<i32>,Vec<f64>),APIError>
+    pub fn get_symmat(&self,symmat_idx : i64,nnz : i64) -> Result<(Vec<i32>,Vec<i32>,Vec<f64>),APIError>
     {
         // Arg processing order: task,symmat_idx,nnz,symmat_i,symmat_j,symmat_val
         let mut symmat_i : Vec<i32> = Vec::new();
@@ -3044,7 +3148,7 @@ impl Task {
     /// - `num_symmat` Number of symmetric matrixes
     /// - `dim[num_symmat]` (out) Dimension
     /// - `nnz[num_symmat]` (out) Number of nonzeros
-    pub fn get_symmat_slice_info(&mut self,first_symmat : i64,num_symmat : i64) -> Result<(Vec<i32>,Vec<i64>),APIError>
+    pub fn get_symmat_slice_info(&self,first_symmat : i64,num_symmat : i64) -> Result<(Vec<i32>,Vec<i64>),APIError>
     {
         // Arg processing order: task,first_symmat,num_symmat,dim,nnz
         let mut dim : Vec<i32> = Vec::new();
@@ -3066,7 +3170,7 @@ impl Task {
     /// - `symmat_i[total_nnz]` (out) Symmetric matrix row subscripts
     /// - `symmat_j[total_nnz]` (out) Symmetric matrix column subscripts
     /// - `symmat_val[total_nnz]` (out) Symmetric matrix values
-    pub fn get_symmat_slice(&mut self,first_symmat : i64,num_symmat : i64,total_nnz : i64) -> Result<(Vec<i32>,Vec<i32>,Vec<f64>),APIError>
+    pub fn get_symmat_slice(&self,first_symmat : i64,num_symmat : i64,total_nnz : i64) -> Result<(Vec<i32>,Vec<i32>,Vec<f64>),APIError>
     {
         // Arg processing order: task,first_symmat,num_symmat,total_nnz,symmat_i,symmat_j,symmat_val
         let mut symmat_i : Vec<i32> = Vec::new();
@@ -3181,7 +3285,7 @@ impl Task {
     /// - `first_con` First constraint
     /// - `num_con` Number of constraints
     /// - `dom_idx[num_con]` (out) Index of the domain
-    pub fn get_con_slice_domains(&mut self,first_con : i64,num_con : i64) -> Result<Vec<i64>,APIError>
+    pub fn get_con_slice_domains(&self,first_con : i64,num_con : i64) -> Result<Vec<i64>,APIError>
     {
         // Arg processing order: task,first_con,num_con,dom_idx
         let mut dom_idx : Vec<i64> = Vec::new();
@@ -3198,7 +3302,7 @@ impl Task {
     /// - `first_con` First constraint index in a slice
     /// - `num_con` Number of constraints
     /// - `num_row[1]` (out) Number of affine rows
-    pub fn get_con_slice_num_row(&mut self,first_con : i64,num_con : i64) -> Result<i64,APIError>
+    pub fn get_con_slice_num_row(&self,first_con : i64,num_con : i64) -> Result<i64,APIError>
     {
         // Arg processing order: task,first_con,num_con,num_row
         let mut num_row : i64 = Default::default();
@@ -3217,7 +3321,7 @@ impl Task {
     /// - `row_idx[num_row]` (out) Index of the affine row
     /// - `rhs_offset[num_row]` (out) Domain offset
     /// - `dom_idx[num_con]` (out) Index of the domain
-    pub fn get_con_slice(&mut self,first_con : i64,num_con : i64,num_row : i64) -> Result<(Vec<i64>,Vec<f64>,Vec<i64>),APIError>
+    pub fn get_con_slice(&self,first_con : i64,num_con : i64,num_row : i64) -> Result<(Vec<i64>,Vec<f64>,Vec<i64>),APIError>
     {
         // Arg processing order: task,first_con,num_con,num_row,row_idx,rhs_offset,dom_idx
         let mut row_idx : Vec<i64> = Vec::new();
@@ -3320,7 +3424,7 @@ impl Task {
     /// - `num_term[1]` (out) number of terms in DJC
     /// - `num_dom[1]` (out) Number of domains
     /// - `num_row[1]` (out) Number of affine rows
-    pub fn get_djc_info(&mut self,djc_idx : i64) -> Result<(i64,i64,i64),APIError>
+    pub fn get_djc_info(&self,djc_idx : i64) -> Result<(i64,i64,i64),APIError>
     {
         // Arg processing order: task,djc_idx,num_term,num_dom,num_row
         let mut num_term : i64 = Default::default();
@@ -3343,7 +3447,7 @@ impl Task {
     /// - `dom_idx[num_dom]` (out) Index of the domain
     /// - `row_idx[num_row]` (out) Index of the affine row
     /// - `rhs_offset[num_row]` (out) Domain offset
-    pub fn get_djc(&mut self,djc_idx : i64,num_terms : i64,num_dom : i64,num_row : i64) -> Result<(Vec<i64>,Vec<i64>,Vec<i64>,Vec<f64>),APIError>
+    pub fn get_djc(&self,djc_idx : i64,num_terms : i64,num_dom : i64,num_row : i64) -> Result<(Vec<i64>,Vec<i64>,Vec<i64>,Vec<f64>),APIError>
     {
         // Arg processing order: task,djc_idx,num_terms,num_dom,num_row,term_size,dom_idx,row_idx,rhs_offset
         let mut term_size : Vec<i64> = Vec::new();
@@ -3368,7 +3472,7 @@ impl Task {
     /// - `num_term[1]` (out) total number of terms
     /// - `num_dom[1]` (out) total number of clauses/domains
     /// - `num_row[1]` (out) total number of rows
-    pub fn get_djc_slice_info(&mut self,first_djc : i64,num_djc : i64) -> Result<(i64,i64,i64),APIError>
+    pub fn get_djc_slice_info(&self,first_djc : i64,num_djc : i64) -> Result<(i64,i64,i64),APIError>
     {
         // Arg processing order: task,first_djc,num_djc,num_term,num_dom,num_row
         let mut num_term : i64 = Default::default();
@@ -3393,7 +3497,7 @@ impl Task {
     /// - `row_idx[num_row]` (out) Index of the affine row
     /// - `rhs_offset[num_row]` (out) Domain offset
     /// - `djc_num_term[num_djc]` (out) 
-    pub fn get_djc_slice(&mut self,first_djc : i64,num_djc : i64,num_term : i64,num_dom : i64,num_row : i64) -> Result<(Vec<i64>,Vec<i64>,Vec<i64>,Vec<f64>,Vec<i64>),APIError>
+    pub fn get_djc_slice(&self,first_djc : i64,num_djc : i64,num_term : i64,num_dom : i64,num_row : i64) -> Result<(Vec<i64>,Vec<i64>,Vec<i64>,Vec<f64>,Vec<i64>),APIError>
     {
         // Arg processing order: task,first_djc,num_djc,num_term,num_dom,num_row,term_size,dom_idx,row_idx,rhs_offset,djc_num_term
         let mut term_size : Vec<i64> = Vec::new();
@@ -3426,7 +3530,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_obj_sense(&mut self) -> Result<ObjSense,APIError>
+    pub fn get_obj_sense(&self) -> Result<ObjSense,APIError>
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_obj_sense(self.task) };
@@ -3452,7 +3556,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `row_idx[1]` (out) Index of the affine row
     /// - `asgn[1]` (out) Returns non-zero to indicate that a value was assigned, or zero if it was not
-    pub fn get_obj_row(&mut self) -> (i64,bool)
+    pub fn get_obj_row(&self) -> (i64,bool)
     {
         // Arg processing order: task,row_idx,asgn
         let mut row_idx : i64 = Default::default();
@@ -3526,7 +3630,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_sol(&mut self) -> i32
+    pub fn get_num_sol(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_sol(self.task) };
@@ -3538,7 +3642,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `sol_idx` Solution index
     /// - `sol_type[1]` (out) Returns the type of the solution requested
-    pub fn get_sol_type(&mut self,sol_idx : i32) -> Result<SolType,APIError>
+    pub fn get_sol_type(&self,sol_idx : i32) -> Result<SolType,APIError>
     {
         // Arg processing order: task,sol_idx,sol_type
         let mut sol_type : i32 = 0;
@@ -3554,7 +3658,7 @@ impl Task {
     /// - `sol_idx` Solution index
     /// - `primal_sol_sta[1]` (out) 
     /// - `dual_sol_sta[1]` (out) 
-    pub fn get_sol_status(&mut self,sol_idx : i32) -> Result<(SolSta,SolSta),APIError>
+    pub fn get_sol_status(&self,sol_idx : i32) -> Result<(SolSta,SolSta),APIError>
     {
         // Arg processing order: task,sol_idx,primal_sol_sta,dual_sol_sta
         let mut primal_sol_sta : i32 = 0;
@@ -3571,7 +3675,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `sol_idx` Solution index
     /// - `pro_sta[1]` (out) 
-    pub fn get_problem_status(&mut self,sol_idx : i32) -> Result<ProSta,APIError>
+    pub fn get_problem_status(&self,sol_idx : i32) -> Result<ProSta,APIError>
     {
         // Arg processing order: task,sol_idx,pro_sta
         let mut pro_sta : i32 = 0;
@@ -3587,7 +3691,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `sol_idx` Solution index
     /// - `obj_val[1]` (out) 
-    pub fn get_primal_obj(&mut self,sol_idx : i32) -> Result<f64,APIError>
+    pub fn get_primal_obj(&self,sol_idx : i32) -> Result<f64,APIError>
     {
         // Arg processing order: task,sol_idx,obj_val
         let mut obj_val : f64 = Default::default();
@@ -3602,7 +3706,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `sol_idx` Solution index
     /// - `obj_val[1]` (out) 
-    pub fn get_dual_obj(&mut self,sol_idx : i32) -> Result<f64,APIError>
+    pub fn get_dual_obj(&self,sol_idx : i32) -> Result<f64,APIError>
     {
         // Arg processing order: task,sol_idx,obj_val
         let mut obj_val : f64 = Default::default();
@@ -3619,7 +3723,7 @@ impl Task {
     /// - `first_var` First in slice.
     /// - `num_var` Number of elements in slice.
     /// - `xx[num_var]` (out) 
-    pub fn get_sol_xx_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_xx_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,xx
         let mut xx : Vec<f64> = Vec::new();
@@ -3636,7 +3740,7 @@ impl Task {
     /// - `first_var` Variable index
     /// - `num_var` Number of variables
     /// - `slx[num_var]` (out) 
-    pub fn get_sol_slx_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_slx_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,slx
         let mut slx : Vec<f64> = Vec::new();
@@ -3653,7 +3757,7 @@ impl Task {
     /// - `first_var` Variable index
     /// - `num_var` Number of variables
     /// - `sux[num_var]` (out) 
-    pub fn get_sol_sux_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_sux_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,sux
         let mut sux : Vec<f64> = Vec::new();
@@ -3670,7 +3774,7 @@ impl Task {
     /// - `barvar_idx` Positive semi-definite variable index
     /// - `num_var` Number of variables
     /// - `barx[num_var]` (out) 
-    pub fn get_sol_barxj(&mut self,sol_idx : i32,barvar_idx : i32,num_var : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_barxj(&self,sol_idx : i32,barvar_idx : i32,num_var : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,num_var,barx
         let mut barx : Vec<f64> = Vec::new();
@@ -3687,7 +3791,7 @@ impl Task {
     /// - `barvar_idx` Positive semi-definite variable index
     /// - `num_elm` Number of positive semidefinite non-zero entries
     /// - `bars[num_elm]` (out) 
-    pub fn get_sol_barsj(&mut self,sol_idx : i32,barvar_idx : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_barsj(&self,sol_idx : i32,barvar_idx : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,num_elm,bars
         let mut bars : Vec<f64> = Vec::new();
@@ -3706,7 +3810,7 @@ impl Task {
     /// - `num_barvar` Number of variables in slice.
     /// - `num_elm` Number of positive semidefinite non-zero entries
     /// - `barx[num_elm]` (out) 
-    pub fn get_sol_barx_slice(&mut self,sol_idx : i32,first_barvar : i32,num_barvar : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_barx_slice(&self,sol_idx : i32,first_barvar : i32,num_barvar : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,num_elm,barx
         let mut barx : Vec<f64> = Vec::new();
@@ -3724,7 +3828,7 @@ impl Task {
     /// - `num_barvar` Number of variables
     /// - `num_elm` Number of positive semidefinite non-zero entries
     /// - `bars[num_elm]` (out) 
-    pub fn get_sol_bars_slice(&mut self,sol_idx : i32,first_barvar : i32,num_barvar : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_bars_slice(&self,sol_idx : i32,first_barvar : i32,num_barvar : i32,num_elm : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,num_elm,bars
         let mut bars : Vec<f64> = Vec::new();
@@ -3741,7 +3845,7 @@ impl Task {
     /// - `sol_idx` index of the constraint
     /// - `var_idx` index of the variable
     /// - `basic[1]` (out) 
-    pub fn get_sol_basic_xj(&mut self,sol_idx : i32,var_idx : i32) -> Result<bool,APIError>
+    pub fn get_sol_basic_xj(&self,sol_idx : i32,var_idx : i32) -> Result<bool,APIError>
     {
         // Arg processing order: task,sol_idx,var_idx,basic
         let mut basic : i32 = 0;
@@ -3757,7 +3861,7 @@ impl Task {
     /// - `sol_idx` index of the constraint
     /// - `barvar_idx` index of the variable
     /// - `basic[1]` (out) 
-    pub fn get_sol_basic_barx(&mut self,sol_idx : i32,barvar_idx : i32) -> Result<bool,APIError>
+    pub fn get_sol_basic_barx(&self,sol_idx : i32,barvar_idx : i32) -> Result<bool,APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,basic
         let mut basic : i32 = 0;
@@ -3772,7 +3876,7 @@ impl Task {
     /// - `sol_idx` Solution index
     /// - `con_idx` Constraint index 
     /// - `basic[1]` (out) 
-    pub fn get_sol_basic_con(&mut self,sol_idx : i32,con_idx : i64) -> Result<bool,APIError>
+    pub fn get_sol_basic_con(&self,sol_idx : i32,con_idx : i64) -> Result<bool,APIError>
     {
         // Arg processing order: task,sol_idx,con_idx,basic
         let mut basic : i32 = 0;
@@ -3789,7 +3893,7 @@ impl Task {
     /// - `var_idx` Index of the variable
     /// - `low_binding[1]` (out) 
     /// - `upr_binding[1]` (out) 
-    pub fn get_sol_sta_var(&mut self,sol_idx : i32,var_idx : i32) -> Result<(bool,bool),APIError>
+    pub fn get_sol_sta_var(&self,sol_idx : i32,var_idx : i32) -> Result<(bool,bool),APIError>
     {
         // Arg processing order: task,sol_idx,var_idx,low_binding,upr_binding
         let mut low_binding : i32 = 0;
@@ -3806,7 +3910,7 @@ impl Task {
     /// - `sol_idx` Index of the constraint
     /// - `barvar_idx` Index of the variable
     /// - `binding[1]` (out) 
-    pub fn get_sol_sta_barx(&mut self,sol_idx : i32,barvar_idx : i32) -> Result<bool,APIError>
+    pub fn get_sol_sta_barx(&self,sol_idx : i32,barvar_idx : i32) -> Result<bool,APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,binding
         let mut binding : i32 = 0;
@@ -3821,7 +3925,7 @@ impl Task {
     /// - `sol_idx` Solution index
     /// - `con_idx` Constraint index 
     /// - `binding[1]` (out) 
-    pub fn get_sol_sta_con(&mut self,sol_idx : i32,con_idx : i64) -> Result<bool,APIError>
+    pub fn get_sol_sta_con(&self,sol_idx : i32,con_idx : i64) -> Result<bool,APIError>
     {
         // Arg processing order: task,sol_idx,con_idx,binding
         let mut binding : i32 = 0;
@@ -3837,7 +3941,7 @@ impl Task {
     /// - `first_var` Variable index
     /// - `num_var` Number of variables
     /// - `basic[num_var]` (out) 
-    pub fn get_sol_basic_x_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<bool>,APIError>
+    pub fn get_sol_basic_x_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<bool>,APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,basic
         let mut basic : Vec<i32> = Vec::new();
@@ -3854,7 +3958,7 @@ impl Task {
     /// - `first_var` Variable index
     /// - `num_var` Number of variables
     /// - `basic[num_var]` (out) 
-    pub fn get_sol_basic_barx_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<bool>,APIError>
+    pub fn get_sol_basic_barx_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<Vec<bool>,APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,basic
         let mut basic : Vec<i32> = Vec::new();
@@ -3871,7 +3975,7 @@ impl Task {
     /// - `first_con` First constraint index in a slice
     /// - `num_con` Number of constraints
     /// - `basic[num_con]` (out) 
-    pub fn get_sol_basic_con_slice(&mut self,sol_idx : i32,first_con : i64,num_con : i64) -> Result<Vec<bool>,APIError>
+    pub fn get_sol_basic_con_slice(&self,sol_idx : i32,first_con : i64,num_con : i64) -> Result<Vec<bool>,APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,basic
         let mut basic : Vec<i32> = Vec::new();
@@ -3889,7 +3993,7 @@ impl Task {
     /// - `num_var` Number of variables
     /// - `low_binding[num_var]` (out) 
     /// - `upr_binding[num_var]` (out) 
-    pub fn get_sol_sta_var_slice(&mut self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<(Vec<bool>,Vec<bool>),APIError>
+    pub fn get_sol_sta_var_slice(&self,sol_idx : i32,first_var : i32,num_var : i32) -> Result<(Vec<bool>,Vec<bool>),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,low_binding,upr_binding
         let mut low_binding : Vec<i32> = Vec::new();
@@ -3908,7 +4012,7 @@ impl Task {
     /// - `first_barvar` First semidefinite variable index in a slice
     /// - `num_barvar` Number of variables
     /// - `bindnig[num_barvar]` (out) 
-    pub fn get_sol_sta_barx_slice(&mut self,sol_idx : i32,first_barvar : i32,num_barvar : i32) -> Result<Vec<bool>,APIError>
+    pub fn get_sol_sta_barx_slice(&self,sol_idx : i32,first_barvar : i32,num_barvar : i32) -> Result<Vec<bool>,APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,bindnig
         let mut bindnig : Vec<i32> = Vec::new();
@@ -3925,7 +4029,7 @@ impl Task {
     /// - `first_con` First constraint index in a slice
     /// - `num_con` Number of constraints
     /// - `binding[num_con]` (out) 
-    pub fn get_sol_sta_con_slice(&mut self,sol_idx : i32,first_con : i64,num_con : i64) -> Result<Vec<bool>,APIError>
+    pub fn get_sol_sta_con_slice(&self,sol_idx : i32,first_con : i64,num_con : i64) -> Result<Vec<bool>,APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,binding
         let mut binding : Vec<i32> = Vec::new();
@@ -3944,7 +4048,7 @@ impl Task {
     /// - `num_con` Number of constraints.
     /// - `num_elm` Total number of scalar elements in constraint slice.
     /// - `y[num_elm]` (out) 
-    pub fn get_sol_y_slice(&mut self,sol_idx : i32,first_con : i64,num_con : i64,num_elm : i64) -> Result<Vec<f64>,APIError>
+    pub fn get_sol_y_slice(&self,sol_idx : i32,first_con : i64,num_con : i64,num_elm : i64) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,num_elm,y
         let mut y : Vec<f64> = Vec::new();
@@ -3958,7 +4062,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_num_input_solutions(&mut self) -> i32
+    pub fn get_num_input_solutions(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_num_input_solutions(self.task) };
@@ -4125,7 +4229,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `par_idx` 
     /// - `value[1]` (out) 
-    pub fn get_iinf(&mut self,par_idx : i32) -> Result<i32,APIError>
+    pub fn get_iinf(&self,par_idx : i32) -> Result<i32,APIError>
     {
         // Arg processing order: task,par_idx,value
         let mut value : i32 = Default::default();
@@ -4139,7 +4243,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `par_idx` 
     /// - `value[1]` (out) 
-    pub fn get_liinf(&mut self,par_idx : i32) -> Result<i64,APIError>
+    pub fn get_liinf(&self,par_idx : i32) -> Result<i64,APIError>
     {
         // Arg processing order: task,par_idx,value
         let mut value : i64 = Default::default();
@@ -4153,7 +4257,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `par_idx` 
     /// - `value[1]` (out) 
-    pub fn get_dinf(&mut self,par_idx : i32) -> Result<f64,APIError>
+    pub fn get_dinf(&self,par_idx : i32) -> Result<f64,APIError>
     {
         // Arg processing order: task,par_idx,value
         let mut value : f64 = Default::default();
@@ -4168,7 +4272,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `par_name[.cstring]` (in) Name of the parameter
     /// - `value[1]` (out) 
-    pub fn get_double_param(&mut self,par_name : &str) -> Result<(i32,f64),APIError>
+    pub fn get_double_param(&self,par_name : &str) -> Result<(i32,f64),APIError>
     {
         // Arg processing order: task,par_name,value
         let cstring_par_name_ =
@@ -4185,7 +4289,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `buflen` 
     /// - `buf[buflen]` (out) Target buffer
-    pub fn get_all_double_params(&mut self) -> Result<Vec<f64>,APIError>
+    pub fn get_all_double_params(&self) -> Result<Vec<f64>,APIError>
     {
         // Arg processing order: task,buflen,buf
         let buflen : i32 =
@@ -4218,7 +4322,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `buflen` 
     /// - `buf[buflen]` (out) Target buffer
-    pub fn get_all_int_params(&mut self) -> Result<Vec<i32>,APIError>
+    pub fn get_all_int_params(&self) -> Result<Vec<i32>,APIError>
     {
         // Arg processing order: task,buflen,buf
         let buflen : i32 =
@@ -4251,7 +4355,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `par_name[.cstring]` (in) Name of the parameter
     /// - `value[1]` (out) 
-    pub fn get_int_param(&mut self,par_name : &str) -> Result<(i32,i32),APIError>
+    pub fn get_int_param(&self,par_name : &str) -> Result<(i32,i32),APIError>
     {
         // Arg processing order: task,par_name,value
         let cstring_par_name_ =
@@ -4267,7 +4371,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `par_name[.cstring]` (in) Name of the parameter
-    pub fn get_param_str_len(&mut self,par_name : &str) -> Result<i32,APIError>
+    pub fn get_param_str_len(&self,par_name : &str) -> Result<i32,APIError>
     {
         // Arg processing order: task,par_name
         let cstring_par_name_ =
@@ -4284,7 +4388,7 @@ impl Task {
     /// - `name[.cstring]` (in) 
     /// - `length` 
     /// - `buf[length]` (out) If the parameter is not recognized, the returned string is 0.
-    pub fn get_param_str(&mut self,name : &str) -> Result<String,APIError>
+    pub fn get_param_str(&self,name : &str) -> Result<String,APIError>
     {
         // Arg processing order: task,name,length,buf
         let cstring_name_ =
@@ -4364,7 +4468,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_task_name_len(&mut self) -> i32
+    pub fn get_task_name_len(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_task_name_len(self.task) };
@@ -4374,7 +4478,7 @@ impl Task {
     /// # Arguments
     /// 
     /// - `task` The optimizatioj task object
-    pub fn get_obj_name_len(&mut self) -> i32
+    pub fn get_obj_name_len(&self) -> i32
     {
         // Arg processing order: task
         let returned_value = unsafe{ MSK12_get_obj_name_len(self.task) };
@@ -4386,7 +4490,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `capacity` 
     /// - `buf[capacity]` (out) Target buffer
-    pub fn get_task_name(&mut self) -> Result<String,APIError>
+    pub fn get_task_name(&self) -> Result<String,APIError>
     {
         // Arg processing order: task,capacity,buf
         let capacity : i32 =
@@ -4406,7 +4510,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `capacity` 
     /// - `buf[capacity]` (out) Target buffer
-    pub fn get_obj_name(&mut self) -> Result<String,APIError>
+    pub fn get_obj_name(&self) -> Result<String,APIError>
     {
         // Arg processing order: task,capacity,buf
         let capacity : i32 =
@@ -4456,7 +4560,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `var_idx` Variable index
     /// - `name_len[1]` (out) 
-    pub fn get_var_name_len(&mut self,var_idx : i32) -> Result<i32,APIError>
+    pub fn get_var_name_len(&self,var_idx : i32) -> Result<i32,APIError>
     {
         // Arg processing order: task,var_idx,name_len
         let mut name_len : i32 = Default::default();
@@ -4469,7 +4573,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `var_idx` Variable index
-    pub fn get_var_name_len2(&mut self,var_idx : i32) -> i32
+    pub fn get_var_name_len2(&self,var_idx : i32) -> i32
     {
         // Arg processing order: task,var_idx
         let returned_value = unsafe{ MSK12_get_var_name_len2(self.task,var_idx) };
@@ -4481,7 +4585,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `barvar_idx` Positive semi-definite variable index
     /// - `name_len[1]` (out) 
-    pub fn get_barvar_name_len(&mut self,barvar_idx : i32) -> Result<i32,APIError>
+    pub fn get_barvar_name_len(&self,barvar_idx : i32) -> Result<i32,APIError>
     {
         // Arg processing order: task,barvar_idx,name_len
         let mut name_len : i32 = Default::default();
@@ -4494,7 +4598,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `barvar_idx` Positive semi-definite variable index
-    pub fn get_barvar_name_len2(&mut self,barvar_idx : i32) -> i32
+    pub fn get_barvar_name_len2(&self,barvar_idx : i32) -> i32
     {
         // Arg processing order: task,barvar_idx
         let returned_value = unsafe{ MSK12_get_barvar_name_len2(self.task,barvar_idx) };
@@ -4582,7 +4686,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `con_idx` Constraint index 
     /// - `len[1]` (out) 
-    pub fn get_con_name_len(&mut self,con_idx : i64) -> Result<i32,APIError>
+    pub fn get_con_name_len(&self,con_idx : i64) -> Result<i32,APIError>
     {
         // Arg processing order: task,con_idx,len
         let mut len : i32 = Default::default();
@@ -4596,7 +4700,7 @@ impl Task {
     /// - `task` The optimizatioj task object
     /// - `djc_idx` Disjunctive constraint index
     /// - `len[1]` (out) 
-    pub fn get_djc_name_len(&mut self,djc_idx : i64) -> Result<i32,APIError>
+    pub fn get_djc_name_len(&self,djc_idx : i64) -> Result<i32,APIError>
     {
         // Arg processing order: task,djc_idx,len
         let mut len : i32 = Default::default();
@@ -4609,7 +4713,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `con_idx` Constraint index 
-    pub fn get_con_name_len2(&mut self,con_idx : i64) -> i32
+    pub fn get_con_name_len2(&self,con_idx : i64) -> i32
     {
         // Arg processing order: task,con_idx
         let returned_value = unsafe{ MSK12_get_con_name_len2(self.task,con_idx) };
@@ -4620,7 +4724,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `djc_idx` Disjunctive constraint index
-    pub fn get_djc_name_len2(&mut self,djc_idx : i64) -> i32
+    pub fn get_djc_name_len2(&self,djc_idx : i64) -> i32
     {
         // Arg processing order: task,djc_idx
         let returned_value = unsafe{ MSK12_get_djc_name_len2(self.task,djc_idx) };
@@ -4708,7 +4812,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `filename[.cstring]` (in) 
-    pub fn write_task_to_file(&mut self,filename : &str) -> Result<(),APIError>
+    pub fn write_task_to_file(&self,filename : &str) -> Result<(),APIError>
     {
         // Arg processing order: task,filename
         let cstring_filename_ =
@@ -4724,7 +4828,7 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `filename[.cstring]` (in) 
-    pub fn write_solution_to_file(&mut self,filename : &str) -> Result<(),APIError>
+    pub fn write_solution_to_file(&self,filename : &str) -> Result<(),APIError>
     {
         // Arg processing order: task,filename
         let cstring_filename_ =

@@ -1,5 +1,5 @@
 [package]
-name = "mosek_core_api"
+name = "mosek_stable_api"
 version = "12.0.0"
 edition = "2024"
 
