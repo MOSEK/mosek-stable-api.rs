@@ -4,8 +4,8 @@
 //!  File: `lo1.rs`
 //!
 
-extern crate mosek_core_api;
-use mosek_core_api as moco;
+extern crate mosek_stable_api;
+use mosek_stable_api as moco;
 
 fn main() {
     lo1().unwrap();
@@ -15,7 +15,7 @@ fn lo1() -> Result<(),moco::APIError> {
     let msk = moco::initialize()?;
     // All the normal lo1 data:
     const NUMVAR : i32 = 4;
-    const NUMCON : i64 = 3;
+    const _NUMCON : i64 = 3;
     let cj : &[i32] = &[0,   1,   2,   3];
     let c  : &[f64] = &[3.0, 1.0, 5.0, 1.0];
     let rownum : &[i32]  = &[3, 4, 2 ];
@@ -65,7 +65,7 @@ fn lo1() -> Result<(),moco::APIError> {
                 const SOLIDX : i32 = 0;
                 match task.get_sol_status(SOLIDX)? {
                     (moco::SolSta::OPTIMAL,_) => {
-                        let xx = task.get_sol_xx_slice(SOLIDX, 0, NUMVAR)?;
+                        let mut xx = vec![0.0; NUMVAR as usize]; task.get_sol_xx_slice(SOLIDX, 0,&mut xx)?;
                         println!("xx: {:?}\n", xx);
                     },
                     (moco::SolSta::INFEAS_CERT,_)|(_,moco::SolSta::INFEAS_CERT) => {

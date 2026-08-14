@@ -29,7 +29,7 @@
 //!      x > 0
 //! ```
 
-use mosek_core_api as moco;
+use mosek_stable_api as moco;
 
 fn portfolio() -> Result<(),moco::APIError>
 {
@@ -129,7 +129,8 @@ fn portfolio() -> Result<(),moco::APIError>
                 (moco::SolSta::OPTIMAL,_) => {
                     /* Read the x variables one by one and compute expected return. */
                     /* Can also be obtained as value of the objective. */
-                    let xx = task.get_sol_xx_slice(solidx,0,n)?;
+                    let mut xx = vec![0.0; n as usize];
+                    task.get_sol_xx_slice(solidx,0,&mut xx)?;
                     let expret : f64 = mu.iter().zip(xx.iter()).map(|(a,b)| a*b).sum();
 
                     /* Read the value of s. This should be gamma. */

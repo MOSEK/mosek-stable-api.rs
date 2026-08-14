@@ -19,7 +19,7 @@
 //!      0.0 < x2 < 10.0
 //! ```
 
-use mosek_core_api as moco;
+use mosek_stable_api as moco;
 
 fn lo2() -> Result<(),moco::APIError> {
     let msk = moco::initialize()?;
@@ -99,8 +99,10 @@ fn lo2() -> Result<(),moco::APIError> {
 
             let solidx : i32 = 0;
             match task.get_sol_status(solidx)? {
-                (moco::SolSta::OPTIMAL,_) =>
-                    println!("Optimal primal solution = {:?}",task.get_sol_xx_slice(solidx,0,numvar as i32)?),
+                (moco::SolSta::OPTIMAL,_) => {
+                    let mut xx = vec![0.0; numvar]; task.get_sol_xx_slice(solidx,0,&mut xx)?;
+                    println!("Optimal primal solution = {:?}",xx);
+                },
                 (moco::SolSta::INFEAS_CERT,_) => println!("Certificate of dual infeasibility found."),
                 (_,moco::SolSta::INFEAS_CERT) => println!("Certificate of primal infeasibility found."),
                 (moco::SolSta::ILLPOSED_CERT,_) => println!("Certificate of dual illposedness found."),

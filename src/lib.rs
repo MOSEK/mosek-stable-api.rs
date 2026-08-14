@@ -42,7 +42,7 @@ DAMAGE.
 //! `initialize_with_paths()`, which will load the actual library dynamically.
 //!
 //! ```
-//! use mosek_core_api as mca;
+//! use mosek_stable_api as mca;
 //!
 //! fn main() {
 //!     lo1().unwrap();
@@ -102,7 +102,8 @@ DAMAGE.
 //!                const solidx : i32 = 0;
 //!                match task.get_sol_status(solidx)? {
 //!                    (mca::SolSta::OPTIMAL,_) => {
-//!                        let xx = task.get_sol_xx_slice(solidx, 0, numvar)?;
+//!                        let mut xx = vec![0.0; numvar as usize];
+//!                        task.get_sol_xx_slice(solidx, 0, &mut xx)?;
 //!                        println!("xx: {:?}\n", xx);
 //!                    },
 //!                    (mca::SolSta::INFEAS_CERT,_)|(_,mca::SolSta::INFEAS_CERT) => {
