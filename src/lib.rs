@@ -169,7 +169,7 @@ type  MSK12_ErrorCallbackFunc = extern "C" fn (h : c_void_p,r : i32,name : *cons
 type  MSK12_CallbackFunc = extern "C" fn (h : c_void_p,code : i32,len_iinf : i32,iinf : *const i32,len_liinf : i32,liinf : *const i64,len_dinf : i32,dinf : *const f64) -> i32;
 #[allow(non_camel_case_types)]
 #[allow(unused)]
-type  MSK12_IntSolCallbackFunc = extern "C" fn (handle : c_void_p,num : i32,xx : *const f64);
+type  MSK12_IntSolCallbackFunc = extern "C" fn (handle : c_void_p,num : i32,primal_obj : f64,xx : *const f64);
 
 
 #[allow(non_camel_case_types)]
@@ -654,7 +654,7 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_solution_summary(task : Task_t,whichstream : i32) -> i32;
     #[allow(unused)]
-    fn MSK12_optimize_callback(task : Task_t,trm : *mut i32,cb_handle : c_void_p,cb_func : Option<extern "C" fn (h : c_void_p,code : i32,len_iinf : i32,iinf : *const i32,len_liinf : i32,liinf : *const i64,len_dinf : i32,dinf : *const f64) -> i32>,int_cb_handle : c_void_p,int_cb_func : Option<extern "C" fn (handle : c_void_p,num : i32,xx : *const f64)>) -> i32;
+    fn MSK12_optimize_callback(task : Task_t,trm : *mut i32,cb_handle : c_void_p,cb_func : Option<extern "C" fn (h : c_void_p,code : i32,len_iinf : i32,iinf : *const i32,len_liinf : i32,liinf : *const i64,len_dinf : i32,dinf : *const f64) -> i32>,int_cb_handle : c_void_p,int_cb_func : Option<extern "C" fn (handle : c_void_p,num : i32,primal_obj : f64,xx : *const f64)>) -> i32;
     #[allow(unused)]
     fn MSK12_put_remote_solver(task : Task_t,server : *const c_char,cert : *const c_char);
     #[allow(unused)]
@@ -1642,9 +1642,9 @@ extern "C" fn info_cb(h : CallbackHandle,code : i32,len_iinf : i32,iinf : *const
     if r { 1 } else { 0 }
 }
 
-extern "C" fn intsol_cb(h : CallbackHandle,num : i32,xx : *const f64) {
-    let func = h as *mut Box<dyn Fn(&[f64])>;
-    unsafe{ (*func)(std::slice::from_raw_parts(xx, usize::try_from(num).unwrap_or(0))) };
+extern "C" fn intsol_cb(h : CallbackHandle,num : i32,primal_obj : f64, xx : *const f64) {
+    let func = h as *mut Box<dyn Fn(f64,&[f64])>;
+    unsafe{ (*func)(primal_obj,std::slice::from_raw_parts(xx, usize::try_from(num).unwrap_or(0))) };
 }
 
 
@@ -1687,10 +1687,10 @@ impl Task {
     pub fn optimize_with_callbacks<F1,F2>(&mut self, info_f : Option<F1>, intsol_f : Option<F2>) -> Result<TrmCode,APIError>
         where
             F1 : FnMut(i32,&[i32],&[i64],&[f64]) -> bool,
-            F2 : FnMut(&[f64])
+            F2 : FnMut(f64,&[f64])
     {
         let info   = if let Some(f) = info_f { let r : Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> = Box::new(f); Some(r) } else { None };
-        let intsol = if let Some(f) = intsol_f { let r : Box<dyn FnMut(&[f64])> = Box::new(f); Some(r) } else { None };
+        let intsol = if let Some(f) = intsol_f { let r : Box<dyn FnMut(f64,&[f64])> = Box::new(f); Some(r) } else { None };
 
         let has_info = info.is_some();
         let has_intsol = intsol.is_some();
@@ -1702,7 +1702,7 @@ impl Task {
             info.map(|f| &f as * const Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> as CallbackHandle).unwrap_or(std::ptr::null_mut()),
             if has_info { Some(info_cb as extern "C" fn(*mut c_void, i32, i32, *const i32, i32, *const i64, i32, *const f64) -> i32) } else {None},
             intsol.map(|f| &f as * const _ as CallbackHandle).unwrap_or(std::ptr::null_mut()),
-            if has_intsol { Some(intsol_cb as extern "C" fn(*mut c_void, i32, *const f64)) } else {None}) };
+            if has_intsol { Some(intsol_cb as extern "C" fn(*mut c_void, i32,f64,*const f64)) } else {None}) };
         if 0 != r {
             self.last_error()?
         }
