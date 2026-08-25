@@ -28,7 +28,6 @@ fn sdo1() -> Result<(),msk::APIError> {
     const LENBARVAR : &[i32] = &[3 * (3 + 1) / 2]; /* Number of scalar SD variables  */
     const NUMVAR : i32 = 3;
     const NUMROW : i64 = 6;
-    const NUMCON : i64 = 3;
 
     let subj = &[0, 0, 1, 2, 0, 1, 2];
     let cof = &[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
@@ -89,9 +88,12 @@ fn sdo1() -> Result<(),msk::APIError> {
                 // Set the bounds on constraints.
                 // for i=1, ...,NUMCON : blc[i] <= constraint i <= buc[i]
 
-                for i in 0..NUMCON {
-                    task.append_con(dom_rzero, &[i+1], Some(&rhsc[1..2]));
-                }
+
+                task.append_cons(
+                    &[dom_rzero,dom_rzero],
+                    &[1,1],
+                    &[1,2],
+                    Some(rhsc))?;
 
                 /* Append the affine conic constraint with quadratic cone */
                 let dom_quad3 = task.get_domain_quadratic_cone(3)?;
@@ -107,6 +109,7 @@ fn sdo1() -> Result<(),msk::APIError> {
                 task.append_symmat(DIMBARVAR[0], &bara_i[3..9], &bara_j[3..9], &bara_v[3..9])?;
                 task.put_bar_entry(2, 0, &[midx+1], &[1.0])?;
 
+                task.write_task_to_file("sdo1.ptf")?;
                 /* Run optimizer */
                 let trmcode = task.optimize()?;
 

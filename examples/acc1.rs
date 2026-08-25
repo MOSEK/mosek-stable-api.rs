@@ -11,7 +11,6 @@
 //!             gamma >= |Gx+h|_2
 //! ```
 
-use std::f64;
 
 use mosek_stable_api as msk;
 
