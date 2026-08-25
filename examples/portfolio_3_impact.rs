@@ -162,8 +162,7 @@ fn portfolio() -> Result<(),msk::APIError> {
                 task.put_obj_sense(msk::ObjSense::MAXIMIZE);
                 task.put_obj_row(0)?;
 
-                task.write_task_to_file("portfolio_3.ptf")?;
-                let trmcode = task.optimize()?;
+                let _trmcode = task.optimize()?;
 
                 /* Display the solution summary for quick inspection of results. */
                 task.solution_summary(msk::StreamType::MSG)?;
