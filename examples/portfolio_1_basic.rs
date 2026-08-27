@@ -121,8 +121,6 @@ fn portfolio() -> Result<(),moco::APIError>
             /* Display the solution summary for quick inspection of results. */
             task.solution_summary(moco::StreamType::MSG)?;
 
-            task.write_task_to_file("portfolio_1_basic.ptf")?;
-
             // Check if the interior point solution is an optimal point
             let solidx = 0;
             match task.get_sol_status(solidx)? {

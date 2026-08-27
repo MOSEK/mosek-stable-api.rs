@@ -31,10 +31,6 @@
 // DAMAGE.
 
 
-#include "mosekstabledynamic12.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 /* NOTES on compiling and linking:
  * To build the MOSEK Core dymalic loader functions this file must be included in the final binary or library.
@@ -42,17 +38,21 @@
  *
  */
 
-#ifdef WIN32
+#ifdef _WIN32
+    #include <windows.h>
     #include <libloaderapi.h>
     #define libname "mosekstable12.dll"
     typedef HMODULE libhandle_t;
 
-    libhandle_t __dlopen(const char * filename, char *const* errmsg) {
+    libhandle_t __dlopen(const char * filename, const char ** errmsg) {
         libhandle_t h = LoadLibraryA(filename);
         if (!h) {
             *errmsg = "Failed to load MOSEK Core library";
         }
         return h;
+    }
+    void __dlclose(libhandle_t h) {
+        FreeLibrary(h);
     }
 
     void * __loadsym(libhandle_t h, const char * symname, const char *(* errmsg)) {
@@ -79,6 +79,9 @@
         }
         return h;
     }
+    void __dlclose(libhandle_t h) {
+        dlclose(h);
+    }
 
     void * __loadsym(libhandle_t h, const char * symname, const char ** errmsg) {
         void * symaddr = dlsym(h,symname);
@@ -89,6 +92,11 @@
 
     #define PATH_SEP '/'
 #endif
+#include "mosekstabledynamic12.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 static libhandle_t libmosek_handle = NULL;
 MSK12_get_callback_code_name_func_t MSK12_get_callback_code_name_ptr;
@@ -1092,17 +1100,20 @@ MSK12_put_double_param_func_t MSK12_put_double_param_ptr;
 MSK12_ResCode MSK12_put_double_param(
     MSK12_Task_t task,
     const char* par_name,
-    double value) { return MSK12_put_double_param_ptr(task,par_name,value); }
+    double value,
+    int ok[1]) { return MSK12_put_double_param_ptr(task,par_name,value,ok); }
 MSK12_put_int_param_func_t MSK12_put_int_param_ptr;
 MSK12_ResCode MSK12_put_int_param(
     MSK12_Task_t task,
     const char* par_name,
-    int32_t value) { return MSK12_put_int_param_ptr(task,par_name,value); }
+    int32_t value,
+    int ok[1]) { return MSK12_put_int_param_ptr(task,par_name,value,ok); }
 MSK12_put_param_str_func_t MSK12_put_param_str_ptr;
 MSK12_ResCode MSK12_put_param_str(
     MSK12_Task_t task,
     const char* par_name,
-    const char* value) { return MSK12_put_param_str_ptr(task,par_name,value); }
+    const char* value,
+    int ok[1]) { return MSK12_put_param_str_ptr(task,par_name,value,ok); }
 MSK12_get_task_name_len_func_t MSK12_get_task_name_len_ptr;
 int32_t MSK12_get_task_name_len(MSK12_Task_t task) { return MSK12_get_task_name_len_ptr(task); }
 MSK12_get_obj_name_len_func_t MSK12_get_obj_name_len_ptr;
@@ -1401,263 +1412,262 @@ int MSK12_initialize_library_with_paths(const char * paths[]) {
         if (!libmosek_handle)
             libmosek_handle = __dlopen(libname,&errmsg);
 
-        if (!libmosek_handle) goto ERROR;
+        if (!libmosek_handle) goto EXIT_ERROR;
 
-        if (NULL == (MSK12_get_callback_code_name_ptr = (MSK12_get_callback_code_name_func_t)__loadsym(libmosek_handle,"MSK12_get_callback_code_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_resp_name_ptr = (MSK12_get_resp_name_func_t)__loadsym(libmosek_handle,"MSK12_get_resp_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_resp_descr_ptr = (MSK12_get_resp_descr_func_t)__loadsym(libmosek_handle,"MSK12_get_resp_descr",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_last_resp_ptr = (MSK12_get_last_resp_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_last_resp_msg_ptr = (MSK12_get_last_resp_msg_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp_msg",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_last_resp_msg_len_ptr = (MSK12_get_last_resp_msg_len_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp_msg_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_trm_name_ptr = (MSK12_get_trm_name_func_t)__loadsym(libmosek_handle,"MSK12_get_trm_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_trm_descr_ptr = (MSK12_get_trm_descr_func_t)__loadsym(libmosek_handle,"MSK12_get_trm_descr",&errmsg))) goto ERROR;
-if (NULL == (MSK12_new_task_from_task_ptr = (MSK12_new_task_from_task_func_t)__loadsym(libmosek_handle,"MSK12_new_task_from_task",&errmsg))) goto ERROR;
-if (NULL == (MSK12_new_task_ptr = (MSK12_new_task_func_t)__loadsym(libmosek_handle,"MSK12_new_task",&errmsg))) goto ERROR;
-if (NULL == (MSK12_delete_task_ptr = (MSK12_delete_task_func_t)__loadsym(libmosek_handle,"MSK12_delete_task",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_var_ptr = (MSK12_reserve_num_var_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_var",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_barvar_ptr = (MSK12_reserve_num_barvar_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_barvar",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_con_ptr = (MSK12_reserve_num_con_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_row_ptr = (MSK12_reserve_num_row_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_nz_ptr = (MSK12_reserve_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_dom_ptr = (MSK12_reserve_num_dom_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_dom",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_symmat_ptr = (MSK12_reserve_num_symmat_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_symmat",&errmsg))) goto ERROR;
-if (NULL == (MSK12_reserve_num_symmat_nz_ptr = (MSK12_reserve_num_symmat_nz_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_symmat_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_var_ptr = (MSK12_get_num_var_func_t)__loadsym(libmosek_handle,"MSK12_get_num_var",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_barvar_ptr = (MSK12_get_num_barvar_func_t)__loadsym(libmosek_handle,"MSK12_get_num_barvar",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_domain_ptr = (MSK12_get_num_domain_func_t)__loadsym(libmosek_handle,"MSK12_get_num_domain",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_row_ptr = (MSK12_get_num_row_func_t)__loadsym(libmosek_handle,"MSK12_get_num_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_symmat_ptr = (MSK12_get_num_symmat_func_t)__loadsym(libmosek_handle,"MSK12_get_num_symmat",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_con_ptr = (MSK12_get_num_con_func_t)__loadsym(libmosek_handle,"MSK12_get_num_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_djc_ptr = (MSK12_get_num_djc_func_t)__loadsym(libmosek_handle,"MSK12_get_num_djc",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_vars_ptr = (MSK12_append_vars_func_t)__loadsym(libmosek_handle,"MSK12_append_vars",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_rows_ptr = (MSK12_append_rows_func_t)__loadsym(libmosek_handle,"MSK12_append_rows",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_barvar_ptr = (MSK12_append_barvar_func_t)__loadsym(libmosek_handle,"MSK12_append_barvar",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_barvars_ptr = (MSK12_append_barvars_func_t)__loadsym(libmosek_handle,"MSK12_append_barvars",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_symmat_ptr = (MSK12_append_symmat_func_t)__loadsym(libmosek_handle,"MSK12_append_symmat",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_symmats_ptr = (MSK12_append_symmats_func_t)__loadsym(libmosek_handle,"MSK12_append_symmats",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_empty_cons_ptr = (MSK12_append_empty_cons_func_t)__loadsym(libmosek_handle,"MSK12_append_empty_cons",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_empty_djcs_ptr = (MSK12_append_empty_djcs_func_t)__loadsym(libmosek_handle,"MSK12_append_empty_djcs",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_type_ptr = (MSK12_put_var_type_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_type_slice_ptr = (MSK12_put_var_type_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_type_slice_value_ptr = (MSK12_put_var_type_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_slice_value",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_type_list_ptr = (MSK12_put_var_type_list_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_list",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_type_ptr = (MSK12_get_var_type_func_t)__loadsym(libmosek_handle,"MSK12_get_var_type",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_type_slice_ptr = (MSK12_get_var_type_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_var_type_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_bound_ptr = (MSK12_put_var_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_bound_slice_ptr = (MSK12_put_var_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_bound_slice_value_ptr = (MSK12_put_var_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound_slice_value",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_low_bound_ptr = (MSK12_put_var_low_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_low_bound_slice_ptr = (MSK12_put_var_low_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_low_bound_slice_value_ptr = (MSK12_put_var_low_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound_slice_value",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_upr_bound_ptr = (MSK12_put_var_upr_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_upr_bound_slice_ptr = (MSK12_put_var_upr_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_upr_bound_slice_value_ptr = (MSK12_put_var_upr_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound_slice_value",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_bound_ptr = (MSK12_get_var_bound_func_t)__loadsym(libmosek_handle,"MSK12_get_var_bound",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_bound_slice_ptr = (MSK12_get_var_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_var_bound_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_slice_num_elm_ptr = (MSK12_get_barvar_slice_num_elm_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_slice_num_elm",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_dim_ptr = (MSK12_get_barvar_dim_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_dim",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_slice_dims_ptr = (MSK12_get_barvar_slice_dims_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_slice_dims",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_ptr = (MSK12_get_domain_func_t)__loadsym(libmosek_handle,"MSK12_get_domain",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_empty_ptr = (MSK12_get_domain_empty_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_empty",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_rzero_ptr = (MSK12_get_domain_rzero_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rzero",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_rplus_ptr = (MSK12_get_domain_rplus_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rplus",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_rminus_ptr = (MSK12_get_domain_rminus_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rminus",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_r_ptr = (MSK12_get_domain_r_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_r",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_quadratic_cone_ptr = (MSK12_get_domain_quadratic_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_quadratic_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_rotated_quadratic_cone_ptr = (MSK12_get_domain_rotated_quadratic_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rotated_quadratic_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_primal_exponential_cone_ptr = (MSK12_get_domain_primal_exponential_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_exponential_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_dual_exponential_cone_ptr = (MSK12_get_domain_dual_exponential_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_exponential_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_primal_power_cone_ptr = (MSK12_get_domain_primal_power_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_power_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_dual_power_cone_ptr = (MSK12_get_domain_dual_power_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_power_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_primal_geometric_mean_cone_ptr = (MSK12_get_domain_primal_geometric_mean_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_geometric_mean_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_dual_geometric_mean_cone_ptr = (MSK12_get_domain_dual_geometric_mean_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_geometric_mean_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_svecpsd_cone_ptr = (MSK12_get_domain_svecpsd_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_svecpsd_cone",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_info_ptr = (MSK12_get_domain_info_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_info",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_domain_alpha_ptr = (MSK12_get_domain_alpha_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_alpha",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_ptr = (MSK12_put_row_func_t)__loadsym(libmosek_handle,"MSK12_put_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_slice_ptr = (MSK12_put_row_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_row_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_list_ptr = (MSK12_put_row_list_func_t)__loadsym(libmosek_handle,"MSK12_put_row_list",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_g_ptr = (MSK12_put_row_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_g",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_slice_g_ptr = (MSK12_put_row_slice_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_slice_g",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_row_list_g_ptr = (MSK12_put_row_list_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_list_g",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_col_ptr = (MSK12_put_col_func_t)__loadsym(libmosek_handle,"MSK12_put_col",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_col_slice_ptr = (MSK12_put_col_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_col_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_col_list_ptr = (MSK12_put_col_list_func_t)__loadsym(libmosek_handle,"MSK12_put_col_list",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_ijc_ptr = (MSK12_put_ijc_func_t)__loadsym(libmosek_handle,"MSK12_put_ijc",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_ijc_list_ptr = (MSK12_put_ijc_list_func_t)__loadsym(libmosek_handle,"MSK12_put_ijc_list",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_row_num_nz_ptr = (MSK12_get_row_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_row_num_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_row_slice_num_nz_ptr = (MSK12_get_row_slice_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_row_slice_num_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_row_ptr = (MSK12_get_row_func_t)__loadsym(libmosek_handle,"MSK12_get_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_row_slice_ptr = (MSK12_get_row_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_row_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_col_num_nz_ptr = (MSK12_get_col_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_col_num_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_col_slice_num_nz_ptr = (MSK12_get_col_slice_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_col_slice_num_nz",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_col_ptr = (MSK12_get_col_func_t)__loadsym(libmosek_handle,"MSK12_get_col",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_col_slice_ptr = (MSK12_get_col_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_col_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_bar_entry_ptr = (MSK12_put_bar_entry_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_entry",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_bar_entry_list_ptr = (MSK12_put_bar_entry_list_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_entry_list",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_bar_row_ptr = (MSK12_put_bar_row_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_symmat_info_ptr = (MSK12_get_symmat_info_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_info",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_symmat_ptr = (MSK12_get_symmat_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_symmat_slice_info_ptr = (MSK12_get_symmat_slice_info_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_slice_info",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_symmat_slice_ptr = (MSK12_get_symmat_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_con_ptr = (MSK12_append_con_func_t)__loadsym(libmosek_handle,"MSK12_append_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_cons_ptr = (MSK12_append_cons_func_t)__loadsym(libmosek_handle,"MSK12_append_cons",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_con_ptr = (MSK12_put_con_func_t)__loadsym(libmosek_handle,"MSK12_put_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_scalar_con_ptr = (MSK12_put_scalar_con_func_t)__loadsym(libmosek_handle,"MSK12_put_scalar_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_con_slice_ptr = (MSK12_put_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_con_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_slice_domains_ptr = (MSK12_get_con_slice_domains_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice_domains",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_slice_num_row_ptr = (MSK12_get_con_slice_num_row_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice_num_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_slice_ptr = (MSK12_get_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_djc_ptr = (MSK12_append_djc_func_t)__loadsym(libmosek_handle,"MSK12_append_djc",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_djc_ptr = (MSK12_put_djc_func_t)__loadsym(libmosek_handle,"MSK12_put_djc",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_djc_slice_ptr = (MSK12_put_djc_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_djc_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_info_ptr = (MSK12_get_djc_info_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_info",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_ptr = (MSK12_get_djc_func_t)__loadsym(libmosek_handle,"MSK12_get_djc",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_slice_info_ptr = (MSK12_get_djc_slice_info_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_slice_info",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_slice_ptr = (MSK12_get_djc_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_obj_sense_ptr = (MSK12_put_obj_sense_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_sense",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_obj_sense_ptr = (MSK12_get_obj_sense_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_sense",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_obj_row_ptr = (MSK12_put_obj_row_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_obj_row_ptr = (MSK12_get_obj_row_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_row",&errmsg))) goto ERROR;
-if (NULL == (MSK12_optimize_ptr = (MSK12_optimize_func_t)__loadsym(libmosek_handle,"MSK12_optimize",&errmsg))) goto ERROR;
-if (NULL == (MSK12_solution_summary_ptr = (MSK12_solution_summary_func_t)__loadsym(libmosek_handle,"MSK12_solution_summary",&errmsg))) goto ERROR;
-if (NULL == (MSK12_optimize_callback_ptr = (MSK12_optimize_callback_func_t)__loadsym(libmosek_handle,"MSK12_optimize_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_remote_solver_ptr = (MSK12_put_remote_solver_func_t)__loadsym(libmosek_handle,"MSK12_put_remote_solver",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_optserver_access_token_ptr = (MSK12_put_optserver_access_token_func_t)__loadsym(libmosek_handle,"MSK12_put_optserver_access_token",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_sol_ptr = (MSK12_get_num_sol_func_t)__loadsym(libmosek_handle,"MSK12_get_num_sol",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_type_ptr = (MSK12_get_sol_type_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_type",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_status_ptr = (MSK12_get_sol_status_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_status",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_problem_status_ptr = (MSK12_get_problem_status_func_t)__loadsym(libmosek_handle,"MSK12_get_problem_status",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_primal_obj_ptr = (MSK12_get_primal_obj_func_t)__loadsym(libmosek_handle,"MSK12_get_primal_obj",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_dual_obj_ptr = (MSK12_get_dual_obj_func_t)__loadsym(libmosek_handle,"MSK12_get_dual_obj",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_xx_slice_ptr = (MSK12_get_sol_xx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_xx_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_slx_slice_ptr = (MSK12_get_sol_slx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_slx_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sux_slice_ptr = (MSK12_get_sol_sux_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sux_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_barxj_ptr = (MSK12_get_sol_barxj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barxj",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_barsj_ptr = (MSK12_get_sol_barsj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barsj",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_barx_slice_ptr = (MSK12_get_sol_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barx_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_bars_slice_ptr = (MSK12_get_sol_bars_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_bars_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_xj_ptr = (MSK12_get_sol_basic_xj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_xj",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_barx_ptr = (MSK12_get_sol_basic_barx_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_barx",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_con_ptr = (MSK12_get_sol_basic_con_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_var_ptr = (MSK12_get_sol_sta_var_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_var",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_barx_ptr = (MSK12_get_sol_sta_barx_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_barx",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_con_ptr = (MSK12_get_sol_sta_con_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_con",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_x_slice_ptr = (MSK12_get_sol_basic_x_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_x_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_barx_slice_ptr = (MSK12_get_sol_basic_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_barx_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_basic_con_slice_ptr = (MSK12_get_sol_basic_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_con_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_var_slice_ptr = (MSK12_get_sol_sta_var_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_var_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_barx_slice_ptr = (MSK12_get_sol_sta_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_barx_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_sta_con_slice_ptr = (MSK12_get_sol_sta_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_con_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_xc_slice_ptr = (MSK12_get_sol_xc_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_xc_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_sol_y_slice_ptr = (MSK12_get_sol_y_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_y_slice",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_input_solutions_ptr = (MSK12_get_num_input_solutions_func_t)__loadsym(libmosek_handle,"MSK12_get_num_input_solutions",&errmsg))) goto ERROR;
-if (NULL == (MSK12_copy_sol_to_input_ptr = (MSK12_copy_sol_to_input_func_t)__loadsym(libmosek_handle,"MSK12_copy_sol_to_input",&errmsg))) goto ERROR;
-if (NULL == (MSK12_append_sol_ptr = (MSK12_append_sol_func_t)__loadsym(libmosek_handle,"MSK12_append_sol",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_xx_ptr = (MSK12_put_sol_xx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_xx",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_slx_ptr = (MSK12_put_sol_slx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_slx",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_sux_ptr = (MSK12_put_sol_sux_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_sux",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_basic_x_ptr = (MSK12_put_sol_basic_x_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_basic_x",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_barx_ptr = (MSK12_put_sol_barx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_barx",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_bars_ptr = (MSK12_put_sol_bars_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_bars",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_yi_ptr = (MSK12_put_sol_yi_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_yi",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_sol_basic_c_ptr = (MSK12_put_sol_basic_c_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_basic_c",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_iinf_ptr = (MSK12_get_num_iinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_iinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_liinf_ptr = (MSK12_get_num_liinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_liinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_dinf_ptr = (MSK12_get_num_dinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_dinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_iinf_ptr = (MSK12_get_iinf_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_liinf_ptr = (MSK12_get_liinf_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_dinf_ptr = (MSK12_get_dinf_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_iinf_name_ptr = (MSK12_get_iinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_liinf_name_ptr = (MSK12_get_liinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_dinf_name_ptr = (MSK12_get_dinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_iinf_index_ptr = (MSK12_get_iinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf_index",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_liinf_index_ptr = (MSK12_get_liinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf_index",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_dinf_index_ptr = (MSK12_get_dinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf_index",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_double_param_ptr = (MSK12_get_double_param_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_double_param_index_ptr = (MSK12_get_double_param_index_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param_index",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_double_param_name_ptr = (MSK12_get_double_param_name_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_double_param_ptr = (MSK12_get_num_double_param_func_t)__loadsym(libmosek_handle,"MSK12_get_num_double_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_all_double_params_ptr = (MSK12_get_all_double_params_func_t)__loadsym(libmosek_handle,"MSK12_get_all_double_params",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_all_double_params_ptr = (MSK12_put_all_double_params_func_t)__loadsym(libmosek_handle,"MSK12_put_all_double_params",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_int_param_index_ptr = (MSK12_get_int_param_index_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param_index",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_int_param_name_ptr = (MSK12_get_int_param_name_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_num_int_param_ptr = (MSK12_get_num_int_param_func_t)__loadsym(libmosek_handle,"MSK12_get_num_int_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_all_int_params_ptr = (MSK12_get_all_int_params_func_t)__loadsym(libmosek_handle,"MSK12_get_all_int_params",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_all_int_params_ptr = (MSK12_put_all_int_params_func_t)__loadsym(libmosek_handle,"MSK12_put_all_int_params",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_int_param_ptr = (MSK12_get_int_param_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_param_str_len_ptr = (MSK12_get_param_str_len_func_t)__loadsym(libmosek_handle,"MSK12_get_param_str_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_param_str_ptr = (MSK12_get_param_str_func_t)__loadsym(libmosek_handle,"MSK12_get_param_str",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_double_param_ptr = (MSK12_put_double_param_func_t)__loadsym(libmosek_handle,"MSK12_put_double_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_int_param_ptr = (MSK12_put_int_param_func_t)__loadsym(libmosek_handle,"MSK12_put_int_param",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_param_str_ptr = (MSK12_put_param_str_func_t)__loadsym(libmosek_handle,"MSK12_put_param_str",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_task_name_len_ptr = (MSK12_get_task_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_task_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_obj_name_len_ptr = (MSK12_get_obj_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_task_name_ptr = (MSK12_get_task_name_func_t)__loadsym(libmosek_handle,"MSK12_get_task_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_obj_name_ptr = (MSK12_get_obj_name_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_task_name_ptr = (MSK12_put_task_name_func_t)__loadsym(libmosek_handle,"MSK12_put_task_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_obj_name_ptr = (MSK12_put_obj_name_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_name_len_ptr = (MSK12_get_var_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_name_len2_ptr = (MSK12_get_var_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name_len2",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_name_len_ptr = (MSK12_get_barvar_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_name_len2_ptr = (MSK12_get_barvar_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name_len2",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_var_name_ptr = (MSK12_get_var_name_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_barvar_name_ptr = (MSK12_get_barvar_name_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_var_name_ptr = (MSK12_put_var_name_func_t)__loadsym(libmosek_handle,"MSK12_put_var_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_barvar_name_ptr = (MSK12_put_barvar_name_func_t)__loadsym(libmosek_handle,"MSK12_put_barvar_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_name_len_ptr = (MSK12_get_con_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_name_len_ptr = (MSK12_get_djc_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name_len",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_name_len2_ptr = (MSK12_get_con_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name_len2",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_name_len2_ptr = (MSK12_get_djc_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name_len2",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_con_name_ptr = (MSK12_get_con_name_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_djc_name_ptr = (MSK12_get_djc_name_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_con_name_ptr = (MSK12_put_con_name_func_t)__loadsym(libmosek_handle,"MSK12_put_con_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_djc_name_ptr = (MSK12_put_djc_name_func_t)__loadsym(libmosek_handle,"MSK12_put_djc_name",&errmsg))) goto ERROR;
-if (NULL == (MSK12_write_task_to_file_ptr = (MSK12_write_task_to_file_func_t)__loadsym(libmosek_handle,"MSK12_write_task_to_file",&errmsg))) goto ERROR;
-if (NULL == (MSK12_write_task_to_handle_ptr = (MSK12_write_task_to_handle_func_t)__loadsym(libmosek_handle,"MSK12_write_task_to_handle",&errmsg))) goto ERROR;
-if (NULL == (MSK12_write_solution_to_file_ptr = (MSK12_write_solution_to_file_func_t)__loadsym(libmosek_handle,"MSK12_write_solution_to_file",&errmsg))) goto ERROR;
-if (NULL == (MSK12_write_solution_to_handle_ptr = (MSK12_write_solution_to_handle_func_t)__loadsym(libmosek_handle,"MSK12_write_solution_to_handle",&errmsg))) goto ERROR;
-if (NULL == (MSK12_read_from_file_ptr = (MSK12_read_from_file_func_t)__loadsym(libmosek_handle,"MSK12_read_from_file",&errmsg))) goto ERROR;
-if (NULL == (MSK12_read_from_handle_ptr = (MSK12_read_from_handle_func_t)__loadsym(libmosek_handle,"MSK12_read_from_handle",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_stream_callback_ptr = (MSK12_put_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_stream_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_clear_stream_callback_ptr = (MSK12_clear_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_stream_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_error_callback_ptr = (MSK12_put_error_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_error_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_warning_callback_ptr = (MSK12_put_warning_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_warning_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_clear_error_callback_ptr = (MSK12_clear_error_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_error_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_clear_warning_callback_ptr = (MSK12_clear_warning_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_warning_callback",&errmsg))) goto ERROR;
-if (NULL == (MSK12_license_cleanup_ptr = (MSK12_license_cleanup_func_t)__loadsym(libmosek_handle,"MSK12_license_cleanup",&errmsg))) goto ERROR;
-if (NULL == (MSK12_shutdown_global_threadpool_ptr = (MSK12_shutdown_global_threadpool_func_t)__loadsym(libmosek_handle,"MSK12_shutdown_global_threadpool",&errmsg))) goto ERROR;
-if (NULL == (MSK12_axpy_ptr = (MSK12_axpy_func_t)__loadsym(libmosek_handle,"MSK12_axpy",&errmsg))) goto ERROR;
-if (NULL == (MSK12_dot_ptr = (MSK12_dot_func_t)__loadsym(libmosek_handle,"MSK12_dot",&errmsg))) goto ERROR;
-if (NULL == (MSK12_gemv_ptr = (MSK12_gemv_func_t)__loadsym(libmosek_handle,"MSK12_gemv",&errmsg))) goto ERROR;
-if (NULL == (MSK12_gemm_ptr = (MSK12_gemm_func_t)__loadsym(libmosek_handle,"MSK12_gemm",&errmsg))) goto ERROR;
-if (NULL == (MSK12_syrk_ptr = (MSK12_syrk_func_t)__loadsym(libmosek_handle,"MSK12_syrk",&errmsg))) goto ERROR;
-if (NULL == (MSK12_sparse_triangular_solve_dense_ptr = (MSK12_sparse_triangular_solve_dense_func_t)__loadsym(libmosek_handle,"MSK12_sparse_triangular_solve_dense",&errmsg))) goto ERROR;
-if (NULL == (MSK12_potrf_ptr = (MSK12_potrf_func_t)__loadsym(libmosek_handle,"MSK12_potrf",&errmsg))) goto ERROR;
-if (NULL == (MSK12_syeig_ptr = (MSK12_syeig_func_t)__loadsym(libmosek_handle,"MSK12_syeig",&errmsg))) goto ERROR;
-if (NULL == (MSK12_syevd_ptr = (MSK12_syevd_func_t)__loadsym(libmosek_handle,"MSK12_syevd",&errmsg))) goto ERROR;
-if (NULL == (MSK12_optimize_batch_ptr = (MSK12_optimize_batch_func_t)__loadsym(libmosek_handle,"MSK12_optimize_batch",&errmsg))) goto ERROR;
-if (NULL == (MSK12_check_out_license_ptr = (MSK12_check_out_license_func_t)__loadsym(libmosek_handle,"MSK12_check_out_license",&errmsg))) goto ERROR;
-if (NULL == (MSK12_check_in_license_ptr = (MSK12_check_in_license_func_t)__loadsym(libmosek_handle,"MSK12_check_in_license",&errmsg))) goto ERROR;
-if (NULL == (MSK12_check_in_all_ptr = (MSK12_check_in_all_func_t)__loadsym(libmosek_handle,"MSK12_check_in_all",&errmsg))) goto ERROR;
-if (NULL == (MSK12_echo_intro_ptr = (MSK12_echo_intro_func_t)__loadsym(libmosek_handle,"MSK12_echo_intro",&errmsg))) goto ERROR;
-if (NULL == (MSK12_get_version_ptr = (MSK12_get_version_func_t)__loadsym(libmosek_handle,"MSK12_get_version",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_license_debug_ptr = (MSK12_put_license_debug_func_t)__loadsym(libmosek_handle,"MSK12_put_license_debug",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_license_code_ptr = (MSK12_put_license_code_func_t)__loadsym(libmosek_handle,"MSK12_put_license_code",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_license_wait_ptr = (MSK12_put_license_wait_func_t)__loadsym(libmosek_handle,"MSK12_put_license_wait",&errmsg))) goto ERROR;
-if (NULL == (MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)__loadsym(libmosek_handle,"MSK12_put_license_path",&errmsg))) goto ERROR;
+        if (NULL == (MSK12_get_callback_code_name_ptr = (MSK12_get_callback_code_name_func_t)__loadsym(libmosek_handle,"MSK12_get_callback_code_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_resp_name_ptr = (MSK12_get_resp_name_func_t)__loadsym(libmosek_handle,"MSK12_get_resp_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_resp_descr_ptr = (MSK12_get_resp_descr_func_t)__loadsym(libmosek_handle,"MSK12_get_resp_descr",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_last_resp_ptr = (MSK12_get_last_resp_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_last_resp_msg_ptr = (MSK12_get_last_resp_msg_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp_msg",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_last_resp_msg_len_ptr = (MSK12_get_last_resp_msg_len_func_t)__loadsym(libmosek_handle,"MSK12_get_last_resp_msg_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_trm_name_ptr = (MSK12_get_trm_name_func_t)__loadsym(libmosek_handle,"MSK12_get_trm_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_trm_descr_ptr = (MSK12_get_trm_descr_func_t)__loadsym(libmosek_handle,"MSK12_get_trm_descr",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_new_task_from_task_ptr = (MSK12_new_task_from_task_func_t)__loadsym(libmosek_handle,"MSK12_new_task_from_task",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_new_task_ptr = (MSK12_new_task_func_t)__loadsym(libmosek_handle,"MSK12_new_task",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_delete_task_ptr = (MSK12_delete_task_func_t)__loadsym(libmosek_handle,"MSK12_delete_task",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_var_ptr = (MSK12_reserve_num_var_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_var",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_barvar_ptr = (MSK12_reserve_num_barvar_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_barvar",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_con_ptr = (MSK12_reserve_num_con_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_row_ptr = (MSK12_reserve_num_row_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_nz_ptr = (MSK12_reserve_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_dom_ptr = (MSK12_reserve_num_dom_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_dom",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_symmat_ptr = (MSK12_reserve_num_symmat_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_symmat",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_reserve_num_symmat_nz_ptr = (MSK12_reserve_num_symmat_nz_func_t)__loadsym(libmosek_handle,"MSK12_reserve_num_symmat_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_var_ptr = (MSK12_get_num_var_func_t)__loadsym(libmosek_handle,"MSK12_get_num_var",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_barvar_ptr = (MSK12_get_num_barvar_func_t)__loadsym(libmosek_handle,"MSK12_get_num_barvar",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_domain_ptr = (MSK12_get_num_domain_func_t)__loadsym(libmosek_handle,"MSK12_get_num_domain",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_row_ptr = (MSK12_get_num_row_func_t)__loadsym(libmosek_handle,"MSK12_get_num_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_symmat_ptr = (MSK12_get_num_symmat_func_t)__loadsym(libmosek_handle,"MSK12_get_num_symmat",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_con_ptr = (MSK12_get_num_con_func_t)__loadsym(libmosek_handle,"MSK12_get_num_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_djc_ptr = (MSK12_get_num_djc_func_t)__loadsym(libmosek_handle,"MSK12_get_num_djc",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_vars_ptr = (MSK12_append_vars_func_t)__loadsym(libmosek_handle,"MSK12_append_vars",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_rows_ptr = (MSK12_append_rows_func_t)__loadsym(libmosek_handle,"MSK12_append_rows",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_barvar_ptr = (MSK12_append_barvar_func_t)__loadsym(libmosek_handle,"MSK12_append_barvar",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_barvars_ptr = (MSK12_append_barvars_func_t)__loadsym(libmosek_handle,"MSK12_append_barvars",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_symmat_ptr = (MSK12_append_symmat_func_t)__loadsym(libmosek_handle,"MSK12_append_symmat",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_symmats_ptr = (MSK12_append_symmats_func_t)__loadsym(libmosek_handle,"MSK12_append_symmats",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_empty_cons_ptr = (MSK12_append_empty_cons_func_t)__loadsym(libmosek_handle,"MSK12_append_empty_cons",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_empty_djcs_ptr = (MSK12_append_empty_djcs_func_t)__loadsym(libmosek_handle,"MSK12_append_empty_djcs",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_type_ptr = (MSK12_put_var_type_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_type_slice_ptr = (MSK12_put_var_type_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_type_slice_value_ptr = (MSK12_put_var_type_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_slice_value",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_type_list_ptr = (MSK12_put_var_type_list_func_t)__loadsym(libmosek_handle,"MSK12_put_var_type_list",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_type_ptr = (MSK12_get_var_type_func_t)__loadsym(libmosek_handle,"MSK12_get_var_type",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_type_slice_ptr = (MSK12_get_var_type_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_var_type_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_bound_ptr = (MSK12_put_var_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_bound_slice_ptr = (MSK12_put_var_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_bound_slice_value_ptr = (MSK12_put_var_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_bound_slice_value",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_low_bound_ptr = (MSK12_put_var_low_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_low_bound_slice_ptr = (MSK12_put_var_low_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_low_bound_slice_value_ptr = (MSK12_put_var_low_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_low_bound_slice_value",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_upr_bound_ptr = (MSK12_put_var_upr_bound_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_upr_bound_slice_ptr = (MSK12_put_var_upr_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_upr_bound_slice_value_ptr = (MSK12_put_var_upr_bound_slice_value_func_t)__loadsym(libmosek_handle,"MSK12_put_var_upr_bound_slice_value",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_bound_ptr = (MSK12_get_var_bound_func_t)__loadsym(libmosek_handle,"MSK12_get_var_bound",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_bound_slice_ptr = (MSK12_get_var_bound_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_var_bound_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_slice_num_elm_ptr = (MSK12_get_barvar_slice_num_elm_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_slice_num_elm",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_dim_ptr = (MSK12_get_barvar_dim_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_dim",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_slice_dims_ptr = (MSK12_get_barvar_slice_dims_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_slice_dims",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_ptr = (MSK12_get_domain_func_t)__loadsym(libmosek_handle,"MSK12_get_domain",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_empty_ptr = (MSK12_get_domain_empty_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_empty",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_rzero_ptr = (MSK12_get_domain_rzero_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rzero",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_rplus_ptr = (MSK12_get_domain_rplus_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rplus",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_rminus_ptr = (MSK12_get_domain_rminus_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rminus",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_r_ptr = (MSK12_get_domain_r_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_r",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_quadratic_cone_ptr = (MSK12_get_domain_quadratic_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_quadratic_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_rotated_quadratic_cone_ptr = (MSK12_get_domain_rotated_quadratic_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_rotated_quadratic_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_primal_exponential_cone_ptr = (MSK12_get_domain_primal_exponential_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_exponential_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_dual_exponential_cone_ptr = (MSK12_get_domain_dual_exponential_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_exponential_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_primal_power_cone_ptr = (MSK12_get_domain_primal_power_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_power_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_dual_power_cone_ptr = (MSK12_get_domain_dual_power_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_power_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_primal_geometric_mean_cone_ptr = (MSK12_get_domain_primal_geometric_mean_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_primal_geometric_mean_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_dual_geometric_mean_cone_ptr = (MSK12_get_domain_dual_geometric_mean_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_dual_geometric_mean_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_svecpsd_cone_ptr = (MSK12_get_domain_svecpsd_cone_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_svecpsd_cone",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_info_ptr = (MSK12_get_domain_info_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_info",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_domain_alpha_ptr = (MSK12_get_domain_alpha_func_t)__loadsym(libmosek_handle,"MSK12_get_domain_alpha",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_ptr = (MSK12_put_row_func_t)__loadsym(libmosek_handle,"MSK12_put_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_slice_ptr = (MSK12_put_row_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_row_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_list_ptr = (MSK12_put_row_list_func_t)__loadsym(libmosek_handle,"MSK12_put_row_list",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_g_ptr = (MSK12_put_row_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_g",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_slice_g_ptr = (MSK12_put_row_slice_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_slice_g",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_row_list_g_ptr = (MSK12_put_row_list_g_func_t)__loadsym(libmosek_handle,"MSK12_put_row_list_g",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_col_ptr = (MSK12_put_col_func_t)__loadsym(libmosek_handle,"MSK12_put_col",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_col_slice_ptr = (MSK12_put_col_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_col_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_col_list_ptr = (MSK12_put_col_list_func_t)__loadsym(libmosek_handle,"MSK12_put_col_list",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_ijc_ptr = (MSK12_put_ijc_func_t)__loadsym(libmosek_handle,"MSK12_put_ijc",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_ijc_list_ptr = (MSK12_put_ijc_list_func_t)__loadsym(libmosek_handle,"MSK12_put_ijc_list",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_row_num_nz_ptr = (MSK12_get_row_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_row_num_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_row_slice_num_nz_ptr = (MSK12_get_row_slice_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_row_slice_num_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_row_ptr = (MSK12_get_row_func_t)__loadsym(libmosek_handle,"MSK12_get_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_row_slice_ptr = (MSK12_get_row_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_row_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_col_num_nz_ptr = (MSK12_get_col_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_col_num_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_col_slice_num_nz_ptr = (MSK12_get_col_slice_num_nz_func_t)__loadsym(libmosek_handle,"MSK12_get_col_slice_num_nz",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_col_ptr = (MSK12_get_col_func_t)__loadsym(libmosek_handle,"MSK12_get_col",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_col_slice_ptr = (MSK12_get_col_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_col_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_bar_entry_ptr = (MSK12_put_bar_entry_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_entry",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_bar_entry_list_ptr = (MSK12_put_bar_entry_list_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_entry_list",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_bar_row_ptr = (MSK12_put_bar_row_func_t)__loadsym(libmosek_handle,"MSK12_put_bar_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_symmat_info_ptr = (MSK12_get_symmat_info_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_info",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_symmat_ptr = (MSK12_get_symmat_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_symmat_slice_info_ptr = (MSK12_get_symmat_slice_info_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_slice_info",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_symmat_slice_ptr = (MSK12_get_symmat_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_con_ptr = (MSK12_append_con_func_t)__loadsym(libmosek_handle,"MSK12_append_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_cons_ptr = (MSK12_append_cons_func_t)__loadsym(libmosek_handle,"MSK12_append_cons",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_con_ptr = (MSK12_put_con_func_t)__loadsym(libmosek_handle,"MSK12_put_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_scalar_con_ptr = (MSK12_put_scalar_con_func_t)__loadsym(libmosek_handle,"MSK12_put_scalar_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_con_slice_ptr = (MSK12_put_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_con_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_slice_domains_ptr = (MSK12_get_con_slice_domains_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice_domains",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_slice_num_row_ptr = (MSK12_get_con_slice_num_row_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice_num_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_slice_ptr = (MSK12_get_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_con_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_djc_ptr = (MSK12_append_djc_func_t)__loadsym(libmosek_handle,"MSK12_append_djc",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_djc_ptr = (MSK12_put_djc_func_t)__loadsym(libmosek_handle,"MSK12_put_djc",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_djc_slice_ptr = (MSK12_put_djc_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_djc_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_info_ptr = (MSK12_get_djc_info_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_info",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_ptr = (MSK12_get_djc_func_t)__loadsym(libmosek_handle,"MSK12_get_djc",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_slice_info_ptr = (MSK12_get_djc_slice_info_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_slice_info",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_slice_ptr = (MSK12_get_djc_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_obj_sense_ptr = (MSK12_put_obj_sense_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_sense",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_obj_sense_ptr = (MSK12_get_obj_sense_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_sense",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_obj_row_ptr = (MSK12_put_obj_row_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_obj_row_ptr = (MSK12_get_obj_row_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_row",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_optimize_ptr = (MSK12_optimize_func_t)__loadsym(libmosek_handle,"MSK12_optimize",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_solution_summary_ptr = (MSK12_solution_summary_func_t)__loadsym(libmosek_handle,"MSK12_solution_summary",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_optimize_callback_ptr = (MSK12_optimize_callback_func_t)__loadsym(libmosek_handle,"MSK12_optimize_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_remote_solver_ptr = (MSK12_put_remote_solver_func_t)__loadsym(libmosek_handle,"MSK12_put_remote_solver",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_optserver_access_token_ptr = (MSK12_put_optserver_access_token_func_t)__loadsym(libmosek_handle,"MSK12_put_optserver_access_token",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_sol_ptr = (MSK12_get_num_sol_func_t)__loadsym(libmosek_handle,"MSK12_get_num_sol",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_type_ptr = (MSK12_get_sol_type_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_type",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_status_ptr = (MSK12_get_sol_status_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_status",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_problem_status_ptr = (MSK12_get_problem_status_func_t)__loadsym(libmosek_handle,"MSK12_get_problem_status",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_primal_obj_ptr = (MSK12_get_primal_obj_func_t)__loadsym(libmosek_handle,"MSK12_get_primal_obj",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_dual_obj_ptr = (MSK12_get_dual_obj_func_t)__loadsym(libmosek_handle,"MSK12_get_dual_obj",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_xx_slice_ptr = (MSK12_get_sol_xx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_xx_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_slx_slice_ptr = (MSK12_get_sol_slx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_slx_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sux_slice_ptr = (MSK12_get_sol_sux_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sux_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_barxj_ptr = (MSK12_get_sol_barxj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barxj",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_barsj_ptr = (MSK12_get_sol_barsj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barsj",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_barx_slice_ptr = (MSK12_get_sol_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_barx_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_bars_slice_ptr = (MSK12_get_sol_bars_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_bars_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_xj_ptr = (MSK12_get_sol_basic_xj_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_xj",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_barx_ptr = (MSK12_get_sol_basic_barx_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_barx",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_con_ptr = (MSK12_get_sol_basic_con_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_var_ptr = (MSK12_get_sol_sta_var_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_var",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_barx_ptr = (MSK12_get_sol_sta_barx_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_barx",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_con_ptr = (MSK12_get_sol_sta_con_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_con",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_x_slice_ptr = (MSK12_get_sol_basic_x_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_x_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_barx_slice_ptr = (MSK12_get_sol_basic_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_barx_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_basic_con_slice_ptr = (MSK12_get_sol_basic_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_basic_con_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_var_slice_ptr = (MSK12_get_sol_sta_var_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_var_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_barx_slice_ptr = (MSK12_get_sol_sta_barx_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_barx_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_sta_con_slice_ptr = (MSK12_get_sol_sta_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_sta_con_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_xc_slice_ptr = (MSK12_get_sol_xc_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_xc_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_sol_y_slice_ptr = (MSK12_get_sol_y_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_sol_y_slice",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_input_solutions_ptr = (MSK12_get_num_input_solutions_func_t)__loadsym(libmosek_handle,"MSK12_get_num_input_solutions",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_copy_sol_to_input_ptr = (MSK12_copy_sol_to_input_func_t)__loadsym(libmosek_handle,"MSK12_copy_sol_to_input",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_sol_ptr = (MSK12_append_sol_func_t)__loadsym(libmosek_handle,"MSK12_append_sol",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_xx_ptr = (MSK12_put_sol_xx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_xx",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_slx_ptr = (MSK12_put_sol_slx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_slx",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_sux_ptr = (MSK12_put_sol_sux_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_sux",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_basic_x_ptr = (MSK12_put_sol_basic_x_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_basic_x",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_barx_ptr = (MSK12_put_sol_barx_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_barx",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_bars_ptr = (MSK12_put_sol_bars_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_bars",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_yi_ptr = (MSK12_put_sol_yi_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_yi",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_sol_basic_c_ptr = (MSK12_put_sol_basic_c_func_t)__loadsym(libmosek_handle,"MSK12_put_sol_basic_c",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_iinf_ptr = (MSK12_get_num_iinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_iinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_liinf_ptr = (MSK12_get_num_liinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_liinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_dinf_ptr = (MSK12_get_num_dinf_func_t)__loadsym(libmosek_handle,"MSK12_get_num_dinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_iinf_ptr = (MSK12_get_iinf_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_liinf_ptr = (MSK12_get_liinf_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_dinf_ptr = (MSK12_get_dinf_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_iinf_name_ptr = (MSK12_get_iinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_liinf_name_ptr = (MSK12_get_liinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_dinf_name_ptr = (MSK12_get_dinf_name_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_iinf_index_ptr = (MSK12_get_iinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_iinf_index",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_liinf_index_ptr = (MSK12_get_liinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_liinf_index",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_dinf_index_ptr = (MSK12_get_dinf_index_func_t)__loadsym(libmosek_handle,"MSK12_get_dinf_index",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_double_param_ptr = (MSK12_get_double_param_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_double_param_index_ptr = (MSK12_get_double_param_index_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param_index",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_double_param_name_ptr = (MSK12_get_double_param_name_func_t)__loadsym(libmosek_handle,"MSK12_get_double_param_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_double_param_ptr = (MSK12_get_num_double_param_func_t)__loadsym(libmosek_handle,"MSK12_get_num_double_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_all_double_params_ptr = (MSK12_get_all_double_params_func_t)__loadsym(libmosek_handle,"MSK12_get_all_double_params",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_all_double_params_ptr = (MSK12_put_all_double_params_func_t)__loadsym(libmosek_handle,"MSK12_put_all_double_params",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_int_param_index_ptr = (MSK12_get_int_param_index_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param_index",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_int_param_name_ptr = (MSK12_get_int_param_name_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_num_int_param_ptr = (MSK12_get_num_int_param_func_t)__loadsym(libmosek_handle,"MSK12_get_num_int_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_all_int_params_ptr = (MSK12_get_all_int_params_func_t)__loadsym(libmosek_handle,"MSK12_get_all_int_params",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_all_int_params_ptr = (MSK12_put_all_int_params_func_t)__loadsym(libmosek_handle,"MSK12_put_all_int_params",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_int_param_ptr = (MSK12_get_int_param_func_t)__loadsym(libmosek_handle,"MSK12_get_int_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_param_str_len_ptr = (MSK12_get_param_str_len_func_t)__loadsym(libmosek_handle,"MSK12_get_param_str_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_param_str_ptr = (MSK12_get_param_str_func_t)__loadsym(libmosek_handle,"MSK12_get_param_str",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_double_param_ptr = (MSK12_put_double_param_func_t)__loadsym(libmosek_handle,"MSK12_put_double_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_int_param_ptr = (MSK12_put_int_param_func_t)__loadsym(libmosek_handle,"MSK12_put_int_param",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_param_str_ptr = (MSK12_put_param_str_func_t)__loadsym(libmosek_handle,"MSK12_put_param_str",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_task_name_len_ptr = (MSK12_get_task_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_task_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_obj_name_len_ptr = (MSK12_get_obj_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_task_name_ptr = (MSK12_get_task_name_func_t)__loadsym(libmosek_handle,"MSK12_get_task_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_obj_name_ptr = (MSK12_get_obj_name_func_t)__loadsym(libmosek_handle,"MSK12_get_obj_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_task_name_ptr = (MSK12_put_task_name_func_t)__loadsym(libmosek_handle,"MSK12_put_task_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_obj_name_ptr = (MSK12_put_obj_name_func_t)__loadsym(libmosek_handle,"MSK12_put_obj_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_name_len_ptr = (MSK12_get_var_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_name_len2_ptr = (MSK12_get_var_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name_len2",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_name_len_ptr = (MSK12_get_barvar_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_name_len2_ptr = (MSK12_get_barvar_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name_len2",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_var_name_ptr = (MSK12_get_var_name_func_t)__loadsym(libmosek_handle,"MSK12_get_var_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_barvar_name_ptr = (MSK12_get_barvar_name_func_t)__loadsym(libmosek_handle,"MSK12_get_barvar_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_var_name_ptr = (MSK12_put_var_name_func_t)__loadsym(libmosek_handle,"MSK12_put_var_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_barvar_name_ptr = (MSK12_put_barvar_name_func_t)__loadsym(libmosek_handle,"MSK12_put_barvar_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_name_len_ptr = (MSK12_get_con_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_name_len_ptr = (MSK12_get_djc_name_len_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name_len",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_name_len2_ptr = (MSK12_get_con_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name_len2",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_name_len2_ptr = (MSK12_get_djc_name_len2_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name_len2",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_con_name_ptr = (MSK12_get_con_name_func_t)__loadsym(libmosek_handle,"MSK12_get_con_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_djc_name_ptr = (MSK12_get_djc_name_func_t)__loadsym(libmosek_handle,"MSK12_get_djc_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_con_name_ptr = (MSK12_put_con_name_func_t)__loadsym(libmosek_handle,"MSK12_put_con_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_djc_name_ptr = (MSK12_put_djc_name_func_t)__loadsym(libmosek_handle,"MSK12_put_djc_name",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_write_task_to_file_ptr = (MSK12_write_task_to_file_func_t)__loadsym(libmosek_handle,"MSK12_write_task_to_file",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_write_task_to_handle_ptr = (MSK12_write_task_to_handle_func_t)__loadsym(libmosek_handle,"MSK12_write_task_to_handle",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_write_solution_to_file_ptr = (MSK12_write_solution_to_file_func_t)__loadsym(libmosek_handle,"MSK12_write_solution_to_file",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_write_solution_to_handle_ptr = (MSK12_write_solution_to_handle_func_t)__loadsym(libmosek_handle,"MSK12_write_solution_to_handle",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_read_from_file_ptr = (MSK12_read_from_file_func_t)__loadsym(libmosek_handle,"MSK12_read_from_file",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_read_from_handle_ptr = (MSK12_read_from_handle_func_t)__loadsym(libmosek_handle,"MSK12_read_from_handle",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_stream_callback_ptr = (MSK12_put_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_stream_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_clear_stream_callback_ptr = (MSK12_clear_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_stream_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_error_callback_ptr = (MSK12_put_error_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_error_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_warning_callback_ptr = (MSK12_put_warning_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_warning_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_clear_error_callback_ptr = (MSK12_clear_error_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_error_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_clear_warning_callback_ptr = (MSK12_clear_warning_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_warning_callback",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_license_cleanup_ptr = (MSK12_license_cleanup_func_t)__loadsym(libmosek_handle,"MSK12_license_cleanup",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_shutdown_global_threadpool_ptr = (MSK12_shutdown_global_threadpool_func_t)__loadsym(libmosek_handle,"MSK12_shutdown_global_threadpool",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_axpy_ptr = (MSK12_axpy_func_t)__loadsym(libmosek_handle,"MSK12_axpy",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_dot_ptr = (MSK12_dot_func_t)__loadsym(libmosek_handle,"MSK12_dot",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_gemv_ptr = (MSK12_gemv_func_t)__loadsym(libmosek_handle,"MSK12_gemv",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_gemm_ptr = (MSK12_gemm_func_t)__loadsym(libmosek_handle,"MSK12_gemm",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_syrk_ptr = (MSK12_syrk_func_t)__loadsym(libmosek_handle,"MSK12_syrk",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_sparse_triangular_solve_dense_ptr = (MSK12_sparse_triangular_solve_dense_func_t)__loadsym(libmosek_handle,"MSK12_sparse_triangular_solve_dense",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_potrf_ptr = (MSK12_potrf_func_t)__loadsym(libmosek_handle,"MSK12_potrf",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_syeig_ptr = (MSK12_syeig_func_t)__loadsym(libmosek_handle,"MSK12_syeig",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_syevd_ptr = (MSK12_syevd_func_t)__loadsym(libmosek_handle,"MSK12_syevd",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_optimize_batch_ptr = (MSK12_optimize_batch_func_t)__loadsym(libmosek_handle,"MSK12_optimize_batch",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_check_out_license_ptr = (MSK12_check_out_license_func_t)__loadsym(libmosek_handle,"MSK12_check_out_license",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_check_in_license_ptr = (MSK12_check_in_license_func_t)__loadsym(libmosek_handle,"MSK12_check_in_license",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_check_in_all_ptr = (MSK12_check_in_all_func_t)__loadsym(libmosek_handle,"MSK12_check_in_all",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_echo_intro_ptr = (MSK12_echo_intro_func_t)__loadsym(libmosek_handle,"MSK12_echo_intro",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_get_version_ptr = (MSK12_get_version_func_t)__loadsym(libmosek_handle,"MSK12_get_version",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_license_debug_ptr = (MSK12_put_license_debug_func_t)__loadsym(libmosek_handle,"MSK12_put_license_debug",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_license_code_ptr = (MSK12_put_license_code_func_t)__loadsym(libmosek_handle,"MSK12_put_license_code",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_license_wait_ptr = (MSK12_put_license_wait_func_t)__loadsym(libmosek_handle,"MSK12_put_license_wait",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)__loadsym(libmosek_handle,"MSK12_put_license_path",&errmsg))) goto EXIT_ERROR;
 
     }
-    goto SUCCESS;
-ERROR:
-//printf("------------- loaded %s: %s\n",libname,errmsg);
+    goto EXIT_OK;
+EXIT_ERROR:
     if (libmosek_handle) {
-        dlclose(libmosek_handle);
+        __dlclose(libmosek_handle);
         libmosek_handle = NULL;
     }
     if (buf) free(buf);
     return 1;
-SUCCESS:
+EXIT_OK:
     if (buf) free(buf);
     return 0;
 }

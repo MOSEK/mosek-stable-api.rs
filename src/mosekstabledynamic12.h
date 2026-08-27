@@ -3378,39 +3378,55 @@ void MSK12_get_param_str(
 
 /**
 
- * Get the current value of a named parameter. 
+ * Set the value of a named parameter.
+ * 
+ * The function will succeed if either the parameter is _not_ recognized or if the parameter is
+ * recognized and the given value is within valid bounds it. If the parameter is recognized but
+ * the value is invalid, it will fail.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `par_name[.cstring]` (in) The parameter name is the lower case name of the MOSEK parameter without "MSK_" prefix
  * - `value` 
+ * - `ok[1]` (out) Returns true if the parameter was found and successfully set, otherwise false. 
  */
-typedef MSK12_ResCode (*MSK12_put_double_param_func_t)(MSK12_Task_t task,const char* par_name,double value);
+typedef MSK12_ResCode (*MSK12_put_double_param_func_t)(MSK12_Task_t task,const char* par_name,double value,int ok[1]);
 extern MSK12_put_double_param_func_t MSK12_put_double_param_ptr;
 MSK12_ResCode MSK12_put_double_param(
     MSK12_Task_t task,
     const char* par_name,
-    double value);
+    double value,
+    int ok[1]);
 
 /**
 
- * Get the current value of a named parameter. 
+ * Set the value of a named parameter.
+ * 
+ * The function will succeed if either the parameter is _not_ recognized or if the parameter is
+ * recognized and the given value is within valid bounds it. If the parameter is recognized but
+ * the value is invalid, it will fail.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
  * - `par_name[.cstring]` (in) The parameter name is the lower case name of the MOSEK parameter without "MSK_" prefix
  * - `value` 
+ * - `ok[1]` (out) Returns true if the parameter was found and successfully set, otherwise false. 
  */
-typedef MSK12_ResCode (*MSK12_put_int_param_func_t)(MSK12_Task_t task,const char* par_name,int32_t value);
+typedef MSK12_ResCode (*MSK12_put_int_param_func_t)(MSK12_Task_t task,const char* par_name,int32_t value,int ok[1]);
 extern MSK12_put_int_param_func_t MSK12_put_int_param_ptr;
 MSK12_ResCode MSK12_put_int_param(
     MSK12_Task_t task,
     const char* par_name,
-    int32_t value);
+    int32_t value,
+    int ok[1]);
 
 /**
 
- * Get the current value of a named parameter. 
+ * Set the value of a named parameter as a string.
+ * 
+ * The function will succeed if either the parameter is _not_ recognized or if the parameter is
+ * recognized and the given value is within valid bounds it. If the parameter is recognized but
+ * the value is invalid, it will fail.
  * 
  * # Arguments
  * - `task` The optimizatioj task object
@@ -3421,13 +3437,15 @@ floating point value. For integer parameters this can be
 either the ascii representation of the integer value or, for
 parameters that accept symbolic values, the lower case value
 name without "MSK_" prefix.
+ * - `ok[1]` (out) Returns true if the parameter was found and successfully set, otherwise false. 
  */
-typedef MSK12_ResCode (*MSK12_put_param_str_func_t)(MSK12_Task_t task,const char* par_name,const char* value);
+typedef MSK12_ResCode (*MSK12_put_param_str_func_t)(MSK12_Task_t task,const char* par_name,const char* value,int ok[1]);
 extern MSK12_put_param_str_func_t MSK12_put_param_str_ptr;
 MSK12_ResCode MSK12_put_param_str(
     MSK12_Task_t task,
     const char* par_name,
-    const char* value);
+    const char* value,
+    int ok[1]);
 
 /**
 
