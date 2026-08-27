@@ -59,7 +59,7 @@ fn djc1() -> Result<(),msk::APIError> {
                 task.append_rows(12)?;
                 task.put_row_slice(0,rowlen,subj,val)?;
 
-                task.put_obj_row(0);
+                task.put_obj_row(0)?;
                 task.put_obj_sense(msk::ObjSense::MINIMIZE);
 
                 let dom_rplus  = task.get_domain_rplus()?;

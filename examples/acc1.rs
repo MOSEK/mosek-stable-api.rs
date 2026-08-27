@@ -45,11 +45,10 @@ fn acc1() -> Result<(),msk::APIError> {
 
                 /* One linear constraint sum(x) == 1 */
                 let zero_dom = task.get_domain_rzero()?;
-                let quad_dom = task.get_domain_quadratic_cone(k + 1)?;
 
                 // define sum constraint
-                for i in 0..n { task.put_ijc(1, i, 1.0); }
-                task.append_cons(&[zero_dom], &[1], &[1], Some(&[1.0]));
+                for i in 0..n { task.put_ijc(1, i, 1.0)?; }
+                task.append_cons(&[zero_dom], &[1], &[1], Some(&[1.0]))?;
 
                 {
                     /* Fill in the affine expression storage with data */
@@ -62,7 +61,7 @@ fn acc1() -> Result<(),msk::APIError> {
 
                     /* Fill in g storage */
                     task.put_row_g(0, gamma)?;
-                    task.put_row_slice_g(2, h);
+                    task.put_row_slice_g(2, h)?;
                 }
 
                 /* Define a conic quadratic domain */

@@ -18,7 +18,6 @@ fn ceo1() -> Result<(),msk::APIError> {
     let mskapi = msk::initialize()?;
 
     let numvar : i32 = 3;
-    let numcon : i32 = 2;
     let numrow : i64 = 5;
 
     let subj : &[i32]   = &[0, 1,    /* objective */
@@ -44,7 +43,7 @@ fn ceo1() -> Result<(),msk::APIError> {
                 /* Set up domains and bounds */
                 let dom_rzero = task.get_domain_rzero()?;
 
-                task.put_obj_row(0);
+                task.put_obj_row(0)?;
                 task.put_obj_sense(msk::ObjSense::MINIMIZE);
 
                 /* Set up the linear part */
@@ -63,11 +62,10 @@ fn ceo1() -> Result<(),msk::APIError> {
 
                 // Print a summary containing information
                 // about the solution for debugging purposes
-                task.solution_summary(msk::StreamType::MSG);
+                task.solution_summary(msk::StreamType::MSG)?;
 
                 let solidx = 0;
 
-                let soltype = task.get_sol_type(solidx)?;
                 let (psolsta, dsolsta) = task.get_sol_status(solidx)?;
 
                 match psolsta {
@@ -78,7 +76,7 @@ fn ceo1() -> Result<(),msk::APIError> {
                     },
                     msk::SolSta::INFEAS_CERT => println!("Dual infeasibility certificate found."),
                     msk::SolSta::ILLPOSED_CERT => println!("Dual illposedness certificate found."),
-                    msk::SolSta::UNDEFINED|msk::SolSta::UNDEFINED =>
+                    msk::SolSta::UNDEFINED|msk::SolSta::UNKNOWN =>
                         match dsolsta {
                             msk::SolSta::INFEAS_CERT => println!("Primal infeasibility certificate found."),
                             msk::SolSta::ILLPOSED_CERT => println!("Primal illposedness certificate found."),

@@ -57,7 +57,7 @@ fn milo1() -> Result<(),msk::APIError> {
                 task.put_var_type_slice_value(0, numvar, msk::VariableType::INTEGER)?;
 
                 /* Set max solution time */
-                task.put_double_param("dpar_mio_max_time", 60.0);
+                _ = task.put_double_param("dpar_mio_max_time", 60.0)?;
 
                 // Run optimizer
                 let trmcode = task.optimize()?;
@@ -70,7 +70,7 @@ fn milo1() -> Result<(),msk::APIError> {
 
                 let solidx = 0;
 
-                let (psolsta,dsolsta) = task.get_sol_status(solidx)?;
+                let (psolsta,_dsolsta) = task.get_sol_status(solidx)?;
 
                 match psolsta {
                     msk::SolSta::INTEGER_OPTIMAL|msk::SolSta::OPTIMAL => {
@@ -84,7 +84,7 @@ fn milo1() -> Result<(),msk::APIError> {
                         task.get_sol_xx_slice(solidx,0,&mut xx)?;
                         println!("Feasible solution: x = {:?}",xx);
                     },
-                    msk::SolSta::UNDEFINED|msk::SolSta::UNDEFINED => {
+                    msk::SolSta::UNDEFINED|msk::SolSta::UNKNOWN => {
                         let prosta = task.get_problem_status(solidx)?;
                         match prosta {
                             msk::ProSta::PRIMAL_INFEASIBLE_OR_UNBOUNDED => println!("Problem status Infeasible or unbounded"),
@@ -93,7 +93,7 @@ fn milo1() -> Result<(),msk::APIError> {
                             _ => println!("Other problem status.")
                         }
                     },
-                    _ => println!("Other solution status.")
+                    _ => panic!("Other solution status.")
                 }
                 Ok(())
             })

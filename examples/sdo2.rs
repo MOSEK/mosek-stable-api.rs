@@ -25,7 +25,6 @@ fn sdo2() -> Result<(),msk::APIError> {
             |msg| print!("{}",msg),
             |task| {
                 /* Input data */
-                let numbarvar = 2;
                 /* Dimension of semidefinite variables */
                 let dimbarvar = &[3, 4];
 
@@ -53,7 +52,6 @@ fn sdo2() -> Result<(),msk::APIError> {
                     0.5];
 
                 /* Constraint bounds and values */
-                let numcon = 2;
                 let bc = &[23.0, -3.0];
 
                 let dom_rzero = task.get_domain_rzero()?;
@@ -113,7 +111,7 @@ fn sdo2() -> Result<(),msk::APIError> {
                             _ => println!("The status of the solution could not be determined. Termination code: {}.",
                                          mskapi.get_trm_name(trmcode)),
                         },
-                    _ => println!("Other solution status.")
+                    _ => panic!("Other solution status.")
                 }
                 Ok(())
             })

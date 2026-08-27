@@ -17,13 +17,7 @@ fn cqo1() -> Result<(),msk::APIError> {
     let mskapi = msk::initialize()?;
 
     let numvar : i32 = 6;
-    let numcon : i32 = 1;
     let numrow : i64 = 8;
-    let numacc : i64 = 2;
-    let f_nnz  : i64 = 6;
-
-    let blc = &[ 1.0 ];
-    let buc = &[ 1.0 ];
 
     let blx    = &[0.0, 0.0, 0.0, f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY];
     let bux    = &[f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY, f64::INFINITY];

@@ -18,6 +18,7 @@ use mosek_stable_api::{self as msk};
 
 const LOGLEVEL : i32 = 0;
 
+#[allow(non_snake_case)]
 fn portfolio() -> Result<(),msk::APIError> {
     let mskapi = msk::initialize()?;
 
@@ -44,10 +45,6 @@ fn portfolio() -> Result<(),msk::APIError> {
     let numvar : i32 = n as i32 + 1;
     let voff_x : i32 = 0;
     let voff_s : i32 = n as i32;
-
-    // Constraints offsets
-    let numcon : i32 = 1;
-    let coff_bud : i32 = 0;
 
     mskapi.task()?
         .with_stream_callback(
@@ -89,7 +86,7 @@ fn portfolio() -> Result<(),msk::APIError> {
 
                 // Set budget constraint
                 task.put_row(1, xidxs, &[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0])?;
-                task.append_con(dom_rzero,  &[1], Some(&[totalBudget]));
+                task.append_con(dom_rzero,  &[1], Some(&[totalBudget]))?;
 
                 task.put_con_name(0, "budget")?;
 
@@ -109,7 +106,7 @@ fn portfolio() -> Result<(),msk::APIError> {
                 task.put_con_name(1, "risk")?;
 
                 /* Set the log level */
-                task.put_int_param("ipar_log", LOGLEVEL);
+                _ = task.put_int_param("ipar_log", LOGLEVEL)?;
 
                 let mut xs = vec![0.0; n+1];
                 let mut expret = vec![0.0; alphas.len()];
@@ -120,10 +117,10 @@ fn portfolio() -> Result<(),msk::APIError> {
 
                     /* Sets the objective function coefficient for s. */
                     task.put_ijc(0, voff_s + 0, -alpha)?;
-                    let trmcode = task.optimize()?;
+                    let _trmcode = task.optimize()?;
 
                     // Check if the interior point solution is an optimal point
-                    let (psolsta,dsolsta) = task.get_sol_status(0)?;
+                    let (psolsta,_dsolsta) = task.get_sol_status(0)?;
 
                     task.get_sol_xx_slice(0,0,&mut xs)?;
 
@@ -136,15 +133,10 @@ fn portfolio() -> Result<(),msk::APIError> {
                     }
                 }
 
-                //println!("%-12s  %-12s  %-12s\n", "alpha", "exp ret", "std. dev");
                 println!("{:<12}  {:<12}  {:<12}", "alpha", "exp ret", "std. dev");
                 for ((alpha,expret),stddev) in alphas.iter().zip(expret.iter()).zip(stddev.iter()) {
                     println!("{:<12.3e}  {:<12.3e}  {:<12.3e}", alpha, expret, stddev.sqrt());
                 }
-                //for (int i = 0; i < numalpha; ++i) {
-                //    //println!("%-12.3e  %-12.3e  %-12.3e\n", alphas[i], expret[i], sqrt(stddev[i]));
-                //    println!("%-12.3e  %-12.3e  %-12.3e\n", alphas[i], expret[i], sqrt(stddev[i]));
-                // }
                 Ok(())
             })
 }

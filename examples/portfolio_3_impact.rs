@@ -171,7 +171,7 @@ fn portfolio() -> Result<(),msk::APIError> {
                 // Check if the interior point solution is an optimal point
                 let (psolsta,_dsolsta) = task.get_sol_status(solidx)?;
 
-                match (psolsta) {
+                match psolsta {
                     msk::SolSta::OPTIMAL => {
                         let mut xx = vec![0.0; n as usize];
                         task.get_sol_xx_slice(solidx,voff_x,&mut xx)?;
@@ -181,7 +181,7 @@ fn portfolio() -> Result<(),msk::APIError> {
                     },
                     _ => {
                         // See https://docs.mosek.com/latest/capi/accessing-solution.html about handling solution statuses.
-                        println!("Unexpected solution status: {:?}", psolsta);
+                        panic!("Unexpected solution status: {:?}", psolsta);
                     }
                 }
 

@@ -57,7 +57,6 @@ fn max_volume_box(
 {
     // Basic dimensions of our problem
     const NUMVAR : i32 = 3;  // Variables in original problem
-    const NUMCON : i64 = 3;  // Linear constraints in original problem
     const NUMROW : i64 = 10;
 
     // Linear part of the problem involving x, y, z
@@ -142,7 +141,7 @@ fn max_volume_box(
                 // Objective is the sum of three first variables
                 task.put_obj_sense(msk::ObjSense::MAXIMIZE);
 
-                task.put_obj_row(0);
+                task.put_obj_row(0)?;
 
                 // Add the linear constraints
                 {
@@ -179,16 +178,16 @@ fn max_volume_box(
 
                         for (t,&s) in hwd.iter_mut().zip(xyz.iter()) { *t = s.exp(); }
                     },
-                    _ => println!("Solution not optimal, termination code {}.\n", mskapi.get_trm_name(trmcode))
+                    _ => panic!("Solution not optimal, termination code {}.\n", mskapi.get_trm_name(trmcode))
                 }
                 Ok(())
             })
 }
 
 
+#[allow(non_snake_case)]
 fn gp1()
 {
-
     let Aw    : f64 = 200.0;
     let Af    : f64 = 50.0;
     let alpha : f64 = 2.0;

@@ -49,7 +49,6 @@ fn portfolio() -> Result<(),msk::APIError> {
                 let voff_y = voff_z + n as i32;
 
                 // Offset of constraints.
-                let numcon      = 3 * n + 1;
                 let roff_obj : i64 = 0;             // 1 row
                 let roff_bud : i64    = roff_obj+1;    // 1 row
                 let roff_z : i64      = roff_bud+1;    // 1 row
@@ -119,43 +118,6 @@ fn portfolio() -> Result<(),msk::APIError> {
                     task.put_con_name(coni, &format!("switch[{}]",i+1))?;
                 }
 
-                // for (i,coni,rowi,zi,yi) in izip!(0..n,task.get_num_con()..,roff_swi..,voff_z..,voff_y..)
-                // {
-                //     task.append_con(dom_rminus,&[rowi], None)?;
-                //     task.put_ijc(rowi, zi, 1.0)?;
-                //     task.put_ijc(rowi, ti, -U)?;
-                //     task.put_con_name(coni, &format!("switch[{}]",1+i))?;
-                // }
-
-                // for (i,coni,rowi,zi,yi) in izip!(0..n,task.get_num_con()..,roff_swi..,roff_z..,roff_y..)
-                // {
-                //     task.append_con(dom_rminus, &[rowi], None)?;
-                //     task.put_ijc(rowi, zi, 1.0)?;
-                //     task.put_ijc(rowi, yo, -U)?;
-                //     task.put_con_name(coni, &format!("switch[{}]",1+i))?;
-                // }
-
-                // for (i,coni,rowi,zi,yi) in izip!(0..n,task.get_num_con()..,roff_swi..,voff_z..,voff_y..)
-                // {
-                //     task.append_con(dom_rminus,&[rowidx], None)?;
-                //     task.put_ijc(rowi, zi, 1.0)?;
-                //     task.put_ijc(rowi, yi, -U)?;
-                //     task.put_con_name(coni, &format!("switch[{}]"),1+i)?;
-                // }
-
-                // for (int i = 0; i < n && MSK120_RES_OK == r; ++i) {
-                //     int64_t coni = MSK120_get_num_con(task);
-                //     int64_t rowidx = roff_swi+i;
-                //     double rhs = 0.0;
-                //     task.append_con(dom_rminus,1, &rowidx, &rhs);
-                //         task.put_ijc(roff_swi+i, voff_z+i, 1.0);
-                //         task.put_ijc(roff_swi+i, voff_y+i, -U);
-                //     sprintf(buf, "switch[%d]", 1 + i);
-                //         task.put_con_name(coni, buf);
-                // }
-
-
-
                 // - Risk
                 // - (gamma, GTx) in Q(k+1)
                 // The part of F and g for variable x:
@@ -164,8 +126,7 @@ fn portfolio() -> Result<(),msk::APIError> {
                 {
                     let coni = task.get_num_con();
 
-                    //for (int i = 0; i < k && MSK120_RES_OK == r; ++i)
-                    for (i,rowi,GTi) in izip!(0..k,roff_risk+1..,GT.chunks(n as usize)) {
+                    for (_,rowi,GTi) in izip!(0..k,roff_risk+1..,GT.chunks(n as usize)) {
                         task.put_row(rowi, &(voff_x..voff_x+k as i32).collect::<Vec<i32>>(), GTi)?;
                     }
 
@@ -195,14 +156,14 @@ fn portfolio() -> Result<(),msk::APIError> {
                 match psolsta {
                     msk::SolSta::INTEGER_OPTIMAL => {
                         let mut xx = vec![0.0; n as usize];
-                        task.get_sol_xx_slice(0,0,&mut xx);
+                        task.get_sol_xx_slice(0,0,&mut xx)?;
                         let expret = xx.iter().zip(mu.iter()).map(|(&xj,&muj)| xj*muj).sum::<f64>();
 
                         println!("Expected return {:.4e} for gamma {:.4e}", expret, gamma);
                     },
                     _ => {
                         // See https://docs.mosek.com/latest/capi/accessing-solution.html about handling solution statuses.
-                        println!("Unexpected solution status: {:?}", psolsta);
+                        panic!("Unexpected solution status: {:?}", psolsta);
                     }
                 }
 

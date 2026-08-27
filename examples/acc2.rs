@@ -59,7 +59,7 @@ fn acc2() -> Result<(),msk::APIError> {
 
                 /* Set up the objective */
                 task.put_obj_sense(msk::ObjSense::MAXIMIZE);
-                task.put_obj_row(0);
+                task.put_obj_row(0)?;
 
                 /* One linear constraint sum(x) == 1 */
                 let dom_rzero = task.get_domain_rzero()?;
@@ -74,10 +74,8 @@ fn acc2() -> Result<(),msk::APIError> {
 
                     task.append_con(quad_dom,
                                     afeidx,
-                                    Some(rhs));
+                                    Some(rhs))?;
                 }
-
-                task.write_task_to_file("acc2.ptf");
 
                 /* Begin optimization and fetching the solution */
                 /* Run optimizer */

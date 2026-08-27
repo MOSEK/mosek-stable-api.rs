@@ -20,12 +20,10 @@
 
 
 const NUMVAR : i32 = 2;    /* Number of scalar variables */
-const NUMAFE : i64 = 4;    /* Number of affine expressions        */
-const NUMFNZ : i64 = 6;    /* Number of non-zeros in F            */
-const NUMBARVAR : i32 = 1; /* Number of semidefinite variables    */
 
 use mosek_stable_api as msk;
 
+#[allow(non_snake_case)]
 fn sdo_lmi() -> Result<(),msk::APIError> {
     let mskapi = msk::initialize()?;
 
@@ -109,14 +107,14 @@ fn sdo_lmi() -> Result<(),msk::APIError> {
                 task.put_bar_entry(1, barx0, &[1], &[1.0])?;
 
                 /* Set the objective */
-                task.put_obj_row(0);
+                task.put_obj_row(0)?;
                 task.put_obj_sense(msk::ObjSense::MINIMIZE);
 
                 /* Add linear constraint */
                 task.append_con(dom_rplus, &[1], None)?;
 
                 /* Add PSD constraint */
-                task.append_con(dom_svecpsd2, &[2,3,4], None);
+                task.append_con(dom_svecpsd2, &[2,3,4], None)?;
 
                 let solidx = 0;
 
@@ -152,7 +150,7 @@ fn sdo_lmi() -> Result<(),msk::APIError> {
                         println!("The solution status is unknown.");
                         println!("The optimizer terminitated with code: {}", mskapi.get_trm_name(trmcode));
                     },
-                    _ => println!("Other solution status.")
+                    _ => panic!("Other solution status.")
                 }
 
                 Ok(())

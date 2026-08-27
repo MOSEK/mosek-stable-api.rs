@@ -23,17 +23,12 @@ use mosek_stable_api as msk;
 fn pow1() -> Result<(),msk::APIError> {
     let mskapi = msk::initialize()?;
 
-
-
     let numvar : i32 = 5;
-    let numcon : i32 = 1;
     let numrow : i64 = 8;
 
     let rowlen = &[ 3, 3, 1,1,1, 1,0,1 ];
     let subj   = &[ 3,4,0, 0,1,2, 0,1,3, 2,4 ];
     let  val   = &[ 1.0,1.0,-1.0, 1.0,1.0,0.5, 1.0,1.0,1.0, 1.0,1.0 ];
-
-    let rowidx = &[ 1, 2,3,4, 5,6,7 ];
 
     let alpha_1 = &[0.2, 0.8];
     let alpha_2 = &[0.4, 0.6];
@@ -87,7 +82,7 @@ fn pow1() -> Result<(),msk::APIError> {
                             msk::SolSta::ILLPOSED_CERT => println!("Primal illposedness certificate found."),
                             _ => println!("The status of the solution could not be determined. Termination code: {}.", mskapi.get_trm_name(trmcode))
                         }
-                    _ => println!("Other solution status.")
+                    _ => panic!("Other solution status.")
                 }
                 Ok(())
             })

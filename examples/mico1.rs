@@ -24,9 +24,6 @@ fn mico1() -> Result<(),msk::APIError> {
             |task| {
                 let numvar = 3;  /* x, y, t */
 
-                let vart = &[msk::VariableType::INTEGER, msk::VariableType::INTEGER];
-                let intsub = &[ 0, 1 ];
-
                 task.append_vars(numvar)?;
                 task.put_var_name(0, "x")?;
                 task.put_var_name(1, "y")?;

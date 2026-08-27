@@ -60,9 +60,6 @@ fn portfolio() -> Result<(),moco::APIError>
     let voff_x : i32 = 0;
 
     // Constraints offsets
-    let numcon : i32 = 1;
-    let coff_bud : i32 = 0;
-
 
     msk.task()?
         /* Directs the log task stream to the printer function. */
@@ -135,7 +132,7 @@ fn portfolio() -> Result<(),moco::APIError>
                     println!("\nExpected return {:.4} for gamma {:.2}\n", expret, gamma);
                 },
                 (psolsta,_) => {
-                    println!("Unexpected solution status: {:?}", psolsta);
+                    panic!("Unexpected solution status: {:?}", psolsta);
                 }
             }
 

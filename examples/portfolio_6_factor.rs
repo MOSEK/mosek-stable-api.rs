@@ -189,14 +189,6 @@ impl Matrix {
     }
     pub fn num_rows(&self) -> usize { self.shape.0 }
     pub fn num_cols(&self) -> usize { self.shape.1 }
-    pub fn rows(&self) -> Option<impl Iterator<Item=&[f64]>> {
-        if self.row_major {
-            Some(self.data.chunks(self.shape.1))
-        }
-        else {
-            None
-        }
-    }
 
     /// For a symmetric matrix, compute the cholesky factorization
     ///
@@ -242,19 +234,6 @@ impl Matrix {
         Ok(Matrix{data, shape : (self.num_rows(),b.num_cols()), row_major : false })
     }
 
-    pub fn make_row_major(&mut self) {
-        let mut data = vec![0.0;self.data.len()];
-        if ! self.row_major {
-            for (&s,t) in (0..self.num_rows())
-                .flat_map(|j| self.data[j..].iter().step_by(self.num_rows()))
-                .zip(data.iter_mut())
-            {
-                *t = s;
-            }
-        }
-        self.data = data;
-        self.row_major = true;
-    }
     #[allow(dead_code)]
     pub fn make_col_major(&mut self) {
         let mut data = vec![0.0;self.data.len()];

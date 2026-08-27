@@ -75,7 +75,7 @@ fn lo1() -> Result<(),moco::APIError> {
                         println!("Primal or dual illposed certificate found.");
                     },
                     _ => {
-                        println!("Other solution status");
+                        panic!("Other solution status");
                     }
                 }
 

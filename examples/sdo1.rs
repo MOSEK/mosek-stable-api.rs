@@ -39,20 +39,11 @@ fn sdo1() -> Result<(),msk::APIError> {
     let barc_j = &[0, 0, 1, 1, 2];
     let barc_v = &[2.0, 1.0, 2.0, 1.0, 2.0];
 
-    let aptrb = &[0, 1];
-    let aptre = &[1, 3];
-    let asub = &[0, 1, 2];
     /* column subscripts of A */
-    let aval = &[1.0, 1.0, 1.0];
 
     let bara_i = &[0, 1, 2, 0, 1, 2, 1, 2, 2];
     let bara_j = &[0, 1, 2, 0, 0, 0, 1, 1, 2];
     let bara_v = &[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
-
-    let conesub = &[0, 1, 2];
-    let afeidx = &[0, 1, 2];
-    let varidx = &[0, 1, 2];
-    let f_val = &[1, 1, 1];
 
     mskapi.task()?
         .with_stream_callback(
@@ -140,7 +131,7 @@ fn sdo1() -> Result<(),msk::APIError> {
                                 println!("The optimizer terminitated with code: {}\n", mskapi.get_trm_name(trmcode));
                             }
                         },
-                    _ => println!("Other solution status.")
+                    _ => panic!("Other solution status.")
                 }
 
                 Ok(())

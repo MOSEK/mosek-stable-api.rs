@@ -169,7 +169,7 @@ fn markowitz_with_card(
                     },
                     _ => {
                         // See https://docs.mosek.com/latest/capi/accessing-solution.html about handling solution statuses.
-                        println!("Unexpected solution status: {:?}", psolsta);
+                        panic!("Unexpected solution status: {:?}", psolsta);
                     }
                 }
             Ok(())
