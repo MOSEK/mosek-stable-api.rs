@@ -197,7 +197,7 @@ fn logistic_regression(d : usize,    // dimension
 #[allow(non_snake_case)]
 fn main() {
     // Test: detect and approximate a circle using degree 2 polynomials
-    let n : usize = 5;
+    let n : usize = 30;
 
     let mut X = vec![0.0; n*n*6];
     for ((i,j),Xij) in iproduct!(0..n,0..n).zip(X.chunks_mut(6)) {
