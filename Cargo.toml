@@ -1,11 +1,17 @@
 [package]
-name = "mosek_stable_api"
+name    = "mosek_stable_api"
 version = "12.0.0"
 edition = "2024"
+description = "MOSEK Stable API for Rust"
+authors = [ "Ulf Worsøe <ulf.worsoe@mosek.com>" ]
+repository = "https://github.com/MOSEK/mosek_stable_api.rust"
+keywords = ["mosek","optimization","conic_optimization","linear_programming"]
+categories = ["mathematics","science"]
+license = "MIT"
+homepage = "https://mosek.com"
+readme = "README.md"
 
 [dependencies]
-
-
 
 [dev-dependencies]
 itertools = "0.15.0"

@@ -17,7 +17,7 @@ or run time until loading is explicitly requested.
 
 Calling `initialize()` or `initialize_with_paths()` successfully will return a struct with access to all API functions.
 
-A few examples are included. To test, the MOSEK Core API library must be discoverable, which means that the path to the
+A few examples are included under `examples/`. To test, the MOSEK Core API library must be discoverable, which means that the path to the
 library must be in the
 - `PATH` environment variable on Windows
 - `LD_LIBRARY_PATH` on Linux
