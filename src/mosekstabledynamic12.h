@@ -4158,20 +4158,16 @@ MSK12_ResCode MSK12_syrk(
  * - `transposed` Controls whether the solve is with L or the transposed L. 
  * - `n` Specifies the dimension of L. 
  * - `lnzc[n]` (in) `lnzc[j]` is the number of nonzeros in column j. 
- * - `lptrc[n]` (in) `lptrc[j]` is a pointer to the first row index and value in column j. 
- * - `nnz` Number of elements in lsubc and lvalc. 
- * - `lsubc[nnz]` (in) Row indexes for each column stored sequentially. 
- * - `lvalc[nnz]` (in) The value corresponding to row indexed stored lsubc. 
+ * - `lsubc` (in) Row indexes for each column stored sequentially. 
+ * - `lvalc` (in) The value corresponding to row indexed stored lsubc. 
  * - `b[n]` (in-out) The right-hand side of linear equation system to be solved as a dense vector. 
  */
-typedef MSK12_ResCode (*MSK12_sparse_triangular_solve_dense_func_t)(int transposed,int32_t n,const int32_t* lnzc,const int64_t* lptrc,int64_t nnz,const int32_t* lsubc,const double* lvalc,double* b);
+typedef MSK12_ResCode (*MSK12_sparse_triangular_solve_dense_func_t)(int transposed,int32_t n,const int32_t* lnzc,const int32_t* lsubc,const double* lvalc,double* b);
 extern MSK12_sparse_triangular_solve_dense_func_t MSK12_sparse_triangular_solve_dense_ptr;
 MSK12_ResCode MSK12_sparse_triangular_solve_dense(
     int transposed,
     int32_t n,
     const int32_t* lnzc,
-    const int64_t* lptrc,
-    int64_t nnz,
     const int32_t* lsubc,
     const double* lvalc,
     double* b);
@@ -4292,11 +4288,11 @@ Notice that upon return, whether the function failed or suceeded, if a non-null 
 
 Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
  */
-typedef MSK12_ResCode (*MSK12_compute_sparse_cholesky_func_t)(int32_t num_threads,int32_t order_method,double tol_singular,int32_t n,const int32_t* a_col_num_nonzero,const int32_t* a_subi,const double* a_val,int32_t* perm,double* diag,MSK12_AllocFunc alloc,MSK12_AllocHandle alloc_handle,int32_t* l_col_num_nonzero,int32_t** l_subi,double** l_val);
+typedef MSK12_ResCode (*MSK12_compute_sparse_cholesky_func_t)(int32_t num_threads,int order_method,double tol_singular,int32_t n,const int32_t* a_col_num_nonzero,const int32_t* a_subi,const double* a_val,int32_t* perm,double* diag,MSK12_AllocFunc alloc,MSK12_AllocHandle alloc_handle,int32_t* l_col_num_nonzero,int32_t** l_subi,double** l_val);
 extern MSK12_compute_sparse_cholesky_func_t MSK12_compute_sparse_cholesky_ptr;
 MSK12_ResCode MSK12_compute_sparse_cholesky(
     int32_t num_threads,
-    int32_t order_method,
+    int order_method,
     double tol_singular,
     int32_t n,
     const int32_t* a_col_num_nonzero,

@@ -883,7 +883,7 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_syrk(is_upr : i32,trans : i32,n : i32,k : i32,alpha : f64,a : *const f64,beta : f64,c : *mut f64) -> i32;
     #[allow(unused)]
-    fn MSK12_sparse_triangular_solve_dense(transposed : i32,n : i32,lnzc : *const i32,lptrc : *const i64,nnz : i64,lsubc : *const i32,lvalc : *const f64,b : *mut f64) -> i32;
+    fn MSK12_sparse_triangular_solve_dense(transposed : i32,n : i32,lnzc : *const i32,lsubc : *const i32,lvalc : *const f64,b : *mut f64) -> i32;
     #[allow(unused)]
     fn MSK12_potrf(is_upr : i32,n : i32,a : *mut f64) -> i32;
     #[allow(unused)]
@@ -936,12 +936,12 @@ impl From<APIError> for String {
 
 }
 
+// Note that this construction is highly questionable. We "allocate" memory for external use by
 extern "C" fn memory_alloc(handle : *mut c_void, size : usize) -> *mut u8 {
-    let allocated : &mut Vec<(std::alloc::Layout,*mut u8)> = unsafe { &mut *(handle as * mut Vec<(std::alloc::Layout,*mut u8)>) };
-    let layout = std::alloc::Layout::from_size_align(size,8).unwrap();
-    let p = unsafe { std::alloc::alloc(layout) };
-    allocated.push((layout,p));
-    p
+    let allocated : &mut Vec<Vec<u64>> = unsafe { &mut *(handle as * mut Vec<Vec<u64>>) };
+    let n = (size / 8)+1;
+    allocated.push(vec![0;n]);
+    allocated.last_mut ().map(|v| v.as_mut_slice() as * mut _ as * mut u8).unwrap_or(std::ptr::null_mut())
 }
 
 extern "C" fn write_proxy(handle : c_void_p, src : c_void_p,  num : usize) -> usize {
@@ -1417,20 +1417,16 @@ impl MosekStableAPI {
     /// 
     /// - `transposed` Controls whether the solve is with L or the transposed L. 
     /// - `n` Specifies the dimension of L. 
-    /// - `nnz` Number of elements in lsubc and lvalc. 
     /// - `lnzc[n]` (in) `lnzc[j]` is the number of nonzeros in column j. 
-    /// - `lptrc[n]` (in) `lptrc[j]` is a pointer to the first row index and value in column j. 
-    /// - `lsubc[nnz]` (in) Row indexes for each column stored sequentially. 
-    /// - `lvalc[nnz]` (in) The value corresponding to row indexed stored lsubc. 
     /// - `b[n]` (in-out) The right-hand side of linear equation system to be solved as a dense vector. 
-    pub fn sparse_triangular_solve_dense(&self,transposed : bool,lnzc : &[i32],lptrc : &[i64],lsubc : &[i32],lvalc : &[f64],b : &mut [f64]) -> Result<(),APIError>
+    /// - `lsubc` (in) Row indexes for each column stored sequentially. 
+    /// - `lvalc` (in) The value corresponding to row indexed stored lsubc. 
+    pub fn sparse_triangular_solve_dense(&self,transposed : bool,lnzc : &[i32],lsubc : &[i32],lvalc : &[f64],b : &mut [f64]) -> Result<(),APIError>
     {
-        // Arg processing order: transposed,n,nnz,lnzc,lptrc,lsubc,lvalc,b
-        let n = i32::try_from([Some(lnzc.len()),Some(lptrc.len()),Some(b.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+        // Arg processing order: transposed,n,lnzc,b,lsubc,lvalc
+        let n = i32::try_from([Some(lnzc.len()),Some(b.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let nnz = i64::try_from([Some(lsubc.len()),Some(lvalc.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_sparse_triangular_solve_dense(if transposed {1} else {0},n,lnzc.as_ptr(),lptrc.as_ptr(),nnz,lsubc.as_ptr(),lvalc.as_ptr(),b.as_mut_ptr()) };
+        let returned_value = unsafe{ MSK12_sparse_triangular_solve_dense(if transposed {1} else {0},n,lnzc.as_ptr(),lsubc.as_ptr(),lvalc.as_ptr(),b.as_mut_ptr()) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
         Ok(())
     }
@@ -1544,15 +1540,15 @@ impl MosekStableAPI {
     /// - `l_val` (out) The values corresponding to row indexed stored in lsubc. The returned array is guaranteed to be allocated with the allocation function `alloc`.
     ///   
     ///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
-    pub fn compute_sparse_cholesky(&self,num_threads : i32,order_method : i32,tol_singular : f64,a_col_num_nonzero : &[i32],a_subi : &[i32],a_val : &[f64],perm : &mut [i32],diag : &mut [f64],l_col_num_nonzero : &mut [i32]) -> Result<(Vec<i32>,Vec<f64>),APIError>
+    pub fn compute_sparse_cholesky(&self,num_threads : i32,order_method : bool,tol_singular : f64,a_col_num_nonzero : &[i32],a_subi : &[i32],a_val : &[f64],perm : &mut [i32],diag : &mut [f64],l_col_num_nonzero : &mut [i32]) -> Result<(Vec<i32>,Vec<f64>),APIError>
     {
         // Arg processing order: num_threads,order_method,tol_singular,n,alloc,alloc_handle,a_col_num_nonzero,perm,diag,l_col_num_nonzero,a_subi,a_val,l_subi,l_val
         let n = i32::try_from([Some(a_col_num_nonzero.len()),Some(perm.len()),Some(diag.len()),Some(l_col_num_nonzero.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let mut allocated_items : Vec<(std::alloc::Layout,*mut u8)> = Vec:: new();
+        let mut allocated_items : Vec<Vec<u64>> = Vec:: new();
         let mut ptr_l_subi : * mut i32 = std::ptr::null_mut();
         let mut ptr_l_val : * mut f64 = std::ptr::null_mut();
-        let returned_value = unsafe{ MSK12_compute_sparse_cholesky(num_threads,order_method,tol_singular,n,a_col_num_nonzero.as_ptr(),a_subi.as_ptr(),a_val.as_ptr(),perm.as_mut_ptr(),diag.as_mut_ptr(),memory_alloc,(&mut allocated_items) as * mut _ as c_void_p,l_col_num_nonzero.as_mut_ptr(),&mut ptr_l_subi,&mut ptr_l_val) };
+        let returned_value = unsafe{ MSK12_compute_sparse_cholesky(num_threads,if order_method {1} else {0},tol_singular,n,a_col_num_nonzero.as_ptr(),a_subi.as_ptr(),a_val.as_ptr(),perm.as_mut_ptr(),diag.as_mut_ptr(),memory_alloc,(&mut allocated_items) as * mut _ as c_void_p,l_col_num_nonzero.as_mut_ptr(),&mut ptr_l_subi,&mut ptr_l_val) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
         let l_subi_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
         let mut l_subi = vec![i32::default(); l_subi_len];
@@ -1560,7 +1556,6 @@ impl MosekStableAPI {
         let l_val_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
         let mut l_val = vec![f64::default(); l_val_len];
         l_val.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_val,l_val_len) });
-        for (layout,ptr) in allocated_items { unsafe{ std::alloc::dealloc(ptr,layout); } }
         Ok((l_subi,l_val))
     }
     /// Optimize a number of tasks in parallel using a specified number of threads. All

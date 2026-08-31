@@ -1326,11 +1326,9 @@ MSK12_ResCode MSK12_sparse_triangular_solve_dense(
     int transposed,
     int32_t n,
     const int32_t* lnzc,
-    const int64_t* lptrc,
-    int64_t nnz,
     const int32_t* lsubc,
     const double* lvalc,
-    double* b) { return MSK12_sparse_triangular_solve_dense_ptr(transposed,n,lnzc,lptrc,nnz,lsubc,lvalc,b); }
+    double* b) { return MSK12_sparse_triangular_solve_dense_ptr(transposed,n,lnzc,lsubc,lvalc,b); }
 MSK12_potrf_func_t MSK12_potrf_ptr;
 MSK12_ResCode MSK12_potrf(
     int is_upr,
@@ -1351,7 +1349,7 @@ MSK12_ResCode MSK12_syevd(
 MSK12_compute_sparse_cholesky_func_t MSK12_compute_sparse_cholesky_ptr;
 MSK12_ResCode MSK12_compute_sparse_cholesky(
     int32_t num_threads,
-    int32_t order_method,
+    int order_method,
     double tol_singular,
     int32_t n,
     const int32_t* a_col_num_nonzero,
