@@ -220,3 +220,9 @@ fn main() {
 
     println!("\ntheta = {:?}",theta);
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

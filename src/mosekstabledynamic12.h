@@ -206,6 +206,14 @@ typedef int32_t (*MSK12_CallbackFunc)(MSK12_CallbackHandle h,int32_t code,int32_
  * Integer solution callback function.
  */
 typedef void (*MSK12_IntSolCallbackFunc)(MSK12_CallbackHandle handle,int32_t num,double primal_obj,const double* xx);
+/**
+ * Handle for memory allocation functions.
+ */
+typedef void* MSK12_AllocHandle;
+/**
+ * Memory allocation function
+ */
+typedef int8_t* (*MSK12_AllocFunc)(MSK12_AllocHandle handle,size_t num);
 
 
 #ifdef __cplusplus
@@ -4228,6 +4236,79 @@ MSK12_ResCode MSK12_syevd(
     int32_t n,
     double* a,
     double* w);
+
+/**
+
+ * The function computes a Cholesky factorization of a sparse positive semidefinite matrix. Sparsity is exploited
+ * during the computations to reduce the amount of space and work required. Both the input and output matrices
+ * are represented using the sparse format.
+ * 
+ * To be precise, given a symmetric matrix \\(A \\in \\real^{n\\times n}\\) the function computes a nonsingular lower triangular matrix \\(L\\), a diagonal matrix \\(D\\) and a permutation matrix \\(P\\) such that
+ * 
+ * $$
+ * LL^T - D = P A P^T
+ * $$
+ * 
+ * If ``order_method`` is zero then reordering heuristics are not employed and \\(P\\) is the identity.
+ * 
+ * If a pivot during the computation of the Cholesky factorization is less than
+ * 
+ * $$
+ * -\\rho\\cdot\\max((PAP^T)_{jj},1.0)
+ * $$
+ * 
+ * then the matrix is declared negative semidefinite. On the hand if a pivot is smaller than
+ * 
+ * $$
+ * \\rho\\cdot\\max((PAP^T)_{jj},1.0),
+ * $$
+ * 
+ * then \\(D_{jj}\\) is increased from zero to
+ * 
+ * $$
+ * \\rho\\cdot\\max((PAP^T)_{jj},1.0).
+ * $$
+ * 
+ * Therefore, if \\(A\\) is sufficiently positive definite then \\(D\\) will be the zero matrix.
+ * Here \\(\\rho\\) is set equal to value of ``tol_singular``.
+ * 
+ * # Arguments
+ * - `num_threads` The number threads that can be used to do the computation. 0 means the code makes the choice. 
+ * - `order_method` If nonzero, then a sparsity preserving ordering will be employed. 
+ * - `tol_singular` A positive parameter controlling when a pivot is declared zero. 
+ * - `n` Specifies the order of \\(A\\). 
+ * - `a_col_num_nonzero[n]` (in) `a_col_num_nonzero[j]` is a pointer to the first element in column \\(j\\). 
+ * - `a_subi` (in) Row indexes for each column stored in increasing order. 
+ * - `a_val` (in) The value corresponding to row indexed stored in asubc. 
+ * - `perm[n]` (out) Permutation array used to specify the permutation matrix \\(P\\) computed by the function. 
+ * - `diag[n]` (out) The diagonal elements of matrix \\(D\\). 
+ * - `alloc` Memory allocation function for allocating the result. If `null`, the system `malloc` function is used. 
+ * - `alloc_handle` Handle passed to the memory allocation function 
+ * - `l_col_num_nonzero[n]` (out) `l_col_num_nonzero[j]` is the number of non zero elements in column \\(j\\) of \\(L\\). 
+ * - `l_subi` (out) Row indexes for each column stored in increasing order. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+
+Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+ * - `l_val` (out) The values corresponding to row indexed stored in lsubc. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+
+Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+ */
+typedef MSK12_ResCode (*MSK12_compute_sparse_cholesky_func_t)(int32_t num_threads,int32_t order_method,double tol_singular,int32_t n,const int32_t* a_col_num_nonzero,const int32_t* a_subi,const double* a_val,int32_t* perm,double* diag,MSK12_AllocFunc alloc,MSK12_AllocHandle alloc_handle,int32_t* l_col_num_nonzero,int32_t** l_subi,double** l_val);
+extern MSK12_compute_sparse_cholesky_func_t MSK12_compute_sparse_cholesky_ptr;
+MSK12_ResCode MSK12_compute_sparse_cholesky(
+    int32_t num_threads,
+    int32_t order_method,
+    double tol_singular,
+    int32_t n,
+    const int32_t* a_col_num_nonzero,
+    const int32_t* a_subi,
+    const double* a_val,
+    int32_t* perm,
+    double* diag,
+    MSK12_AllocFunc alloc,
+    MSK12_AllocHandle alloc_handle,
+    int32_t* l_col_num_nonzero,
+    int32_t** l_subi,
+    double** l_val);
 
 /**
 

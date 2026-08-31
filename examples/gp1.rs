@@ -205,3 +205,9 @@ fn gp1()
 fn main() {
     gp1();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

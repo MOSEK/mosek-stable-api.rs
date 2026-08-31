@@ -116,3 +116,9 @@ fn acc2() -> Result<(),msk::APIError> {
 fn main() {
     acc2().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

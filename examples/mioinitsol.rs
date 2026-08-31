@@ -41,7 +41,7 @@ fn mioinitsol() -> Result<(),msk::APIError> {
                 task.put_int_param("ipar_mio_construct_sol", 1)?;
 
                 /* solve */
-                let _trmcode = task.optimize();
+                let _trmcode = task.optimize()?;
 
                 task.solution_summary(msk::StreamType::LOG)?;
 
@@ -70,4 +70,9 @@ fn main() {
     mioinitsol().unwrap();
 }
 
-/*TAG:end-code*/
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

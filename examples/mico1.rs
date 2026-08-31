@@ -81,3 +81,9 @@ fn mico1() -> Result<(),msk::APIError> {
 fn main() {
     mico1().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

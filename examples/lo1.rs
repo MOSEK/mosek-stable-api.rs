@@ -82,3 +82,9 @@ fn lo1() -> Result<(),moco::APIError> {
                 Ok(())
             })
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

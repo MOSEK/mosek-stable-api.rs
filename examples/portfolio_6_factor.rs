@@ -29,7 +29,7 @@ use mosek_stable_api::{self as msk, APIError};
 /// where `P'P = R
 #[allow(non_snake_case)]
 fn portfolio() -> Result<(),msk::APIError> {
-    let mskapi : msk::MosekCoreAPI = msk::initialize().unwrap();
+    let mskapi = msk::initialize().unwrap();
     let w  = 1.0;
     let mu = &[0.07197, 0.15518, 0.17535, 0.08981, 0.42896, 0.39292, 0.32171, 0.18379];
     let x0 = &[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
@@ -195,7 +195,7 @@ impl Matrix {
     /// It is assumed but not checked that the matrix is symmetric. It is checked that the matrix is quadratic.
     pub fn cholesky(&self) -> Result<Matrix,APIError>
     {
-        let mskapi : msk::MosekCoreAPI = msk::initialize().unwrap();
+        let mskapi = msk::initialize().unwrap();
 
         assert_eq!(self.shape.0, self.shape.1);
         let n = self.num_rows();
@@ -212,7 +212,7 @@ impl Matrix {
     // Matrix multiplication. The operand dimensions must match correctly.
     pub fn matrix_mul(&self, b : &Matrix) -> Result<Matrix,APIError>
     {
-        let mskapi : msk::MosekCoreAPI = msk::initialize().unwrap();
+        let mskapi = msk::initialize().unwrap();
         assert_eq!(self.num_cols(),b.num_rows());
 
         let ta = self.row_major;
@@ -276,4 +276,10 @@ impl Matrix {
 
 fn main() {
     portfolio().unwrap();
+}
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
 }

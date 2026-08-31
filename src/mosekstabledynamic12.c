@@ -1348,6 +1348,22 @@ MSK12_ResCode MSK12_syevd(
     int32_t n,
     double* a,
     double* w) { return MSK12_syevd_ptr(is_upr,n,a,w); }
+MSK12_compute_sparse_cholesky_func_t MSK12_compute_sparse_cholesky_ptr;
+MSK12_ResCode MSK12_compute_sparse_cholesky(
+    int32_t num_threads,
+    int32_t order_method,
+    double tol_singular,
+    int32_t n,
+    const int32_t* a_col_num_nonzero,
+    const int32_t* a_subi,
+    const double* a_val,
+    int32_t* perm,
+    double* diag,
+    MSK12_AllocFunc alloc,
+    MSK12_AllocHandle alloc_handle,
+    int32_t* l_col_num_nonzero,
+    int32_t** l_subi,
+    double** l_val) { return MSK12_compute_sparse_cholesky_ptr(num_threads,order_method,tol_singular,n,a_col_num_nonzero,a_subi,a_val,perm,diag,alloc,alloc_handle,l_col_num_nonzero,l_subi,l_val); }
 MSK12_optimize_batch_func_t MSK12_optimize_batch_ptr;
 MSK12_ResCode MSK12_optimize_batch(
     int is_race,
@@ -1647,6 +1663,7 @@ if (NULL == (MSK12_sparse_triangular_solve_dense_ptr = (MSK12_sparse_triangular_
 if (NULL == (MSK12_potrf_ptr = (MSK12_potrf_func_t)__loadsym(libmosek_handle,"MSK12_potrf",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_syeig_ptr = (MSK12_syeig_func_t)__loadsym(libmosek_handle,"MSK12_syeig",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_syevd_ptr = (MSK12_syevd_func_t)__loadsym(libmosek_handle,"MSK12_syevd",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_compute_sparse_cholesky_ptr = (MSK12_compute_sparse_cholesky_func_t)__loadsym(libmosek_handle,"MSK12_compute_sparse_cholesky",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_optimize_batch_ptr = (MSK12_optimize_batch_func_t)__loadsym(libmosek_handle,"MSK12_optimize_batch",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_check_out_license_ptr = (MSK12_check_out_license_func_t)__loadsym(libmosek_handle,"MSK12_check_out_license",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_check_in_license_ptr = (MSK12_check_in_license_func_t)__loadsym(libmosek_handle,"MSK12_check_in_license",&errmsg))) goto EXIT_ERROR;

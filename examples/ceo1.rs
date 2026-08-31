@@ -91,3 +91,10 @@ fn ceo1() -> Result<(),msk::APIError> {
 fn main() {
     ceo1().unwrap();
 }
+
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

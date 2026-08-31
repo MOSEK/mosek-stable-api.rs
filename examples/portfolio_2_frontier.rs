@@ -144,3 +144,9 @@ fn portfolio() -> Result<(),msk::APIError> {
 fn main() {
     portfolio().unwrap()
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

@@ -171,6 +171,12 @@ type  MSK12_CallbackFunc = extern "C" fn (h : c_void_p,code : i32,len_iinf : i32
 #[allow(non_camel_case_types)]
 #[allow(unused)]
 type  MSK12_IntSolCallbackFunc = extern "C" fn (handle : c_void_p,num : i32,primal_obj : f64,xx : *const f64);
+#[allow(non_camel_case_types)]
+#[allow(unused)]
+pub type AllocHandle = c_void_p;
+#[allow(non_camel_case_types)]
+#[allow(unused)]
+type  MSK12_AllocFunc = extern "C" fn (handle : c_void_p,num : usize) -> *mut u8;
 
 
 #[allow(non_camel_case_types)]
@@ -885,6 +891,8 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_syevd(is_upr : i32,n : i32,a : *mut f64,w : *mut f64) -> i32;
     #[allow(unused)]
+    fn MSK12_compute_sparse_cholesky(num_threads : i32,order_method : i32,tol_singular : f64,n : i32,a_col_num_nonzero : *const i32,a_subi : *const i32,a_val : *const f64,perm : *mut i32,diag : *mut f64,alloc : extern "C" fn (handle : c_void_p,num : usize) -> *mut u8,alloc_handle : c_void_p,l_col_num_nonzero : *mut i32,l_subi : *mut *mut i32,l_val : *mut *mut f64) -> i32;
+    #[allow(unused)]
     fn MSK12_optimize_batch(is_race : i32,max_time_sec : f64,num_threads : i32,num_task : i64,tasks : *const Task_t,trm_code : *mut i32,res_code : *mut i32) -> i32;
     #[allow(unused)]
     fn MSK12_check_out_license(feature : i32) -> i32;
@@ -928,14 +936,31 @@ impl From<APIError> for String {
 
 }
 
+extern "C" fn memory_alloc(handle : *mut c_void, size : usize) -> *mut u8 {
+    let allocated : &mut Vec<(std::alloc::Layout,*mut u8)> = unsafe { &mut *(handle as * mut Vec<(std::alloc::Layout,*mut u8)>) };
+    let layout = std::alloc::Layout::from_size_align(size,8).unwrap();
+    let p = unsafe { std::alloc::alloc(layout) };
+    allocated.push((layout,p));
+    p
+}
+
+extern "C" fn write_proxy(handle : c_void_p, src : c_void_p,  num : usize) -> usize {
+    let f = handle as *mut Box<dyn FnMut(&[u8]) -> usize>;
+    unsafe{ (*f)(std::slice::from_raw_parts(src as *const u8, num)) }
+}
+
+extern "C" fn read_proxy(handle : c_void_p, dst : c_void_p, num : usize) -> usize {
+    let f = handle as *mut Box<dyn FnMut(&mut [u8]) -> usize>;
+    unsafe{ (*f)(std::slice::from_raw_parts_mut(dst as *mut u8, num)) }
+}
 
 pub struct Task {
     task : Task_t,
 }
 unsafe impl std::marker::Send for Task {}
 
-pub struct MosekCoreAPI {}
-unsafe impl std::marker::Send for MosekCoreAPI {}
+pub struct MosekStableAPI {}
+unsafe impl std::marker::Send for MosekStableAPI {}
 
 impl APIError {
     fn new<S>(code : i32, msg : S) -> APIError where S : Into<String> {
@@ -968,17 +993,17 @@ impl APIError {
 pub fn is_initialized() -> bool {
     unsafe { MSK12_library_initialized() != 0 }
 }
-pub fn initialize() -> Result<MosekCoreAPI,APIError>
+pub fn initialize() -> Result<MosekStableAPI,APIError>
 {
     let load_res = unsafe { MSK12_initialize_library() };
     if load_res != 0 {
         Err(APIError::from("err_mosek_core_dynamic_load", "","Failed to load MOSEK Core API library"))
     }
     else {
-        Ok(MosekCoreAPI{})
+        Ok(MosekStableAPI{})
     }
 }
-pub fn initialize_with_paths(paths : &[&str]) -> Result<MosekCoreAPI,APIError>
+pub fn initialize_with_paths(paths : &[&str]) -> Result<MosekStableAPI,APIError>
 {
     if ! is_initialized() {
         let mut ps = Vec::with_capacity(paths.len()+1);
@@ -991,15 +1016,15 @@ pub fn initialize_with_paths(paths : &[&str]) -> Result<MosekCoreAPI,APIError>
             Err(APIError::from("err_mosek_core_dynamic_load", "","Failed to load MOSEK Core API library"))
         }
         else {
-            Ok(MosekCoreAPI{})
+            Ok(MosekStableAPI{})
         }
     }
     else {
-        Ok(MosekCoreAPI{})
+        Ok(MosekStableAPI{})
     }
 }
 
-impl MosekCoreAPI {
+impl MosekStableAPI {
     pub fn task(&self) -> Result<Task,APIError> {
         let p = unsafe { MSK12_new_task() };
         if p == std::ptr::null_mut() {
@@ -1256,7 +1281,7 @@ impl MosekCoreAPI {
     pub fn axpy(&self,alpha : f64,x : &[f64],y : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: n,alpha,x,y
-        let n = i32::try_from(Some(Some(x.len()).map(|v| y.len().min(v)).unwrap_or(y.len())).unwrap_or(0))
+        let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_axpy(n,alpha,x.as_ptr(),y.as_mut_ptr()) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
@@ -1273,7 +1298,7 @@ impl MosekCoreAPI {
     pub fn dot(&self,x : &[f64],y : &[f64]) -> Result<f64,APIError>
     {
         // Arg processing order: n,xty,x,y
-        let n = i32::try_from(Some(Some(x.len()).map(|v| y.len().min(v)).unwrap_or(y.len())).unwrap_or(0))
+        let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut xty : f64 = Default::default();
         let returned_value = unsafe{ MSK12_dot(n,x.as_ptr(),y.as_ptr(),std::ptr::from_mut(&mut xty)) };
@@ -1401,9 +1426,9 @@ impl MosekCoreAPI {
     pub fn sparse_triangular_solve_dense(&self,transposed : bool,lnzc : &[i32],lptrc : &[i64],lsubc : &[i32],lvalc : &[f64],b : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: transposed,n,nnz,lnzc,lptrc,lsubc,lvalc,b
-        let n = i32::try_from(Some(Some(Some(lnzc.len()).map(|v| lptrc.len().min(v)).unwrap_or(lptrc.len())).map(|v| b.len().min(v)).unwrap_or(b.len())).unwrap_or(0))
+        let n = i32::try_from([Some(lnzc.len()),Some(lptrc.len()),Some(b.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let nnz = i64::try_from(Some(Some(lsubc.len()).map(|v| lvalc.len().min(v)).unwrap_or(lvalc.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(lsubc.len()),Some(lvalc.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_sparse_triangular_solve_dense(if transposed {1} else {0},n,lnzc.as_ptr(),lptrc.as_ptr(),nnz,lsubc.as_ptr(),lvalc.as_ptr(),b.as_mut_ptr()) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
@@ -1434,7 +1459,7 @@ impl MosekCoreAPI {
     pub fn syeig(&self,is_upr : bool,a : &[f64],w : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: is_upr,n,a,w
-        let n = i32::try_from(Some(w.len()).unwrap_or(0))
+        let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_syeig(if is_upr {1} else {0},n,a.as_ptr(),w.as_mut_ptr()) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
@@ -1460,11 +1485,83 @@ impl MosekCoreAPI {
     pub fn syevd(&self,is_upr : bool,a : &mut [f64],w : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: is_upr,n,a,w
-        let n = i32::try_from(Some(w.len()).unwrap_or(0))
+        let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_syevd(if is_upr {1} else {0},n,a.as_mut_ptr(),w.as_mut_ptr()) };
         if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
         Ok(())
+    }
+    /// The function computes a Cholesky factorization of a sparse positive semidefinite matrix. Sparsity is exploited
+    /// during the computations to reduce the amount of space and work required. Both the input and output matrices
+    /// are represented using the sparse format.
+    /// 
+    /// To be precise, given a symmetric matrix \\(A \\in \\real^{n\\times n}\\) the function computes a nonsingular lower triangular matrix \\(L\\), a diagonal matrix \\(D\\) and a permutation matrix \\(P\\) such that
+    /// 
+    /// $$
+    /// LL^T - D = P A P^T
+    /// $$
+    /// 
+    /// If ``order_method`` is zero then reordering heuristics are not employed and \\(P\\) is the identity.
+    /// 
+    /// If a pivot during the computation of the Cholesky factorization is less than
+    /// 
+    /// $$
+    /// -\\rho\\cdot\\max((PAP^T)_{jj},1.0)
+    /// $$
+    /// 
+    /// then the matrix is declared negative semidefinite. On the hand if a pivot is smaller than
+    /// 
+    /// $$
+    /// \\rho\\cdot\\max((PAP^T)_{jj},1.0),
+    /// $$
+    /// 
+    /// then \\(D_{jj}\\) is increased from zero to
+    /// 
+    /// $$
+    /// \\rho\\cdot\\max((PAP^T)_{jj},1.0).
+    /// $$
+    /// 
+    /// Therefore, if \\(A\\) is sufficiently positive definite then \\(D\\) will be the zero matrix.
+    /// Here \\(\\rho\\) is set equal to value of ``tol_singular``.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `num_threads` The number threads that can be used to do the computation. 0 means the code makes the choice. 
+    /// - `order_method` If nonzero, then a sparsity preserving ordering will be employed. 
+    /// - `tol_singular` A positive parameter controlling when a pivot is declared zero. 
+    /// - `n` Specifies the order of \\(A\\). 
+    /// - `alloc` Memory allocation function for allocating the result. If `null`, the system `malloc` function is used. 
+    /// - `alloc_handle` Handle passed to the memory allocation function 
+    /// - `a_col_num_nonzero[n]` (in) `a_col_num_nonzero[j]` is a pointer to the first element in column \\(j\\). 
+    /// - `perm[n]` (out) Permutation array used to specify the permutation matrix \\(P\\) computed by the function. 
+    /// - `diag[n]` (out) The diagonal elements of matrix \\(D\\). 
+    /// - `l_col_num_nonzero[n]` (out) `l_col_num_nonzero[j]` is the number of non zero elements in column \\(j\\) of \\(L\\). 
+    /// - `a_subi` (in) Row indexes for each column stored in increasing order. 
+    /// - `a_val` (in) The value corresponding to row indexed stored in asubc. 
+    /// - `l_subi` (out) Row indexes for each column stored in increasing order. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+    ///   
+    ///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+    /// - `l_val` (out) The values corresponding to row indexed stored in lsubc. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+    ///   
+    ///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+    pub fn compute_sparse_cholesky(&self,num_threads : i32,order_method : i32,tol_singular : f64,a_col_num_nonzero : &[i32],a_subi : &[i32],a_val : &[f64],perm : &mut [i32],diag : &mut [f64],l_col_num_nonzero : &mut [i32]) -> Result<(Vec<i32>,Vec<f64>),APIError>
+    {
+        // Arg processing order: num_threads,order_method,tol_singular,n,alloc,alloc_handle,a_col_num_nonzero,perm,diag,l_col_num_nonzero,a_subi,a_val,l_subi,l_val
+        let n = i32::try_from([Some(a_col_num_nonzero.len()),Some(perm.len()),Some(diag.len()),Some(l_col_num_nonzero.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let mut allocated_items : Vec<(std::alloc::Layout,*mut u8)> = Vec:: new();
+        let mut ptr_l_subi : * mut i32 = std::ptr::null_mut();
+        let mut ptr_l_val : * mut f64 = std::ptr::null_mut();
+        let returned_value = unsafe{ MSK12_compute_sparse_cholesky(num_threads,order_method,tol_singular,n,a_col_num_nonzero.as_ptr(),a_subi.as_ptr(),a_val.as_ptr(),perm.as_mut_ptr(),diag.as_mut_ptr(),memory_alloc,(&mut allocated_items) as * mut _ as c_void_p,l_col_num_nonzero.as_mut_ptr(),&mut ptr_l_subi,&mut ptr_l_val) };
+        if 0 != returned_value { return Err(APIError::new(returned_value,"")); }
+        let l_subi_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
+        let mut l_subi = vec![i32::default(); l_subi_len];
+        l_subi.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_subi,l_subi_len) });
+        let l_val_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
+        let mut l_val = vec![f64::default(); l_val_len];
+        l_val.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_val,l_val_len) });
+        for (layout,ptr) in allocated_items { unsafe{ std::alloc::dealloc(ptr,layout); } }
+        Ok((l_subi,l_val))
     }
     /// Optimize a number of tasks in parallel using a specified number of threads. All
     /// callbacks and log output streams are disabled.
@@ -1490,7 +1587,7 @@ impl MosekCoreAPI {
     pub fn optimize_batch(&self,is_race : bool,max_time_sec : f64,num_threads : i32,tasks : &[Task],trm_code : &mut [i32],res_code : &mut [i32]) -> Result<(),APIError>
     {
         // Arg processing order: is_race,max_time_sec,num_threads,num_task,tasks,trm_code,res_code
-        let num_task = i64::try_from(Some(Some(Some(tasks.len()).map(|v| trm_code.len().min(v)).unwrap_or(trm_code.len())).map(|v| res_code.len().min(v)).unwrap_or(res_code.len())).unwrap_or(0))
+        let num_task = i64::try_from([Some(tasks.len()),Some(trm_code.len()),Some(res_code.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let ptrs_tasks_ : Vec<Task_t> = tasks.iter().map(|t| t.task).collect();
         let returned_value = unsafe{ MSK12_optimize_batch(if is_race {1} else {0},max_time_sec,num_threads,num_task,ptrs_tasks_.as_ptr(),trm_code.as_mut_ptr(),res_code.as_mut_ptr()) };
@@ -1700,9 +1797,9 @@ impl Task {
         let r = unsafe { MSK12_optimize_callback(
             self.task,
             &mut trm as * mut _,
-            info.map(|f| &f as * const Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> as CallbackHandle).unwrap_or(std::ptr::null_mut()),
+            info.as_ref().map(|f| f as * const Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> as CallbackHandle).unwrap_or(std::ptr::null_mut()),
             if has_info { Some(info_cb as extern "C" fn(*mut c_void, i32, i32, *const i32, i32, *const i64, i32, *const f64) -> i32) } else {None},
-            intsol.map(|f| &f as * const _ as CallbackHandle).unwrap_or(std::ptr::null_mut()),
+            intsol.as_ref().map(|f| f as * const _ as CallbackHandle).unwrap_or(std::ptr::null_mut()),
             if has_intsol { Some(intsol_cb as extern "C" fn(*mut c_void, i32,f64,*const f64)) } else {None}) };
         if 0 != r {
             self.last_error()?
@@ -1718,6 +1815,54 @@ impl Task {
         else {
             Ok(Task::from_ptr(task2))
         }
+    }
+
+    // TODO:
+    pub fn read_task_by_func<F>(&mut self, read : F, format : Format, compress : Compression) -> Result<(),APIError>
+        where F : FnMut(&mut [u8]) -> usize
+    {
+        let f : Box<dyn FnMut(&mut [u8]) -> usize> = Box::new(read);
+        let returned_value =
+            unsafe{ MSK12_read_from_handle(
+                self.task,
+                format as i32,
+                compress as i32,
+                (&f) as * const _ as ReadHandle,// * const Box<dyn FnMut(&mut [u8]) -> usize>,
+                read_proxy) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+
+    /// Write task data
+    pub fn write_task_by_func<F>(&mut self, write : F, format : Format, compress : Compression) -> Result<(),APIError>
+        where F : FnMut(&[u8]) -> usize
+    {
+        let f : Box<dyn FnMut(&[u8]) -> usize> = Box::new(write);
+        let returned_value =
+            unsafe{ MSK12_write_task_to_handle(
+                self.task,
+                format as i32,
+                compress as i32,
+                (&f) as * const _ as WriteHandle,
+                write_proxy) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+
+    /// TODO
+    pub fn write_solution_by_func<F>(&mut self, write : F, format : Format, compress : Compression) -> Result<(),APIError>
+        where F : FnMut(&[u8]) -> usize
+    {
+        let f : Box<dyn FnMut(&[u8]) -> usize> = Box::new(write);
+        let returned_value =
+            unsafe{ MSK12_write_solution_to_handle(
+                self.task,
+                format as i32,
+                compress as i32,
+                (&f) as * const _ as WriteHandle,
+                write_proxy) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
     }
 
     /// Reserve space for scalar variables. This is to be considered a _hint_, not a requirement. 
@@ -1950,7 +2095,7 @@ impl Task {
     pub fn append_barvars(&mut self,dims : &[i32]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_barvar,dims
-        let num_barvar = i32::try_from(Some(dims.len()).unwrap_or(0))
+        let num_barvar = i32::try_from([Some(dims.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_barvars(self.task,num_barvar,dims.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -1969,7 +2114,7 @@ impl Task {
     pub fn append_symmat(&mut self,dim : i32,symmat_i : &[i32],symmat_j : &[i32],symmat_val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,dim,nnz,symmat_i,symmat_j,symmat_val
-        let nnz = i64::try_from(Some(Some(Some(symmat_i.len()).map(|v| symmat_j.len().min(v)).unwrap_or(symmat_j.len())).map(|v| symmat_val.len().min(v)).unwrap_or(symmat_val.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(symmat_i.len()),Some(symmat_j.len()),Some(symmat_val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_symmat(self.task,dim,nnz,symmat_i.as_ptr(),symmat_j.as_ptr(),symmat_val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -1989,7 +2134,7 @@ impl Task {
     pub fn append_symmats(&mut self,dim : &[i32],nnz : &[i64],symmat_i : &[i32],symmat_j : &[i32],symmat_val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_symmat,dim,nnz,symmat_i,symmat_j,symmat_val
-        let num_symmat = i64::try_from(Some(Some(dim.len()).map(|v| nnz.len().min(v)).unwrap_or(nnz.len())).unwrap_or(0))
+        let num_symmat = i64::try_from([Some(dim.len()),Some(nnz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_symmats(self.task,num_symmat,dim.as_ptr(),nnz.as_ptr(),symmat_i.as_ptr(),symmat_j.as_ptr(),symmat_val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2046,7 +2191,7 @@ impl Task {
     pub fn put_var_type_slice(&mut self,first_var : i32,var_types : &[VariableType]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,var_types
-        let num_var = i32::try_from(Some(var_types.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(var_types.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         // CHECK: Enum RType(VariableType), var_types, mut=, nullable=False
         let i32_var_types : Vec<i32> = var_types.iter().map(|v| *v as i32).collect();
@@ -2080,7 +2225,7 @@ impl Task {
     pub fn put_var_type_list(&mut self,var_idxs : &[i32],var_types : &[VariableType]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_var,var_idxs,var_types
-        let num_var = i32::try_from(Some(Some(var_idxs.len()).map(|v| var_types.len().min(v)).unwrap_or(var_types.len())).unwrap_or(0))
+        let num_var = i32::try_from([Some(var_idxs.len()),Some(var_types.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         // CHECK: Enum RType(VariableType), var_types, mut=, nullable=False
         let i32_var_types : Vec<i32> = var_types.iter().map(|v| *v as i32).collect();
@@ -2115,7 +2260,7 @@ impl Task {
     pub fn get_var_type_slice(&self,first_var : i32,var_types : &mut [VariableType]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,var_types
-        let num_var = i32::try_from(Some(var_types.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(var_types.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         // CHECK: Enum RType(VariableType), var_types, mut=mut , nullable=False
         let mut i32_var_types : Vec<i32> = var_types.iter().map(|v| *v as i32).collect();
@@ -2152,7 +2297,7 @@ impl Task {
     pub fn put_var_bound_slice(&mut self,first_var : i32,low : &[f64],upr : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,low,upr
-        let num_var = i32::try_from(Some(Some(low.len()).map(|v| upr.len().min(v)).unwrap_or(upr.len())).unwrap_or(0))
+        let num_var = i32::try_from([Some(low.len()),Some(upr.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_var_bound_slice(self.task,first_var,num_var,low.as_ptr(),upr.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2199,7 +2344,7 @@ impl Task {
     pub fn put_var_low_bound_slice(&mut self,first_var : i32,low : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,low
-        let num_var = i32::try_from(Some(low.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(low.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_var_low_bound_slice(self.task,first_var,num_var,low.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2245,7 +2390,7 @@ impl Task {
     pub fn put_var_upr_bound_slice(&mut self,first_var : i32,upr : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,upr
-        let num_var = i32::try_from(Some(upr.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(upr.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_var_upr_bound_slice(self.task,first_var,num_var,upr.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2295,7 +2440,7 @@ impl Task {
     pub fn get_var_bound_slice(&self,first_var : i32,low : &mut [f64],upr : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_var,num_var,low,upr
-        let num_var = i32::try_from(Some(Some(low.len()).map(|v| upr.len().min(v)).unwrap_or(upr.len())).unwrap_or(0))
+        let num_var = i32::try_from([Some(low.len()),Some(upr.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_var_bound_slice(self.task,first_var,num_var,low.as_mut_ptr(),upr.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2343,7 +2488,7 @@ impl Task {
     pub fn get_barvar_slice_dims(&self,first_barvar : i32,dim : &mut [i32]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_barvar,num_barvar,dim
-        let num_barvar = i32::try_from(Some(dim.len()).unwrap_or(0))
+        let num_barvar = i32::try_from([Some(dim.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_barvar_slice_dims(self.task,first_barvar,num_barvar,dim.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2362,7 +2507,7 @@ impl Task {
     pub fn get_domain(&mut self,dom_type : DomainType,num_alpha : i32,alpha : &mut [f64]) -> Result<i64,APIError>
     {
         // Arg processing order: task,dom_type,dim,num_alpha,dom_idx,alpha
-        let dim = i64::try_from(Some(alpha.len()).unwrap_or(0))
+        let dim = i64::try_from([Some(alpha.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut dom_idx : i64 = Default::default();
         let returned_value = unsafe{ MSK12_get_domain(self.task,dom_type as i32,dim,num_alpha,alpha.as_mut_ptr(),std::ptr::from_mut(&mut dom_idx)) };
@@ -2541,7 +2686,7 @@ impl Task {
     pub fn get_domain_primal_power_cone(&mut self,n : i64,alpha : &[f64]) -> Result<i64,APIError>
     {
         // Arg processing order: task,n,num_alpha,dom_idx,alpha
-        let num_alpha = i64::try_from(Some(alpha.len()).unwrap_or(0))
+        let num_alpha = i64::try_from([Some(alpha.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut dom_idx : i64 = Default::default();
         let returned_value = unsafe{ MSK12_get_domain_primal_power_cone(self.task,n,num_alpha,alpha.as_ptr(),std::ptr::from_mut(&mut dom_idx)) };
@@ -2568,7 +2713,7 @@ impl Task {
     pub fn get_domain_dual_power_cone(&mut self,n : i64,alpha : &[f64]) -> Result<i64,APIError>
     {
         // Arg processing order: task,n,num_alpha,dom_idx,alpha
-        let num_alpha = i64::try_from(Some(alpha.len()).unwrap_or(0))
+        let num_alpha = i64::try_from([Some(alpha.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut dom_idx : i64 = Default::default();
         let returned_value = unsafe{ MSK12_get_domain_dual_power_cone(self.task,n,num_alpha,alpha.as_ptr(),std::ptr::from_mut(&mut dom_idx)) };
@@ -2688,7 +2833,7 @@ impl Task {
     pub fn get_domain_alpha(&self,dom_idx : i64,alpha : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,dom_idx,num_alpha,alpha
-        let num_alpha = i64::try_from(Some(alpha.len()).unwrap_or(0))
+        let num_alpha = i64::try_from([Some(alpha.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_domain_alpha(self.task,dom_idx,num_alpha,alpha.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2706,7 +2851,7 @@ impl Task {
     pub fn put_row(&mut self,row_idx : i64,subj : &[i32],cof : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,row_idx,num_nz,subj,cof
-        let num_nz = i32::try_from(Some(Some(subj.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let num_nz = i32::try_from([Some(subj.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_row(self.task,row_idx,num_nz,subj.as_ptr(),cof.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2725,7 +2870,7 @@ impl Task {
     pub fn put_row_slice(&mut self,first_row : i64,row_num_nz : &[i32],subj : &[i32],cof : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_row,num_row,row_num_nz,subj,cof
-        let num_row = i64::try_from(Some(row_num_nz.len()).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_num_nz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_row_slice(self.task,first_row,num_row,row_num_nz.as_ptr(),subj.as_ptr(),cof.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2744,7 +2889,7 @@ impl Task {
     pub fn put_row_list(&mut self,row_idxs : &[i64],row_num_nz : &[i32],subj : &[&[i32]],cof : &[&[f64]]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_row,row_idxs,row_num_nz,subj,cof
-        let num_row = i64::try_from(Some(Some(row_idxs.len()).map(|v| row_num_nz.len().min(v)).unwrap_or(row_num_nz.len())).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_idxs.len()),Some(row_num_nz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let subj_ptrs : Vec<*const i32> = subj.iter().map(|entry| entry.as_ptr()).collect();
         let cof_ptrs : Vec<*const f64> = cof.iter().map(|entry| entry.as_ptr()).collect();
@@ -2777,7 +2922,7 @@ impl Task {
     pub fn put_row_slice_g(&mut self,first_row : i64,g : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_row,num_row,g
-        let num_row = i64::try_from(Some(g.len()).unwrap_or(0))
+        let num_row = i64::try_from([Some(g.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_row_slice_g(self.task,first_row,num_row,g.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2794,7 +2939,7 @@ impl Task {
     pub fn put_row_list_g(&mut self,row_idxs : &[i64],g : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_row,row_idxs,g
-        let num_row = i64::try_from(Some(Some(row_idxs.len()).map(|v| g.len().min(v)).unwrap_or(g.len())).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_idxs.len()),Some(g.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_row_list_g(self.task,num_row,row_idxs.as_ptr(),g.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2812,7 +2957,7 @@ impl Task {
     pub fn put_col(&mut self,col_idx : i32,row_idxs : &[i64],cof : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,col_idx,num_nz,row_idxs,cof
-        let num_nz = i64::try_from(Some(Some(row_idxs.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let num_nz = i64::try_from([Some(row_idxs.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_col(self.task,col_idx,num_nz,row_idxs.as_ptr(),cof.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2831,7 +2976,7 @@ impl Task {
     pub fn put_col_slice(&mut self,first_col : i32,col_len : &[i64],row_idxs : &[i64],cof : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_col,num_col,col_len,row_idxs,cof
-        let num_col = i32::try_from(Some(col_len.len()).unwrap_or(0))
+        let num_col = i32::try_from([Some(col_len.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_col_slice(self.task,first_col,num_col,col_len.as_ptr(),row_idxs.as_ptr(),cof.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2850,7 +2995,7 @@ impl Task {
     pub fn put_col_list(&mut self,col_idxs : &[i32],col_lens : &[i64],row_idxs : &[&[i64]],cof : &[&[f64]]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_col,col_idxs,col_lens,row_idxs,cof
-        let num_col = i32::try_from(Some(Some(col_idxs.len()).map(|v| col_lens.len().min(v)).unwrap_or(col_lens.len())).unwrap_or(0))
+        let num_col = i32::try_from([Some(col_idxs.len()),Some(col_lens.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let row_idxs_ptrs : Vec<*const i64> = row_idxs.iter().map(|entry| entry.as_ptr()).collect();
         let cof_ptrs : Vec<*const f64> = cof.iter().map(|entry| entry.as_ptr()).collect();
@@ -2885,7 +3030,7 @@ impl Task {
     pub fn put_ijc_list(&mut self,row_idxs : &[i64],col_idxs : &[i32],cof : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_nz,row_idxs,col_idxs,cof
-        let num_nz = i64::try_from(Some(Some(Some(row_idxs.len()).map(|v| col_idxs.len().min(v)).unwrap_or(col_idxs.len())).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let num_nz = i64::try_from([Some(row_idxs.len()),Some(col_idxs.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_ijc_list(self.task,num_nz,row_idxs.as_ptr(),col_idxs.as_ptr(),cof.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2915,7 +3060,7 @@ impl Task {
     pub fn get_row_slice_num_nz(&self,first_row : i64,num_nz : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_row,num_row,num_nz
-        let num_row = i64::try_from(Some(num_nz.len()).unwrap_or(0))
+        let num_row = i64::try_from([Some(num_nz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_row_slice_num_nz(self.task,first_row,num_row,num_nz.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2933,7 +3078,7 @@ impl Task {
     pub fn get_row(&self,row_idx : i64,subj : &mut [i32],cof : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,row_idx,nnz,subj,cof
-        let nnz = i32::try_from(Some(Some(subj.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let nnz = i32::try_from([Some(subj.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_row(self.task,row_idx,nnz,subj.as_mut_ptr(),cof.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2953,9 +3098,9 @@ impl Task {
     pub fn get_row_slice(&self,first_row : i64,row_len : &mut [i32],subj : &mut [i32],cof : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_row,num_row,nnz,row_len,subj,cof
-        let num_row = i64::try_from(Some(row_len.len()).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_len.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let nnz = i64::try_from(Some(Some(subj.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(subj.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_row_slice(self.task,first_row,num_row,nnz,row_len.as_mut_ptr(),subj.as_mut_ptr(),cof.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -2985,7 +3130,7 @@ impl Task {
     pub fn get_col_slice_num_nz(&self,first_col : i32,num_nz : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_col,num_col,num_nz
-        let num_col = i32::try_from(Some(num_nz.len()).unwrap_or(0))
+        let num_col = i32::try_from([Some(num_nz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_col_slice_num_nz(self.task,first_col,num_col,num_nz.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3003,7 +3148,7 @@ impl Task {
     pub fn get_col(&self,col_idx : i32,subi : &mut [i64],cof : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,col_idx,nnz,subi,cof
-        let nnz = i64::try_from(Some(Some(subi.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(subi.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_col(self.task,col_idx,nnz,subi.as_mut_ptr(),cof.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3023,9 +3168,9 @@ impl Task {
     pub fn get_col_slice(&self,first_col : i32,col_len : &mut [i64],subi : &mut [i64],cof : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_col,num_col,nnz,col_len,subi,cof
-        let num_col = i32::try_from(Some(col_len.len()).unwrap_or(0))
+        let num_col = i32::try_from([Some(col_len.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let nnz = i64::try_from(Some(Some(subi.len()).map(|v| cof.len().min(v)).unwrap_or(cof.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(subi.len()),Some(cof.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_col_slice(self.task,first_col,num_col,nnz,col_len.as_mut_ptr(),subi.as_mut_ptr(),cof.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3044,7 +3189,7 @@ impl Task {
     pub fn put_bar_entry(&mut self,row_idx : i64,barvar_idx : i32,matrix_idx : &[i64],weight : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,row_idx,barvar_idx,num_weight,matrix_idx,weight
-        let num_weight = i64::try_from(Some(Some(matrix_idx.len()).map(|v| weight.len().min(v)).unwrap_or(weight.len())).unwrap_or(0))
+        let num_weight = i64::try_from([Some(matrix_idx.len()),Some(weight.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_bar_entry(self.task,row_idx,barvar_idx,num_weight,matrix_idx.as_ptr(),weight.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3064,7 +3209,7 @@ impl Task {
     pub fn put_bar_entry_list(&mut self,row_idx : &[i64],barvar_idx : &[i32],num_weight : &[i64],matrix_idx : &[i64],weight : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_bar_entry,row_idx,barvar_idx,num_weight,matrix_idx,weight
-        let num_bar_entry = i64::try_from(Some(Some(Some(row_idx.len()).map(|v| barvar_idx.len().min(v)).unwrap_or(barvar_idx.len())).map(|v| num_weight.len().min(v)).unwrap_or(num_weight.len())).unwrap_or(0))
+        let num_bar_entry = i64::try_from([Some(row_idx.len()),Some(barvar_idx.len()),Some(num_weight.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_bar_entry_list(self.task,num_bar_entry,row_idx.as_ptr(),barvar_idx.as_ptr(),num_weight.as_ptr(),matrix_idx.as_ptr(),weight.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3084,7 +3229,7 @@ impl Task {
     pub fn put_bar_row(&mut self,row_idx : i64,barvar_idx : &[i32],num_weight : &[i64],matrix_idx : &[i64],weight : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,row_idx,num_bar_entry,barvar_idx,num_weight,matrix_idx,weight
-        let num_bar_entry = i32::try_from(Some(Some(barvar_idx.len()).map(|v| num_weight.len().min(v)).unwrap_or(num_weight.len())).unwrap_or(0))
+        let num_bar_entry = i32::try_from([Some(barvar_idx.len()),Some(num_weight.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_bar_row(self.task,row_idx,num_bar_entry,barvar_idx.as_ptr(),num_weight.as_ptr(),matrix_idx.as_ptr(),weight.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3120,7 +3265,7 @@ impl Task {
     pub fn get_symmat(&self,symmat_idx : i64,symmat_i : &mut [i32],symmat_j : &mut [i32],symmat_val : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,symmat_idx,nnz,symmat_i,symmat_j,symmat_val
-        let nnz = i64::try_from(Some(Some(Some(symmat_i.len()).map(|v| symmat_j.len().min(v)).unwrap_or(symmat_j.len())).map(|v| symmat_val.len().min(v)).unwrap_or(symmat_val.len())).unwrap_or(0))
+        let nnz = i64::try_from([Some(symmat_i.len()),Some(symmat_j.len()),Some(symmat_val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_symmat(self.task,symmat_idx,nnz,symmat_i.as_mut_ptr(),symmat_j.as_mut_ptr(),symmat_val.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3138,7 +3283,7 @@ impl Task {
     pub fn get_symmat_slice_info(&self,first_symmat : i64,dim : &mut [i32],nnz : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_symmat,num_symmat,dim,nnz
-        let num_symmat = i64::try_from(Some(Some(dim.len()).map(|v| nnz.len().min(v)).unwrap_or(nnz.len())).unwrap_or(0))
+        let num_symmat = i64::try_from([Some(dim.len()),Some(nnz.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_symmat_slice_info(self.task,first_symmat,num_symmat,dim.as_mut_ptr(),nnz.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3158,7 +3303,7 @@ impl Task {
     pub fn get_symmat_slice(&self,first_symmat : i64,num_symmat : i64,symmat_i : &mut [i32],symmat_j : &mut [i32],symmat_val : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_symmat,num_symmat,total_nnz,symmat_i,symmat_j,symmat_val
-        let total_nnz = i64::try_from(Some(Some(Some(symmat_i.len()).map(|v| symmat_j.len().min(v)).unwrap_or(symmat_j.len())).map(|v| symmat_val.len().min(v)).unwrap_or(symmat_val.len())).unwrap_or(0))
+        let total_nnz = i64::try_from([Some(symmat_i.len()),Some(symmat_j.len()),Some(symmat_val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_symmat_slice(self.task,first_symmat,num_symmat,total_nnz,symmat_i.as_mut_ptr(),symmat_j.as_mut_ptr(),symmat_val.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3176,7 +3321,7 @@ impl Task {
     pub fn append_con(&self,dom_idx : i64,row_idxs : &[i64],con_offset : Option<&[f64]>) -> Result<(),APIError>
     {
         // Arg processing order: task,dom_idx,num_rows,row_idxs,con_offset
-        let num_rows = i64::try_from(Some(row_idxs.len()).map(|v| con_offset.map(|w| v.min(w.len())).unwrap_or(v)).or_else(|| con_offset.map(|v| v.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idxs.len()),con_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_con(self.task,dom_idx,num_rows,row_idxs.as_ptr(),con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
@@ -3195,7 +3340,7 @@ impl Task {
     pub fn append_cons(&self,dom_idxs : &[i64],num_rows : &[i64],row_idxs : &[i64],con_offset : Option<&[f64]>) -> Result<(),APIError>
     {
         // Arg processing order: task,num_con,dom_idxs,num_rows,row_idxs,con_offset
-        let num_con = i64::try_from(Some(Some(dom_idxs.len()).map(|v| num_rows.len().min(v)).unwrap_or(num_rows.len())).unwrap_or(0))
+        let num_con = i64::try_from([Some(dom_idxs.len()),Some(num_rows.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_cons(self.task,num_con,dom_idxs.as_ptr(),num_rows.as_ptr(),row_idxs.as_ptr(),con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
@@ -3214,7 +3359,7 @@ impl Task {
     pub fn put_con(&mut self,con_idx : i64,dom_idx : i64,row_idxs : &[i64],rhs_offset : Option<&[f64]>) -> Result<(),APIError>
     {
         // Arg processing order: task,con_idx,num_rows,dom_idx,row_idxs,rhs_offset
-        let num_rows = i64::try_from(Some(row_idxs.len()).map(|v| rhs_offset.map(|w| v.min(w.len())).unwrap_or(v)).or_else(|| rhs_offset.map(|v| v.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idxs.len()),rhs_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_con(self.task,con_idx,num_rows,dom_idx,row_idxs.as_ptr(),rhs_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
@@ -3250,9 +3395,9 @@ impl Task {
     pub fn put_con_slice(&mut self,first_con : i64,dom_idx : &[i64],row_idx : &[i64],rhs_offset : Option<&[f64]>) -> Result<(),APIError>
     {
         // Arg processing order: task,first_con,num_con,num_rows,dom_idx,row_idx,rhs_offset
-        let num_con = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_con = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_rows = i64::try_from(Some(row_idx.len()).map(|v| rhs_offset.map(|w| v.min(w.len())).unwrap_or(v)).or_else(|| rhs_offset.map(|v| v.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idx.len()),rhs_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_con_slice(self.task,first_con,num_con,num_rows,dom_idx.as_ptr(),row_idx.as_ptr(),rhs_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
@@ -3269,7 +3414,7 @@ impl Task {
     pub fn get_con_slice_domains(&self,first_con : i64,dom_idx : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_con,num_con,dom_idx
-        let num_con = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_con = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_con_slice_domains(self.task,first_con,num_con,dom_idx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3305,9 +3450,9 @@ impl Task {
     pub fn get_con_slice(&self,first_con : i64,row_idx : &mut [i64],rhs_offset : &mut [f64],dom_idx : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_con,num_con,num_row,row_idx,rhs_offset,dom_idx
-        let num_con = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_con = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_row = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_con_slice(self.task,first_con,num_con,num_row,row_idx.as_mut_ptr(),rhs_offset.as_mut_ptr(),dom_idx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3328,11 +3473,11 @@ impl Task {
     pub fn append_djc(&mut self,dom_idx : &[i64],term_size : &[i64],row_idx : &[i64],rhs_offset : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_rows,num_dom,num_terms,dom_idx,term_size,row_idx,rhs_offset
-        let num_rows = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_dom = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_dom = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_terms = i64::try_from(Some(term_size.len()).unwrap_or(0))
+        let num_terms = i64::try_from([Some(term_size.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_djc(self.task,num_rows,num_dom,num_terms,dom_idx.as_ptr(),term_size.as_ptr(),row_idx.as_ptr(),rhs_offset.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3354,11 +3499,11 @@ impl Task {
     pub fn put_djc(&mut self,djc_idx : i64,dom_idx : &[i64],term_size : &[i64],row_idx : &[i64],rhs_offset : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,djc_idx,num_rows,num_dom,num_terms,dom_idx,term_size,row_idx,rhs_offset
-        let num_rows = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_dom = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_dom = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_terms = i64::try_from(Some(term_size.len()).unwrap_or(0))
+        let num_terms = i64::try_from([Some(term_size.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_djc(self.task,djc_idx,num_rows,num_dom,num_terms,dom_idx.as_ptr(),term_size.as_ptr(),row_idx.as_ptr(),rhs_offset.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3382,13 +3527,13 @@ impl Task {
     pub fn put_djc_slice(&mut self,first_djc : i64,dom_idx : &[i64],term_size : &[i64],row_idx : &[i64],rhs_offset : &[f64],djc_numterm : &[i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_djc,num_djc,num_rows,num_dom,num_terms,dom_idx,term_size,row_idx,rhs_offset,djc_numterm
-        let num_djc = i64::try_from(Some(djc_numterm.len()).unwrap_or(0))
+        let num_djc = i64::try_from([Some(djc_numterm.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_rows = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_rows = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_dom = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_dom = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_terms = i64::try_from(Some(term_size.len()).unwrap_or(0))
+        let num_terms = i64::try_from([Some(term_size.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_djc_slice(self.task,first_djc,num_djc,num_rows,num_dom,num_terms,dom_idx.as_ptr(),term_size.as_ptr(),row_idx.as_ptr(),rhs_offset.as_ptr(),djc_numterm.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3429,11 +3574,11 @@ impl Task {
     pub fn get_djc(&self,djc_idx : i64,term_size : &mut [i64],dom_idx : &mut [i64],row_idx : &mut [i64],rhs_offset : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,djc_idx,num_terms,num_dom,num_row,term_size,dom_idx,row_idx,rhs_offset
-        let num_terms = i64::try_from(Some(term_size.len()).unwrap_or(0))
+        let num_terms = i64::try_from([Some(term_size.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_dom = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_dom = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_row = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_djc(self.task,djc_idx,num_terms,num_dom,num_row,term_size.as_mut_ptr(),dom_idx.as_mut_ptr(),row_idx.as_mut_ptr(),rhs_offset.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3477,13 +3622,13 @@ impl Task {
     pub fn get_djc_slice(&self,first_djc : i64,term_size : &mut [i64],dom_idx : &mut [i64],row_idx : &mut [i64],rhs_offset : &mut [f64],djc_num_term : &mut [i64]) -> Result<(),APIError>
     {
         // Arg processing order: task,first_djc,num_djc,num_term,num_dom,num_row,term_size,dom_idx,row_idx,rhs_offset,djc_num_term
-        let num_djc = i64::try_from(Some(djc_num_term.len()).unwrap_or(0))
+        let num_djc = i64::try_from([Some(djc_num_term.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_term = i64::try_from(Some(term_size.len()).unwrap_or(0))
+        let num_term = i64::try_from([Some(term_size.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_dom = i64::try_from(Some(dom_idx.len()).unwrap_or(0))
+        let num_dom = i64::try_from([Some(dom_idx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let num_row = i64::try_from(Some(Some(row_idx.len()).map(|v| rhs_offset.len().min(v)).unwrap_or(rhs_offset.len())).unwrap_or(0))
+        let num_row = i64::try_from([Some(row_idx.len()),Some(rhs_offset.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_djc_slice(self.task,first_djc,num_djc,num_term,num_dom,num_row,term_size.as_mut_ptr(),dom_idx.as_mut_ptr(),row_idx.as_mut_ptr(),rhs_offset.as_mut_ptr(),djc_num_term.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3701,7 +3846,7 @@ impl Task {
     pub fn get_sol_xx_slice(&self,sol_idx : i32,first_var : i32,xx : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,xx
-        let num_var = i32::try_from(Some(xx.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(xx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_xx_slice(self.task,sol_idx,first_var,num_var,xx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3718,7 +3863,7 @@ impl Task {
     pub fn get_sol_slx_slice(&self,sol_idx : i32,first_var : i32,slx : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,slx
-        let num_var = i32::try_from(Some(slx.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(slx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_slx_slice(self.task,sol_idx,first_var,num_var,slx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3735,7 +3880,7 @@ impl Task {
     pub fn get_sol_sux_slice(&self,sol_idx : i32,first_var : i32,sux : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,sux
-        let num_var = i32::try_from(Some(sux.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(sux.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_sux_slice(self.task,sol_idx,first_var,num_var,sux.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3752,7 +3897,7 @@ impl Task {
     pub fn get_sol_barxj(&self,sol_idx : i32,barvar_idx : i32,barx : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,num_var,barx
-        let num_var = i64::try_from(Some(barx.len()).unwrap_or(0))
+        let num_var = i64::try_from([Some(barx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_barxj(self.task,sol_idx,barvar_idx,num_var,barx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3769,7 +3914,7 @@ impl Task {
     pub fn get_sol_barsj(&self,sol_idx : i32,barvar_idx : i32,bars : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,barvar_idx,num_elm,bars
-        let num_elm = i64::try_from(Some(bars.len()).unwrap_or(0))
+        let num_elm = i64::try_from([Some(bars.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_barsj(self.task,sol_idx,barvar_idx,num_elm,bars.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3788,7 +3933,7 @@ impl Task {
     pub fn get_sol_barx_slice(&self,sol_idx : i32,first_barvar : i32,num_barvar : i32,barx : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,num_elm,barx
-        let num_elm = i64::try_from(Some(barx.len()).unwrap_or(0))
+        let num_elm = i64::try_from([Some(barx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_barx_slice(self.task,sol_idx,first_barvar,num_barvar,num_elm,barx.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3806,7 +3951,7 @@ impl Task {
     pub fn get_sol_bars_slice(&self,sol_idx : i32,first_barvar : i32,num_barvar : i32,bars : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,num_elm,bars
-        let num_elm = i64::try_from(Some(bars.len()).unwrap_or(0))
+        let num_elm = i64::try_from([Some(bars.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_bars_slice(self.task,sol_idx,first_barvar,num_barvar,num_elm,bars.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -3919,7 +4064,7 @@ impl Task {
     pub fn get_sol_basic_x_slice(&self,sol_idx : i32,first_var : i32,basic : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,basic
-        let num_var = i32::try_from(Some(basic.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(basic.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_basic_ : Vec<i32> = basic.iter().map(|v| if *v {1} else {0}).collect();
         let returned_value = unsafe{ MSK12_get_sol_basic_x_slice(self.task,sol_idx,first_var,num_var,i32_basic_.as_mut_ptr()) };
@@ -3938,7 +4083,7 @@ impl Task {
     pub fn get_sol_basic_barx_slice(&self,sol_idx : i32,first_var : i32,basic : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,basic
-        let num_var = i32::try_from(Some(basic.len()).unwrap_or(0))
+        let num_var = i32::try_from([Some(basic.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_basic_ : Vec<i32> = basic.iter().map(|v| if *v {1} else {0}).collect();
         let returned_value = unsafe{ MSK12_get_sol_basic_barx_slice(self.task,sol_idx,first_var,num_var,i32_basic_.as_mut_ptr()) };
@@ -3957,7 +4102,7 @@ impl Task {
     pub fn get_sol_basic_con_slice(&self,sol_idx : i32,first_con : i64,basic : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,basic
-        let num_con = i64::try_from(Some(basic.len()).unwrap_or(0))
+        let num_con = i64::try_from([Some(basic.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_basic_ : Vec<i32> = basic.iter().map(|v| if *v {1} else {0}).collect();
         let returned_value = unsafe{ MSK12_get_sol_basic_con_slice(self.task,sol_idx,first_con,num_con,i32_basic_.as_mut_ptr()) };
@@ -3977,7 +4122,7 @@ impl Task {
     pub fn get_sol_sta_var_slice(&self,sol_idx : i32,first_var : i32,low_binding : &mut [bool],upr_binding : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_var,num_var,low_binding,upr_binding
-        let num_var = i32::try_from(Some(Some(low_binding.len()).map(|v| upr_binding.len().min(v)).unwrap_or(upr_binding.len())).unwrap_or(0))
+        let num_var = i32::try_from([Some(low_binding.len()),Some(upr_binding.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_low_binding_ : Vec<i32> = low_binding.iter().map(|v| if *v {1} else {0}).collect();
         let mut i32_upr_binding_ : Vec<i32> = upr_binding.iter().map(|v| if *v {1} else {0}).collect();
@@ -3998,7 +4143,7 @@ impl Task {
     pub fn get_sol_sta_barx_slice(&self,sol_idx : i32,first_barvar : i32,bindnig : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_barvar,num_barvar,bindnig
-        let num_barvar = i32::try_from(Some(bindnig.len()).unwrap_or(0))
+        let num_barvar = i32::try_from([Some(bindnig.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_bindnig_ : Vec<i32> = bindnig.iter().map(|v| if *v {1} else {0}).collect();
         let returned_value = unsafe{ MSK12_get_sol_sta_barx_slice(self.task,sol_idx,first_barvar,num_barvar,i32_bindnig_.as_mut_ptr()) };
@@ -4017,7 +4162,7 @@ impl Task {
     pub fn get_sol_sta_con_slice(&self,sol_idx : i32,first_con : i64,binding : &mut [bool]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,binding
-        let num_con = i64::try_from(Some(binding.len()).unwrap_or(0))
+        let num_con = i64::try_from([Some(binding.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let mut i32_binding_ : Vec<i32> = binding.iter().map(|v| if *v {1} else {0}).collect();
         let returned_value = unsafe{ MSK12_get_sol_sta_con_slice(self.task,sol_idx,first_con,num_con,i32_binding_.as_mut_ptr()) };
@@ -4038,7 +4183,7 @@ impl Task {
     pub fn get_sol_xc_slice(&self,sol_idx : i32,first_con : i64,num_con : i64,xc : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,num_elm,xc
-        let num_elm = i64::try_from(Some(xc.len()).unwrap_or(0))
+        let num_elm = i64::try_from([Some(xc.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_xc_slice(self.task,sol_idx,first_con,num_con,num_elm,xc.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4057,7 +4202,7 @@ impl Task {
     pub fn get_sol_y_slice(&self,sol_idx : i32,first_con : i64,num_con : i64,y : &mut [f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,first_con,num_con,num_elm,y
-        let num_elm = i64::try_from(Some(y.len()).unwrap_or(0))
+        let num_elm = i64::try_from([Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_get_sol_y_slice(self.task,sol_idx,first_con,num_con,num_elm,y.as_mut_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4110,7 +4255,7 @@ impl Task {
     pub fn put_sol_xx(&mut self,sol_idx : i32,val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i32::try_from(Some(val.len()).unwrap_or(0))
+        let num = i32::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_xx(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4126,7 +4271,7 @@ impl Task {
     pub fn put_sol_slx(&mut self,sol_idx : i32,val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i32::try_from(Some(val.len()).unwrap_or(0))
+        let num = i32::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_slx(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4142,7 +4287,7 @@ impl Task {
     pub fn put_sol_sux(&mut self,sol_idx : i32,val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i32::try_from(Some(val.len()).unwrap_or(0))
+        let num = i32::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_sux(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4158,7 +4303,7 @@ impl Task {
     pub fn put_sol_basic_x(&mut self,sol_idx : i32,val : &[i32]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i32::try_from(Some(val.len()).unwrap_or(0))
+        let num = i32::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_basic_x(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4174,7 +4319,7 @@ impl Task {
     pub fn put_sol_barx(&mut self,sol_idx : i32,val : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i64::try_from(Some(val.len()).unwrap_or(0))
+        let num = i64::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_barx(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4190,7 +4335,7 @@ impl Task {
     pub fn put_sol_bars(&mut self,sol_idx : i32,xx : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,xx
-        let num = i64::try_from(Some(xx.len()).unwrap_or(0))
+        let num = i64::try_from([Some(xx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_bars(self.task,sol_idx,num,xx.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4207,7 +4352,7 @@ impl Task {
     pub fn put_sol_yi(&mut self,sol_idx : i32,i : i64,xx : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,i,num,xx
-        let num = i64::try_from(Some(xx.len()).unwrap_or(0))
+        let num = i64::try_from([Some(xx.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_yi(self.task,sol_idx,i,num,xx.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4223,7 +4368,7 @@ impl Task {
     pub fn put_sol_basic_c(&mut self,sol_idx : i32,val : &[i32]) -> Result<(),APIError>
     {
         // Arg processing order: task,sol_idx,num,val
-        let num = i64::try_from(Some(val.len()).unwrap_or(0))
+        let num = i64::try_from([Some(val.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_sol_basic_c(self.task,sol_idx,num,val.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4313,7 +4458,7 @@ impl Task {
     pub fn put_all_double_params(&mut self,params : &[f64]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_par,params
-        let num_par = i32::try_from(Some(params.len()).unwrap_or(0))
+        let num_par = i32::try_from([Some(params.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_all_double_params(self.task,num_par,params.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }
@@ -4344,7 +4489,7 @@ impl Task {
     pub fn put_all_int_params(&mut self,params : &[i32]) -> Result<(),APIError>
     {
         // Arg processing order: task,num_par,params
-        let num_par = i32::try_from(Some(params.len()).unwrap_or(0))
+        let num_par = i32::try_from([Some(params.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_put_all_int_params(self.task,num_par,params.as_ptr()) };
         if 0 != returned_value { self.last_error()?; }

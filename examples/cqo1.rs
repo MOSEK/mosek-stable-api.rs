@@ -99,3 +99,9 @@ fn cqo1() -> Result<(),msk::APIError> {
 fn main() {
     cqo1().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

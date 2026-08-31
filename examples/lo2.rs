@@ -119,3 +119,9 @@ fn lo2() -> Result<(),moco::APIError> {
 fn main() {
     lo2().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

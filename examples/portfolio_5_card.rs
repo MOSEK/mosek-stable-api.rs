@@ -213,3 +213,9 @@ fn main()
         println!("  Return:  {:.5}", expret);
     }
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

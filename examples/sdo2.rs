@@ -122,3 +122,9 @@ fn sdo2() -> Result<(),msk::APIError> {
 fn main() {
     sdo2().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}

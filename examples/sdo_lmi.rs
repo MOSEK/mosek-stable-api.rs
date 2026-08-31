@@ -161,3 +161,9 @@ fn sdo_lmi() -> Result<(),msk::APIError> {
 fn main() {
     sdo_lmi().unwrap();
 }
+
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test() { super::main(); }
+}
