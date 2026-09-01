@@ -142,7 +142,6 @@ fn portfolio() -> Result<(),msk::APIError> {
                     task.put_row_g(roff_risk, gamma)?;
 
                     let _trmcode = task.optimize()?;
-                    task.write_task_to_file(&format!("dump-{}.ptf",i))?;
 
                     /* Display the solution summary for quick inspection of results. */
                     task.solution_summary(msk::StreamType::MSG)?;

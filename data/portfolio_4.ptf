@@ -1,0 +1,98 @@
+Task
+    # Written by MOSEK v12.0.0
+    # problemtype: Conic Problem
+    # number of linear variables: 24
+    # number of linear constraints: 0
+    # number of  old-style cones: 0
+    # number of positive semidefinite variables: 0
+    # number of positive semidefinite matrixes: 0
+    # number of affine conic constraints: 18
+    # number of disjunctive constraints: 0
+    # number scalar affine expressions/nonzeros : 35/84
+    # number of old-style A nonzeros: 0
+Objective
+    Maximize + 0.07197 'x[1]' + 0.15518 'x[2]' + 0.17535 'x[3]' + 0.08981 'x[4]' + 0.42896 'x[5]' + 0.39292 'x[6]' + 0.32171 'x[7]'
+            + 0.18379 'x[8]'
+Constraints
+    budget [ZERO(1)]
+        @ac0: + 'x[1]' + 'x[2]' + 'x[3]' + 'x[4]' + 'x[5]' + 'x[6]' + 'x[7]' + 'x[8]' + 0.001 'z[1]' + 0.001 'z[2]' + 0.001 'z[3]'
+            + 0.001 'z[4]' + 0.001 'z[5]' + 0.001 'z[6]' + 0.001 'z[7]' + 0.001 'z[8]' + 0.01 'y[1]' + 0.01 'y[2]' + 0.01 'y[3]'
+            + 0.01 'y[4]' + 0.01 'y[5]' + 0.01 'y[6]' + 0.01 'y[7]' + 0.01 'y[8]' - 1
+    'zabs[1]' [QUAD(2)]
+        @ac1: + 0
+        @ac2: + 0
+    'zabs[2]' [QUAD(2)]
+        @ac3: + 0
+        @ac4: + 0
+    'zabs[3]' [QUAD(2)]
+        @ac5: + 0
+        @ac6: + 0
+    'zabs[4]' [QUAD(2)]
+        @ac7: + 0
+        @ac8: + 0
+    'zabs[5]' [QUAD(2)]
+        @ac9: + 0
+        @ac10: + 0
+    'zabs[6]' [QUAD(2)]
+        @ac11: + 0
+        @ac12: + 0
+    'zabs[7]' [QUAD(2)]
+        @ac13: + 0
+        @ac14: + 0
+    'zabs[8]' [QUAD(2)]
+        @ac15: + 0
+        @ac16: + 0
+    'switch[1]' [NEGATIVE(1)]
+        @ac17: + 'z[1]' - 'y[1]'
+    'switch[2]' [NEGATIVE(1)]
+        @ac18: + 'z[2]' - 'y[2]'
+    'switch[3]' [NEGATIVE(1)]
+        @ac19: + 'z[3]' - 'y[3]'
+    'switch[4]' [NEGATIVE(1)]
+        @ac20: + 'z[4]' - 'y[4]'
+    'switch[5]' [NEGATIVE(1)]
+        @ac21: + 'z[5]' - 'y[5]'
+    'switch[6]' [NEGATIVE(1)]
+        @ac22: + 'z[6]' - 'y[6]'
+    'switch[7]' [NEGATIVE(1)]
+        @ac23: + 'z[7]' - 'y[7]'
+    'switch[8]' [NEGATIVE(1)]
+        @ac24: + 'z[8]' - 'y[8]'
+    risk [QUAD(9)]
+        @ac25: + 0.36
+        @ac26: + 0.30758 'x[1]' + 0.12146 'x[2]' + 0.11341 'x[3]' + 0.11327 'x[4]' + 0.17625 'x[5]' + 0.11973 'x[6]' + 0.10435 'x[7]'
+            + 0.10638 'x[8]'
+        @ac27: + 0.25042 'x[2]' + 0.09946 'x[3]' + 0.09164 'x[4]' + 0.06692 'x[5]' + 0.08706 'x[6]' + 0.09173 'x[7]' + 0.08506 'x[8]'
+        @ac28: + 0.19914 'x[3]' + 0.05867 'x[4]' + 0.06453 'x[5]' + 0.07367 'x[6]' + 0.06468 'x[7]' + 0.01914 'x[8]'
+        @ac29: + 0.20876 'x[4]' + 0.04933 'x[5]' + 0.03651 'x[6]' + 0.09381 'x[7]' + 0.07742 'x[8]'
+        @ac30: + 0.36096 'x[5]' + 0.12574 'x[6]' + 0.10157 'x[7]' + 0.0571 'x[8]'
+        @ac31: + 0.21552 'x[6]' + 0.05663 'x[7]' + 0.06187 'x[8]'
+        @ac32: + 0.22514 'x[7]' + 0.03327 'x[8]'
+        @ac33: + 0.2202 'x[8]'
+Variables
+    'x[1]' [0;+inf]
+    'x[2]' [0;+inf]
+    'x[3]' [0;+inf]
+    'x[4]' [0;+inf]
+    'x[5]' [0;+inf]
+    'x[6]' [0;+inf]
+    'x[7]' [0;+inf]
+    'x[8]' [0;+inf]
+    'z[1]'
+    'z[2]'
+    'z[3]'
+    'z[4]'
+    'z[5]'
+    'z[6]'
+    'z[7]'
+    'z[8]'
+    'y[1]' [0;1]
+    'y[2]' [0;1]
+    'y[3]' [0;1]
+    'y[4]' [0;1]
+    'y[5]' [0;1]
+    'y[6]' [0;1]
+    'y[7]' [0;1]
+    'y[8]' [0;1]
+Integers
+    'y[1]' 'y[2]' 'y[3]' 'y[4]' 'y[5]' 'y[6]' 'y[7]' 'y[8]'

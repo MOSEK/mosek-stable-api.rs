@@ -135,6 +135,7 @@ use std::default::Default;
 type Task_t = * mut c_void;
 #[allow(non_camel_case_types)]
 type c_void_p = * mut c_void;
+
 #[allow(non_camel_case_types)]
 #[allow(unused)]
 pub type ResCode = i32;
@@ -933,7 +934,6 @@ impl From<APIError> for String {
     fn from(value : APIError) -> Self {
         format!("{:?}",value)
     }
-
 }
 
 // Note that this construction is highly questionable. We "allocate" memory for external use by
@@ -1579,7 +1579,7 @@ impl MosekStableAPI {
     /// - `tasks[num_task]` (in) An array of tasks to optimize in parallel. 
     /// - `trm_code[num_task]` (out) The termination code for each task. 
     /// - `res_code[num_task]` (out) The response code for each task. 
-    pub fn optimize_batch(&self,is_race : bool,max_time_sec : f64,num_threads : i32,tasks : &[Task],trm_code : &mut [i32],res_code : &mut [i32]) -> Result<(),APIError>
+    pub fn optimize_batch(&self,is_race : bool,max_time_sec : f64,num_threads : i32,tasks : &[&mut Task],trm_code : &mut [i32],res_code : &mut [i32]) -> Result<(),APIError>
     {
         // Arg processing order: is_race,max_time_sec,num_threads,num_task,tasks,trm_code,res_code
         let num_task = i64::try_from([Some(tasks.len()),Some(trm_code.len()),Some(res_code.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))

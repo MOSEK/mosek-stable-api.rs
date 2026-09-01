@@ -1,0 +1,118 @@
+Task
+    # Written by MOSEK v12.0.0
+    # problemtype: Conic Problem
+    # number of linear variables: 24
+    # number of linear constraints: 0
+    # number of  old-style cones: 0
+    # number of positive semidefinite variables: 0
+    # number of positive semidefinite matrixes: 0
+    # number of affine conic constraints: 26
+    # number of disjunctive constraints: 0
+    # number scalar affine expressions/nonzeros : 44/108
+    # number of old-style A nonzeros: 0
+Objective expected-return
+    Maximize + 'x[1]' + 'x[2]' + 'x[3]' + 'x[4]' + 'x[5]' + 'x[6]' + 'x[7]' + 'x[8]'
+Constraints
+    budget [ZERO(1)]
+        @ac0: + 'x[1]' + 'x[2]' + 'x[3]' + 'x[4]' + 'x[5]' + 'x[6]' + 'x[7]' + 'x[8]' + 0.01 't[1]' + 0.01 't[2]' + 0.01 't[3]'
+            + 0.01 't[4]' + 0.01 't[5]' + 0.01 't[6]' + 0.01 't[7]' + 0.01 't[8]' - 1
+    risk [QUAD(9)]
+        @ac1: + 0.36
+        @ac2: + 0.30758 'x[1]' + 0.12146 'x[2]' + 0.11341 'x[3]' + 0.11327 'x[4]' + 0.17625 'x[5]' + 0.11973 'x[6]' + 0.10435 'x[7]'
+            + 0.10638 'x[8]'
+        @ac3: + 0.25042 'x[2]' + 0.09946 'x[3]' + 0.09164 'x[4]' + 0.06692 'x[5]' + 0.08706 'x[6]' + 0.09173 'x[7]' + 0.08506 'x[8]'
+        @ac4: + 0.19914 'x[3]' + 0.05867 'x[4]' + 0.06453 'x[5]' + 0.07367 'x[6]' + 0.06468 'x[7]' + 0.01914 'x[8]'
+        @ac5: + 0.20876 'x[4]' + 0.04933 'x[5]' + 0.03651 'x[6]' + 0.09381 'x[7]' + 0.07742 'x[8]'
+        @ac6: + 0.36096 'x[5]' + 0.12574 'x[6]' + 0.10157 'x[7]' + 0.0571 'x[8]'
+        @ac7: + 0.21552 'x[6]' + 0.05663 'x[7]' + 0.06187 'x[8]'
+        @ac8: + 0.22514 'x[7]' + 0.03327 'x[8]'
+        @ac9: + 0.2202 'x[8]'
+    'abs_1[0]' [POSITIVE(1)]
+        @ac10: - 'x[1]' + 'z[1]'
+    'abs_2[0]' [POSITIVE(1)]
+        @ac11: + 'x[1]' + 'z[1]'
+    'abs_1[1]' [POSITIVE(1)]
+        @ac12: - 'x[2]' + 'z[2]'
+    'abs_2[1]' [POSITIVE(1)]
+        @ac13: + 'x[2]' + 'z[2]'
+    'abs_1[2]' [POSITIVE(1)]
+        @ac14: - 'x[3]' + 'z[3]'
+    'abs_2[2]' [POSITIVE(1)]
+        @ac15: + 'x[3]' + 'z[3]'
+    'abs_1[3]' [POSITIVE(1)]
+        @ac16: - 'x[4]' + 'z[4]'
+    'abs_2[3]' [POSITIVE(1)]
+        @ac17: + 'x[4]' + 'z[4]'
+    'abs_1[4]' [POSITIVE(1)]
+        @ac18: - 'x[5]' + 'z[5]'
+    'abs_2[4]' [POSITIVE(1)]
+        @ac19: + 'x[5]' + 'z[5]'
+    'abs_1[5]' [POSITIVE(1)]
+        @ac20: - 'x[6]' + 'z[6]'
+    'abs_2[5]' [POSITIVE(1)]
+        @ac21: + 'x[6]' + 'z[6]'
+    'abs_1[6]' [POSITIVE(1)]
+        @ac22: - 'x[7]' + 'z[7]'
+    'abs_2[6]' [POSITIVE(1)]
+        @ac23: + 'x[7]' + 'z[7]'
+    'abs_1[7]' [POSITIVE(1)]
+        @ac24: - 'x[8]' + 'z[8]'
+    'abs_2[7]' [POSITIVE(1)]
+        @ac25: + 'x[8]' + 'z[8]'
+    'market-impact[0]' [PPOW(3;2,1)]
+        @ac26: + 't[1]'
+        @ac27: + 1
+        @ac28: + 'z[1]'
+    'market-impact[1]' [PPOW(3;2,1)]
+        @ac29: + 't[2]'
+        @ac30: + 1
+        @ac31: + 'z[2]'
+    'market-impact[2]' [PPOW(3;2,1)]
+        @ac32: + 't[3]'
+        @ac33: + 1
+        @ac34: + 'z[3]'
+    'market-impact[3]' [PPOW(3;2,1)]
+        @ac35: + 't[4]'
+        @ac36: + 1
+        @ac37: + 'z[4]'
+    'market-impact[4]' [PPOW(3;2,1)]
+        @ac38: + 't[5]'
+        @ac39: + 1
+        @ac40: + 'z[5]'
+    'market-impact[5]' [PPOW(3;2,1)]
+        @ac41: + 't[6]'
+        @ac42: + 1
+        @ac43: + 'z[6]'
+    'market-impact[6]' [PPOW(3;2,1)]
+        @ac44: + 't[7]'
+        @ac45: + 1
+        @ac46: + 'z[7]'
+    'market-impact[7]' [PPOW(3;2,1)]
+        @ac47: + 't[8]'
+        @ac48: + 1
+        @ac49: + 'z[8]'
+Variables
+    'x[1]' [0;+inf]
+    'x[2]' [0;+inf]
+    'x[3]' [0;+inf]
+    'x[4]' [0;+inf]
+    'x[5]' [0;+inf]
+    'x[6]' [0;+inf]
+    'x[7]' [0;+inf]
+    'x[8]' [0;+inf]
+    't[1]'
+    't[2]'
+    't[3]'
+    't[4]'
+    't[5]'
+    't[6]'
+    't[7]'
+    't[8]'
+    'z[1]'
+    'z[2]'
+    'z[3]'
+    'z[4]'
+    'z[5]'
+    'z[6]'
+    'z[7]'
+    'z[8]'

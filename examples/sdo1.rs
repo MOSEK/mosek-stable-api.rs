@@ -100,7 +100,6 @@ fn sdo1() -> Result<(),msk::APIError> {
                 task.append_symmat(DIMBARVAR[0], &bara_i[3..9], &bara_j[3..9], &bara_v[3..9])?;
                 task.put_bar_entry(2, 0, &[midx+1], &[1.0])?;
 
-                task.write_task_to_file("sdo1.ptf")?;
                 /* Run optimizer */
                 let trmcode = task.optimize()?;
 

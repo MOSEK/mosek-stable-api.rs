@@ -154,7 +154,6 @@ fn markowitz_with_card(
 
                 let _trmcode = task.optimize()?;
                 task.put_int_param("ipar_ptf_write_solutions", 1)?;
-                task.write_task_to_file(&format!("dump-{}.jtask",K))?;
 
                 /* Display the solution summary for quick inspection of results. */
                 task.solution_summary(msk::StreamType::MSG)?;
