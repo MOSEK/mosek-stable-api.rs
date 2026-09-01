@@ -61,10 +61,6 @@ fn reoptimization() -> Result<(),msk::APIError> {
     }
 
 
-
-
-
-
     /******************** Make a change to the A matrix **********/
     task.put_ijc(1,0,3.0)?;
 
@@ -118,7 +114,6 @@ fn reoptimization() -> Result<(),msk::APIError> {
 
         println!("4. Number of variables: {numvar}. xx = {:?}",xx);
     }
-
 
     /* **************** Change constraint bounds ******************* */
 
