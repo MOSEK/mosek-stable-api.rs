@@ -3,19 +3,23 @@ use mosek_stable_api::{self as msk, APIError};
 fn read_and_solve(filenames : &[String]) -> Result<(),APIError>
 {
     let mskapi = msk::initialize().unwrap();
+    let mut res = Vec::new();
     for (i,fname) in filenames.iter().enumerate() {
-        println!("{i}) '{fname}'");
         mskapi.task()?
             .with_stream_callback(msk::StreamType::LOG,
                 |msg| print!("{msg}"),
                 |t| {
+                    t.write_task_to_file(&format!("{fname}.jtask"))?;
                     t.read_from_file(&fname)?;
                     let trm = t.optimize()?;
-                    t.write_task_to_file(&format!("{fname}.jtask"))?;
                     let obj = t.get_primal_obj(0)?;
-                    println!("\t Trm = {trm:?}., Obj = {obj:.5}");
+                    res.push((fname.clone(),trm,obj));
                     Ok(())
                 })?;
+    }
+
+    for (fname,trm,obj) in res.iter() {
+        println!("{fname} Trm = {trm:?}, Obj = {obj:.5}");
     }
     Ok(())
 }

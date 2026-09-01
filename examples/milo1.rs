@@ -44,9 +44,8 @@ fn milo1() -> Result<(),msk::APIError> {
                 task.put_obj_row(0)?;
                 task.put_obj_sense(msk::ObjSense::MAXIMIZE);
 
-                // Append 'numcon' empty constraints.
-                // The constraints will initially have no bounds.
-                task.append_cons(&[dom_rminus,dom_rplus],&[1,1],&[1,2],Some(rhs))?;
+                // Append 'numcon' constraints.
+                task.append_cons(&[dom_rminus,dom_rplus],&[1,2],Some(rhs))?;
 
                 // Set the bounds on variable j.
                 //  blx[j] <= x_j <= bux[j]

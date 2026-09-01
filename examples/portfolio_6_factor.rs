@@ -137,7 +137,7 @@ fn portfolio() -> Result<(),msk::APIError> {
 
                 let mut res = Vec::new();
                 let mut xx  = vec![0.0; n];
-                for (i,&gamma) in gammas.iter().enumerate() {
+                for (_i,&gamma) in gammas.iter().enumerate() {
                     // Specify gamma in ACC
                     task.put_row_g(roff_risk, gamma)?;
 

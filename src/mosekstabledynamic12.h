@@ -1936,17 +1936,17 @@ MSK12_ResCode MSK12_append_con(
  * - `task` The optimizatioj task object
  * - `num_con` Number of constraint blocks to add.
  * - `dom_idxs[num_con]` (in) Index of the domain to use. The domain's size must be exactly `num_rows`.
- * - `num_rows[num_con]` (in) List of row counts for each constraint block.
- * - `row_idxs` (in) Array of row indexes
- * - `con_offset` (in, nullable) Constraint right-hand-side offset vector, where NULL means all zeros 
+ * - `num_rows` Total number of rows we are using.
+ * - `row_idxs[num_rows]` (in) Array of row indexes
+ * - `con_offset[num_rows]` (in, nullable) Constraint right-hand-side offset vector, where NULL means all zeros 
  */
-typedef MSK12_ResCode (*MSK12_append_cons_func_t)(MSK12_Task_t task,int64_t num_con,const int64_t* dom_idxs,const int64_t* num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
+typedef MSK12_ResCode (*MSK12_append_cons_func_t)(MSK12_Task_t task,int64_t num_con,const int64_t* dom_idxs,int64_t num_rows,const int64_t* row_idxs,NULLABLE const double* con_offset);
 extern MSK12_append_cons_func_t MSK12_append_cons_ptr;
 MSK12_ResCode MSK12_append_cons(
     MSK12_Task_t task,
     int64_t num_con,
     const int64_t* dom_idxs,
-    const int64_t* num_rows,
+    int64_t num_rows,
     const int64_t* row_idxs,
     NULLABLE const double* con_offset);
 
@@ -3872,6 +3872,38 @@ MSK12_ResCode MSK12_read_from_handle(
     MSK12_Compression compress,
     MSK12_ReadHandle handle,
     MSK12_ReadFunc func);
+
+/**
+
+ * Write a stream to a file. This will open the file and either append to it or write a clear and rewrite it.
+ * 
+ * # Arguments
+ * - `task` The optimizatioj task object
+ * - `whichstream` 
+ * - `filename[.cstring]` (in) 
+ * - `append` 
+ */
+typedef MSK12_ResCode (*MSK12_put_stream_file_func_t)(MSK12_Task_t task,MSK12_StreamType whichstream,const char* filename,int append);
+extern MSK12_put_stream_file_func_t MSK12_put_stream_file_ptr;
+MSK12_ResCode MSK12_put_stream_file(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream,
+    const char* filename,
+    int append);
+
+/**
+
+ * Close file attached to a stream.
+ * 
+ * # Arguments
+ * - `task` The optimizatioj task object
+ * - `whichstream` 
+ */
+typedef MSK12_ResCode (*MSK12_clear_stream_file_func_t)(MSK12_Task_t task,MSK12_StreamType whichstream);
+extern MSK12_clear_stream_file_func_t MSK12_clear_stream_file_ptr;
+MSK12_ResCode MSK12_clear_stream_file(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream);
 
 /**
 

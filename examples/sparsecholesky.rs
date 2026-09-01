@@ -18,7 +18,6 @@ fn print_sparse(
                         lsubc : &[i32],
                         lvalc : &[f64]  )
 {
-    let n = perm.len();
     println!("P       = {:?}",perm);
     println!("diag(D) = {:?}",diag);
     println!("L       = ");

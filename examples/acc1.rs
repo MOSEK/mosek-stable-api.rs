@@ -48,7 +48,7 @@ fn acc1() -> Result<(),msk::APIError> {
 
                 // define sum constraint
                 for i in 0..n { task.put_ijc(1, i, 1.0)?; }
-                task.append_cons(&[zero_dom], &[1], &[1], Some(&[1.0]))?;
+                task.append_cons(&[zero_dom], &[1], Some(&[1.0]))?;
 
                 {
                     /* Fill in the affine expression storage with data */

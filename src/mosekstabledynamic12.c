@@ -616,7 +616,7 @@ MSK12_ResCode MSK12_append_cons(
     MSK12_Task_t task,
     int64_t num_con,
     const int64_t* dom_idxs,
-    const int64_t* num_rows,
+    int64_t num_rows,
     const int64_t* row_idxs,
     NULLABLE const double* con_offset) { return MSK12_append_cons_ptr(task,num_con,dom_idxs,num_rows,row_idxs,con_offset); }
 MSK12_put_con_func_t MSK12_put_con_ptr;
@@ -1249,6 +1249,16 @@ MSK12_ResCode MSK12_read_from_handle(
     MSK12_Compression compress,
     MSK12_ReadHandle handle,
     MSK12_ReadFunc func) { return MSK12_read_from_handle_ptr(task,format,compress,handle,func); }
+MSK12_put_stream_file_func_t MSK12_put_stream_file_ptr;
+MSK12_ResCode MSK12_put_stream_file(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream,
+    const char* filename,
+    int append) { return MSK12_put_stream_file_ptr(task,whichstream,filename,append); }
+MSK12_clear_stream_file_func_t MSK12_clear_stream_file_ptr;
+MSK12_ResCode MSK12_clear_stream_file(
+    MSK12_Task_t task,
+    MSK12_StreamType whichstream) { return MSK12_clear_stream_file_ptr(task,whichstream); }
 MSK12_put_stream_callback_func_t MSK12_put_stream_callback_ptr;
 MSK12_ResCode MSK12_put_stream_callback(
     MSK12_Task_t task,
@@ -1644,6 +1654,8 @@ if (NULL == (MSK12_write_solution_to_file_ptr = (MSK12_write_solution_to_file_fu
 if (NULL == (MSK12_write_solution_to_handle_ptr = (MSK12_write_solution_to_handle_func_t)__loadsym(libmosek_handle,"MSK12_write_solution_to_handle",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_read_from_file_ptr = (MSK12_read_from_file_func_t)__loadsym(libmosek_handle,"MSK12_read_from_file",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_read_from_handle_ptr = (MSK12_read_from_handle_func_t)__loadsym(libmosek_handle,"MSK12_read_from_handle",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_put_stream_file_ptr = (MSK12_put_stream_file_func_t)__loadsym(libmosek_handle,"MSK12_put_stream_file",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_clear_stream_file_ptr = (MSK12_clear_stream_file_func_t)__loadsym(libmosek_handle,"MSK12_clear_stream_file",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_put_stream_callback_ptr = (MSK12_put_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_stream_callback",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_clear_stream_callback_ptr = (MSK12_clear_stream_callback_func_t)__loadsym(libmosek_handle,"MSK12_clear_stream_callback",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_put_error_callback_ptr = (MSK12_put_error_callback_func_t)__loadsym(libmosek_handle,"MSK12_put_error_callback",&errmsg))) goto EXIT_ERROR;

@@ -82,7 +82,6 @@ fn sdo1() -> Result<(),msk::APIError> {
 
                 task.append_cons(
                     &[dom_rzero,dom_rzero],
-                    &[1,1],
                     &[1,2],
                     Some(rhsc))?;
 

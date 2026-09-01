@@ -57,7 +57,7 @@ fn soft_plus(task : & mut moco::Task, d : usize, voff_theta : i32, voff_t : i32,
     let voff_z = var0;
     let numvar = voff_z + 2*n as i32;
 
-    task.append_vars(2*n as i32)?;   // z1, z2
+    task.append_vars(numvar)?;   // z1, z2
     task.put_var_bound_slice_value(voff_z, 2*n as i32, f64::NEG_INFINITY, f64::INFINITY)?;
     for (i,j) in (voff_z..).step_by(2).take(n).enumerate() {
         task.put_var_name(j, &format!("z1[{}]",i))?;
@@ -95,13 +95,15 @@ fn soft_plus(task : & mut moco::Task, d : usize, voff_theta : i32, voff_t : i32,
     let dom_pexp  = task.get_domain_primal_exponential_cone()?;
 
     // Linear constraints 1 = z_1+x_2
-        task.append_cons(&vec![dom_rzero; n], &vec![1; n], &(roff_z1z2..).take(n).collect::<Vec<i64>>(), Some(&vec![1.0; n]))?;
+        task.append_cons(&vec![dom_rzero; n],&(roff_z1z2..).take(n).collect::<Vec<i64>>(), Some(&vec![1.0; n]))?;
     // Cones: z_1 > e^{-t} <=> (z_1,1,-t) ∈ C_exp
-    task.append_cons(&vec![dom_pexp; n], &vec![3;n], &interleave3(roff_z1..,std::iter::repeat(roff_1),roff_minust..).take(3*n).collect::<Vec<i64>>(),None  )?;
+    task.append_cons(&vec![dom_pexp; n],
+                     &interleave3(roff_z1..,std::iter::repeat(roff_1),roff_minust..).take(3*n).collect::<Vec<i64>>(),
+                     None)?;
     // Cones: z_2 > e^{θ'x_i-t} <=> (z_2,1,θ'x_i-t) ∈ C_exp
     {
         let con_first = task.get_num_con();
-        task.append_cons(&vec![dom_pexp; n], &vec![3;n], &interleave3(roff_z2..,std::iter::repeat(roff_1),roff_theta..).take(3*n).collect::<Vec<i64>>(),None)?;
+        task.append_cons(&vec![dom_pexp; n], &interleave3(roff_z2..,std::iter::repeat(roff_1),roff_theta..).take(3*n).collect::<Vec<i64>>(),None)?;
         for (i,ci,yi) in izip!(0..,con_first..,y.iter()) {
             task.put_con_name(ci, &if *yi { format!("theta*X[{}]-t[{}]",i,i) } else { format!("-theta*X[{}]-t[{}]",i,i) }   )?;
         }

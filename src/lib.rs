@@ -622,7 +622,7 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_append_con(task : Task_t,dom_idx : i64,num_rows : i64,row_idxs : *const i64,con_offset : *const f64) -> i32;
     #[allow(unused)]
-    fn MSK12_append_cons(task : Task_t,num_con : i64,dom_idxs : *const i64,num_rows : *const i64,row_idxs : *const i64,con_offset : *const f64) -> i32;
+    fn MSK12_append_cons(task : Task_t,num_con : i64,dom_idxs : *const i64,num_rows : i64,row_idxs : *const i64,con_offset : *const f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_con(task : Task_t,con_idx : i64,num_rows : i64,dom_idx : i64,row_idxs : *const i64,rhs_offset : *const f64) -> i32;
     #[allow(unused)]
@@ -857,6 +857,10 @@ unsafe extern "C" {
     fn MSK12_read_from_file(task : Task_t,filename : *const c_char) -> i32;
     #[allow(unused)]
     fn MSK12_read_from_handle(task : Task_t,format : i32,compress : i32,handle : c_void_p,func : extern "C" fn (h : c_void_p,dest : c_void_p,num : usize) -> usize) -> i32;
+    #[allow(unused)]
+    fn MSK12_put_stream_file(task : Task_t,whichstream : i32,filename : *const c_char,append : i32) -> i32;
+    #[allow(unused)]
+    fn MSK12_clear_stream_file(task : Task_t,whichstream : i32) -> i32;
     #[allow(unused)]
     fn MSK12_put_stream_callback(task : Task_t,whichstream : i32,handle : c_void_p,func : extern "C" fn (h : c_void_p,src : *const c_char)) -> i32;
     #[allow(unused)]
@@ -3328,16 +3332,18 @@ impl Task {
     /// 
     /// - `task` The optimizatioj task object
     /// - `num_con` Number of constraint blocks to add.
+    /// - `num_rows` Total number of rows we are using.
     /// - `dom_idxs[num_con]` (in) Index of the domain to use. The domain's size must be exactly `num_rows`.
-    /// - `num_rows[num_con]` (in) List of row counts for each constraint block.
-    /// - `row_idxs` (in) Array of row indexes
-    /// - `con_offset` (in) Constraint right-hand-side offset vector, where NULL means all zeros 
-    pub fn append_cons(&self,dom_idxs : &[i64],num_rows : &[i64],row_idxs : &[i64],con_offset : Option<&[f64]>) -> Result<(),APIError>
+    /// - `row_idxs[num_rows]` (in) Array of row indexes
+    /// - `con_offset[num_rows]` (in) Constraint right-hand-side offset vector, where NULL means all zeros 
+    pub fn append_cons(&self,dom_idxs : &[i64],row_idxs : &[i64],con_offset : Option<&[f64]>) -> Result<(),APIError>
     {
-        // Arg processing order: task,num_con,dom_idxs,num_rows,row_idxs,con_offset
-        let num_con = i64::try_from([Some(dom_idxs.len()),Some(num_rows.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+        // Arg processing order: task,num_con,num_rows,dom_idxs,row_idxs,con_offset
+        let num_con = i64::try_from([Some(dom_idxs.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_append_cons(self.task,num_con,dom_idxs.as_ptr(),num_rows.as_ptr(),row_idxs.as_ptr(),con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
+        let num_rows = i64::try_from([Some(row_idxs.len()),con_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let returned_value = unsafe{ MSK12_append_cons(self.task,num_con,dom_idxs.as_ptr(),num_rows,row_idxs.as_ptr(),con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
         Ok(())
     }
@@ -5011,6 +5017,37 @@ impl Task {
           CString::new(filename)
              .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: filename")))?;
         let returned_value = unsafe{ MSK12_read_from_file(self.task,cstring_filename_.as_ptr()) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Write a stream to a file. This will open the file and either append to it or write a clear and rewrite it.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `whichstream` 
+    /// - `filename[.cstring]` (in) 
+    /// - `append` 
+    pub fn put_stream_file(&mut self,whichstream : StreamType,filename : &str,append : bool) -> Result<(),APIError>
+    {
+        // Arg processing order: task,whichstream,filename,append
+        let cstring_filename_ =
+          CString::new(filename)
+             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: filename")))?;
+        let returned_value = unsafe{ MSK12_put_stream_file(self.task,whichstream as i32,cstring_filename_.as_ptr(),if append {1} else {0}) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Close file attached to a stream.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `whichstream` 
+    pub fn clear_stream_file(&mut self,whichstream : StreamType) -> Result<(),APIError>
+    {
+        // Arg processing order: task,whichstream
+        let returned_value = unsafe{ MSK12_clear_stream_file(self.task,whichstream as i32) };
         if 0 != returned_value { self.last_error()?; }
         Ok(())
     }

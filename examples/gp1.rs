@@ -148,9 +148,8 @@ fn max_volume_box(
                     let rhs    = &[ Af.log10(),alpha.log10(),beta.log10(),gamma.log10(),delta.log10() ];
                     let domidx = &[ dom_rminus, dom_rplus, dom_rminus, dom_rplus, dom_rminus ];
                     let rowidx = &[ 1,2,2,3,3 ];
-                    let nrows  = &[ 1,1,1,1,1 ];
 
-                    task.append_cons(domidx, nrows, rowidx, Some(rhs))?;
+                    task.append_cons(domidx, rowidx, Some(rhs))?;
                 }
 
                 // Add conic constraints
