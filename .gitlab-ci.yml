@@ -22,4 +22,6 @@ test:
     - |
       curl -o minidist-linux64x86.tar.bz2 http://files.mosek.intranet/artifacts/item/mosek/minidist-linux64x86-12.0
       tar xf minidist-linux64x86.tar.bz2      
-  script: "LD_LIBRARY_PATH=minidist/bin cargo test --all --release"
+  variables:
+    LD_LIBRARY_PATH: minidist/bin
+  script: "cargo test --all --release"
