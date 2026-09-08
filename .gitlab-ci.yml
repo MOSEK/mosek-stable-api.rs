@@ -24,4 +24,5 @@ test:
       tar xf minidist-linux64x86.tar.bz2
       ls minidist/
       ls minidist/bin
+      minidist/bin/mosek -version
   script: "LD_LIBRARY_PATH=minidist/bin cargo test --all --release"
