@@ -5,6 +5,8 @@ stages:
 build:
   stage:
     build
+  tags:
+    - docker-runner
   image:
     ubuntu/rust
   script: "cargo build --all --release"
@@ -12,6 +14,8 @@ build:
 test:
   stage:
     test
+  tags:
+    - docker-runner
   image:
     ubuntu/rust
   before_script:
