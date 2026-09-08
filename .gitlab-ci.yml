@@ -8,7 +8,7 @@ build:
   tags:
     - docker-runner
   image:
-    ubuntu/rust
+    ubuntu/rust:1.85-24.04_edge
   script: "cargo build --all --release"
 
 test:
@@ -17,7 +17,7 @@ test:
   tags:
     - docker-runner
   image:
-    ubuntu/rust
+    ubuntu/rust:1.85-24.04_edge
   before_script:
     - |
       curl -o minidist-linux64x86.tar.bz2 http://files.mosek.intranet/artifacts/item/mosek/minidist-linux64x86-12.0
