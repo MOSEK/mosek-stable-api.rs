@@ -619,6 +619,14 @@ MSK12_ResCode MSK12_append_cons(
     int64_t num_rows,
     const int64_t* row_idxs,
     NULLABLE const double* con_offset) { return MSK12_append_cons_ptr(task,num_con,dom_idxs,num_rows,row_idxs,con_offset); }
+MSK12_append_cons_seq_func_t MSK12_append_cons_seq_ptr;
+MSK12_ResCode MSK12_append_cons_seq(
+    MSK12_Task_t task,
+    int64_t num_con,
+    int64_t dom_idx,
+    int64_t first_row,
+    int64_t num_rows,
+    NULLABLE const double* con_offset) { return MSK12_append_cons_seq_ptr(task,num_con,dom_idx,first_row,num_rows,con_offset); }
 MSK12_put_con_func_t MSK12_put_con_ptr;
 MSK12_ResCode MSK12_put_con(
     MSK12_Task_t task,
@@ -1537,6 +1545,7 @@ if (NULL == (MSK12_get_symmat_slice_info_ptr = (MSK12_get_symmat_slice_info_func
 if (NULL == (MSK12_get_symmat_slice_ptr = (MSK12_get_symmat_slice_func_t)__loadsym(libmosek_handle,"MSK12_get_symmat_slice",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_append_con_ptr = (MSK12_append_con_func_t)__loadsym(libmosek_handle,"MSK12_append_con",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_append_cons_ptr = (MSK12_append_cons_func_t)__loadsym(libmosek_handle,"MSK12_append_cons",&errmsg))) goto EXIT_ERROR;
+if (NULL == (MSK12_append_cons_seq_ptr = (MSK12_append_cons_seq_func_t)__loadsym(libmosek_handle,"MSK12_append_cons_seq",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_put_con_ptr = (MSK12_put_con_func_t)__loadsym(libmosek_handle,"MSK12_put_con",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_put_scalar_con_ptr = (MSK12_put_scalar_con_func_t)__loadsym(libmosek_handle,"MSK12_put_scalar_con",&errmsg))) goto EXIT_ERROR;
 if (NULL == (MSK12_put_con_slice_ptr = (MSK12_put_con_slice_func_t)__loadsym(libmosek_handle,"MSK12_put_con_slice",&errmsg))) goto EXIT_ERROR;

@@ -624,6 +624,8 @@ unsafe extern "C" {
     #[allow(unused)]
     fn MSK12_append_cons(task : Task_t,num_con : i64,dom_idxs : *const i64,num_rows : i64,row_idxs : *const i64,con_offset : *const f64) -> i32;
     #[allow(unused)]
+    fn MSK12_append_cons_seq(task : Task_t,num_con : i64,dom_idx : i64,first_row : i64,num_rows : i64,con_offset : *const f64) -> i32;
+    #[allow(unused)]
     fn MSK12_put_con(task : Task_t,con_idx : i64,num_rows : i64,dom_idx : i64,row_idxs : *const i64,rhs_offset : *const f64) -> i32;
     #[allow(unused)]
     fn MSK12_put_scalar_con(task : Task_t,con_idx : i64,dom_idx : i64,row_idx : i64,rhs_offset : f64) -> i32;
@@ -3344,6 +3346,25 @@ impl Task {
         let num_rows = i64::try_from([Some(row_idxs.len()),con_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
           .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
         let returned_value = unsafe{ MSK12_append_cons(self.task,num_con,dom_idxs.as_ptr(),num_rows,row_idxs.as_ptr(),con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
+        if 0 != returned_value { self.last_error()?; }
+        Ok(())
+    }
+    /// Append constraints with a range of rows and the same domain for all constraints.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `task` The optimizatioj task object
+    /// - `num_con` Number of constraint blocks to add. 
+    /// - `dom_idx` Index of the domain to use. The domain's size must be exactly `num_rows/num_con`.
+    /// - `first_row` First row.
+    /// - `num_rows` Total number of rows we are using.
+    /// - `con_offset[num_rows]` (in) Constraint right-hand-side offset vector, where NULL means all zeros 
+    pub fn append_cons_seq(&self,num_con : i64,dom_idx : i64,first_row : i64,con_offset : Option<&[f64]>) -> Result<(),APIError>
+    {
+        // Arg processing order: task,num_con,dom_idx,first_row,num_rows,con_offset
+        let num_rows = i64::try_from([con_offset.map(|v| v.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+        let returned_value = unsafe{ MSK12_append_cons_seq(self.task,num_con,dom_idx,first_row,num_rows,con_offset.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
         if 0 != returned_value { self.last_error()?; }
         Ok(())
     }

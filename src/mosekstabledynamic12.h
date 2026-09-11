@@ -1952,6 +1952,28 @@ MSK12_ResCode MSK12_append_cons(
 
 /**
 
+ * Append constraints with a range of rows and the same domain for all constraints.
+ * 
+ * # Arguments
+ * - `task` The optimizatioj task object
+ * - `num_con` Number of constraint blocks to add. 
+ * - `dom_idx` Index of the domain to use. The domain's size must be exactly `num_rows/num_con`.
+ * - `first_row` First row.
+ * - `num_rows` Total number of rows we are using.
+ * - `con_offset[num_rows]` (in, nullable) Constraint right-hand-side offset vector, where NULL means all zeros 
+ */
+typedef MSK12_ResCode (*MSK12_append_cons_seq_func_t)(MSK12_Task_t task,int64_t num_con,int64_t dom_idx,int64_t first_row,int64_t num_rows,NULLABLE const double* con_offset);
+extern MSK12_append_cons_seq_func_t MSK12_append_cons_seq_ptr;
+MSK12_ResCode MSK12_append_cons_seq(
+    MSK12_Task_t task,
+    int64_t num_con,
+    int64_t dom_idx,
+    int64_t first_row,
+    int64_t num_rows,
+    NULLABLE const double* con_offset);
+
+/**
+
  * Put domain and row indexes for constraint `index`.
  * 
  * # Arguments
