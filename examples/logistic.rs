@@ -135,7 +135,7 @@ fn logistic_regression(d : usize,    // dimension
                        lambda : f64,
                        theta_val : &mut [f64]) -> Result<(),APIError>
 {
-    let msk = moco::initialize()?;
+    let msk = moco::initialize_with_defaults()?;
     let n = X.len()/d;
     assert_eq!(n*d,X.len());
     assert_eq!(n,y.len());

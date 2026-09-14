@@ -2,7 +2,7 @@ use mosek_stable_api::{self as msk, APIError};
 
 fn read_and_solve(filenames : &[String]) -> Result<(),APIError>
 {
-    let mskapi = msk::initialize().unwrap();
+    let mskapi = msk::initialize_with_defaults()?;
     let mut res = Vec::new();
     for (i,fname) in filenames.iter().enumerate() {
         mskapi.task()?

@@ -28,7 +28,7 @@ fn print_sparse(
 
 fn sparse_cholelsky() -> Result<(),APIError>
 {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     //Observe that anzc, aptrc, asubc and avalc only specify the lower triangular part.
     {

@@ -23,7 +23,7 @@
 use mosek_stable_api as msk;
 
 fn sdo1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     const LENBARVAR : &[i32] = &[3 * (3 + 1) / 2]; /* Number of scalar SD variables  */
     const NUMVAR : i32 = 3;

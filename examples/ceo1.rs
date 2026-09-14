@@ -15,7 +15,7 @@
 use mosek_stable_api as msk;
 
 fn ceo1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let numvar : i32 = 3;
     let numrow : i64 = 5;

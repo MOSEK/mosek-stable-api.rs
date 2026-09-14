@@ -37,7 +37,7 @@ fn markowitz_with_card(
     xx    : &mut [f64],
     y     : &mut [f64]) -> Result<(),msk::APIError>
 {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     mskapi.task()?
         .with_stream_callback(

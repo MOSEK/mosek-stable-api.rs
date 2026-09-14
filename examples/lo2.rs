@@ -22,7 +22,7 @@
 use mosek_stable_api as moco;
 
 fn lo2() -> Result<(),moco::APIError> {
-    let msk = moco::initialize()?;
+    let msk = moco::initialize_with_defaults()?;
 
     let numvar : usize = 4;
     let numrow : usize = 4;

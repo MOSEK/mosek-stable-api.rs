@@ -13,7 +13,7 @@ use std::f64;
 use mosek_stable_api as msk;
 
 fn reoptimization() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let numvar = 3;
     let numrow = 4;

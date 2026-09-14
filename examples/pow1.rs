@@ -21,7 +21,7 @@
 use mosek_stable_api as msk;
 
 fn pow1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let numvar : i32 = 5;
     let numrow : i64 = 8;

@@ -33,7 +33,7 @@ use mosek_stable_api as moco;
 
 fn portfolio() -> Result<(),moco::APIError>
 {
-    let msk = moco::initialize()?;
+    let msk = moco::initialize_with_defaults()?;
 
     let n : i32     = 8;
     let gamma : f64 = 36.0;
@@ -149,4 +149,3 @@ mod test {
     #[test]
     fn test() { super::main(); }
 }
-

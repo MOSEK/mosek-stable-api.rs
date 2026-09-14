@@ -121,7 +121,7 @@ fn max_volume_box(
     let exp2_rhs   = &[ 0.0,0.0,0.0 ];
 
 
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
     mskapi.task()?
         .with_stream_callback(
             msk::StreamType::MSG,

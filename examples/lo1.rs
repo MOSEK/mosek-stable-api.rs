@@ -12,7 +12,7 @@ fn main() {
 }
 
 fn lo1() -> Result<(),moco::APIError> {
-    let msk = moco::initialize()?;
+    let msk = moco::initialize_with_defaults()?;
     // All the normal lo1 data:
     const NUMVAR : i32 = 4;
     const _NUMCON : i64 = 3;

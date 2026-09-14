@@ -228,6 +228,12 @@ pub fn initialize_with_defaults() -> Result<MosekStableAPI,APIError>
 
             let paths : Vec<&str> = spaths.iter().filter_map(|p| if p.exists() { p.to_str() } else { None }).collect();
 
-            initialize_with_paths(&paths)
+            println!("Search in paths: {:?}",paths);
+            if paths.is_empty() {
+                initialize()
+            }
+            else {
+                initialize_with_paths(&paths)
+            }
         })
 }

@@ -12,7 +12,7 @@ use mosek_stable_api as msk;
 ///    Optimizes tasks whose names were read from command line.
 fn parallel(filenames : &[&str]) -> Result<(),msk::APIError>
 {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     /* Create an example list of tasks to optimize */
     let mut tasks : Vec<msk::Task> =

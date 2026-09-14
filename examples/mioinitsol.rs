@@ -10,7 +10,7 @@
 use mosek_stable_api as msk;
 
 fn mioinitsol() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let numvar    = 4;
     let numrow    = 1;

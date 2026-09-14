@@ -13,7 +13,7 @@ use itertools::izip;
 
 #[allow(non_snake_case)]
 fn portfolio() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let mu    = &[0.07197, 0.15518, 0.17535, 0.08981, 0.42896, 0.39292, 0.32171, 0.18379];
     let n     = mu.len();

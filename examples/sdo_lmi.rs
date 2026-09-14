@@ -25,7 +25,7 @@ use mosek_stable_api as msk;
 
 #[allow(non_snake_case)]
 fn sdo_lmi() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     let DIMBARVAR = &[2];         /* Dimension of semidefinite cone */
     let LENBARVAR = &[2 * (2 + 1) / 2]; /* Number of scalar SD variables  */

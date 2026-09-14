@@ -17,7 +17,7 @@
 use mosek_stable_api as msk;
 
 fn sdo2() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize()?;
+    let mskapi = msk::initialize_with_defaults()?;
 
     mskapi.task()?
         .with_stream_callback(
