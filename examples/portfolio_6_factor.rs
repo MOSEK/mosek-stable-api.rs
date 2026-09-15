@@ -29,7 +29,7 @@ use mosek_stable_api::{self as msk, APIError};
 /// where `P'P = R
 #[allow(non_snake_case)]
 fn portfolio() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
     let w  = 1.0;
     let mu = &[0.07197, 0.15518, 0.17535, 0.08981, 0.42896, 0.39292, 0.32171, 0.18379];
     let x0 = &[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
@@ -63,7 +63,7 @@ fn portfolio() -> Result<(),msk::APIError> {
     let total_budget = w + x0.iter().cloned().sum::<f64>();
 
     /* Initial setup. */
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -194,12 +194,12 @@ impl Matrix {
     /// It is assumed but not checked that the matrix is symmetric. It is checked that the matrix is quadratic.
     pub fn cholesky(&self) -> Result<Matrix,APIError>
     {
-        let mskapi = msk::initialize().unwrap();
+        msk::initialize().unwrap();
 
         assert_eq!(self.shape.0, self.shape.1);
         let n = self.num_rows();
         let mut data = self.data.clone();
-        mskapi.potrf(false, n as i32, &mut data)?;
+        msk::potrf(false, n as i32, &mut data)?;
         // Zero out upper triangular part (MSK_potrf does not use it, original matrix values remain there)
         for ((j,i),v) in iproduct!(0..n,0..n).zip(data.iter_mut()) {
             if j > i { *v = 0.0 }
@@ -211,7 +211,7 @@ impl Matrix {
     // Matrix multiplication. The operand dimensions must match correctly.
     pub fn matrix_mul(&self, b : &Matrix) -> Result<Matrix,APIError>
     {
-        let mskapi = msk::initialize().unwrap();
+        msk::initialize().unwrap();
         assert_eq!(self.num_cols(),b.num_rows());
 
         let ta = self.row_major;
@@ -221,7 +221,7 @@ impl Matrix {
         let (m,n,k) = (self.num_rows(),b.num_cols(),self.num_cols());
         let mut data = vec![999.0; m*n];
 
-        mskapi.gemm(
+        msk::gemm(
             ta,tb,
             m as i32,n as i32,k as i32,
             1.0,

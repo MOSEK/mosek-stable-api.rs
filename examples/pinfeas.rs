@@ -84,8 +84,8 @@ Variables
 
 fn test_problem() -> Result<msk::Task,APIError>
 {
-    let mskapi = msk::initialize_with_defaults()?;
-    let mut task = mskapi.new_task();
+    msk::initialize_with_defaults()?;
+    let mut task = msk::Task::new()?;
     let mut pos = 0;
     task.read_task_by_func(
         |buf| {

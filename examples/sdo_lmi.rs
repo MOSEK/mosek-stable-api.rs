@@ -25,7 +25,7 @@ use mosek_stable_api as msk;
 
 #[allow(non_snake_case)]
 fn sdo_lmi() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let DIMBARVAR = &[2];         /* Dimension of semidefinite cone */
     let LENBARVAR = &[2 * (2 + 1) / 2]; /* Number of scalar SD variables  */
@@ -72,7 +72,7 @@ fn sdo_lmi() -> Result<(),msk::APIError> {
     let symmat_subj = &[0,1, 0,1];
     let symmat_val  = &[1.0,1.0, 1.0,1.0];
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -143,12 +143,12 @@ fn sdo_lmi() -> Result<(),msk::APIError> {
                             msk::SolSta::ILLPOSED_CERT => println!("Primal certificate of illposedness found."),
                             _ => {
                                 println!("The solution status is unknown.");
-                                println!("The optimizer terminitated with code: {}\n", mskapi.get_trm_name(trmcode));
+                                println!("The optimizer terminitated with code: {}\n", msk::get_trm_name(trmcode));
                             }
                         },
                     msk::SolSta::UNKNOWN => {
                         println!("The solution status is unknown.");
-                        println!("The optimizer terminitated with code: {}", mskapi.get_trm_name(trmcode));
+                        println!("The optimizer terminitated with code: {}", msk::get_trm_name(trmcode));
                     },
                     _ => panic!("Other solution status.")
                 }

@@ -853,27 +853,24 @@ pub struct Task {
 }
 unsafe impl std::marker::Send for Task {}
 
-pub struct MosekStableAPI {}
-unsafe impl std::marker::Send for MosekStableAPI {}
-
 
 pub fn is_initialized() -> bool {
     unsafe { MSK12_library_initialized() != 0 }
 }
 
-pub fn initialize() -> Result<MosekStableAPI,APIError>
+pub fn initialize() -> Result<(),APIError>
 {
     let load_res = unsafe { MSK12_initialize_library() };
     if load_res != 0 {
         Err(APIError::from("err_mosek_core_dynamic_load", "","Failed to load MOSEK Core API library"))
     }
     else {
-        Ok(MosekStableAPI{})
+        Ok(())
     }
 }
 
 
-pub fn initialize_with_paths(paths : &[&str]) -> Result<MosekStableAPI,APIError>
+pub fn initialize_with_paths(paths : &[&str]) -> Result<(),APIError>
 {
     if ! is_initialized() {
         let mut ps = Vec::with_capacity(paths.len()+1);
@@ -886,11 +883,11 @@ pub fn initialize_with_paths(paths : &[&str]) -> Result<MosekStableAPI,APIError>
             Err(APIError::from("err_mosek_core_dynamic_load", "","Failed to load MOSEK Core API library"))
         }
         else {
-            Ok(MosekStableAPI{})
+            Ok(())
         }
     }
     else {
-        Ok(MosekStableAPI{})
+        Ok(())
     }
 }
 
@@ -906,702 +903,690 @@ fn api_error_from<S>(code : i32, msg : S) -> APIError where S : Into<String> {
 }
 
 
-impl MosekStableAPI {
-    pub fn task(&self) -> Result<Task,APIError> {
-        let p = unsafe { MSK12_new_task() };
-        if p == std::ptr::null_mut() {
-            Err(APIError::from("err_task_creation","","Failed to create MOSEK Core API Task"))
-        }
-        else {
-            Ok(Task::from_ptr(p))
-        }
-    }
 
-
-    /// Get the name of a callback code 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `code` 
-    pub fn get_callback_code_name(&self,code : i32) -> String
-    {
-        // Arg processing order: code
-        let returned_value = unsafe{ MSK12_get_callback_code_name(code) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get string representing the given response code.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `r` 
-    pub fn get_resp_name(&self,r : ResCode) -> String
-    {
-        // Arg processing order: r
-        let returned_value = unsafe{ MSK12_get_resp_name(r as i32) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get string with a description of the given response code.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `r` 
-    pub fn get_resp_descr(&self,r : ResCode) -> String
-    {
-        // Arg processing order: r
-        let returned_value = unsafe{ MSK12_get_resp_descr(r as i32) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get string representing the given termination code.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `trm` 
-    pub fn get_trm_name(&self,trm : TrmCode) -> String
-    {
-        // Arg processing order: trm
-        let returned_value = unsafe{ MSK12_get_trm_name(trm as i32) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get string with a description if the given termination code.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `trm` 
-    pub fn get_trm_descr(&self,trm : TrmCode) -> String
-    {
-        // Arg processing order: trm
-        let returned_value = unsafe{ MSK12_get_trm_descr(trm as i32) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Create a new task from a file. Accepted file formats are PTF, JSON and TASK, and accepted compressions are plain, zstd and gzip.
-    pub fn new_task(&self) -> Task
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_new_task() };
-        Task::from_ptr(returned_value)
-    }
-    pub fn get_num_iinf(&self) -> i32
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_get_num_iinf() };
-        returned_value
-    }
-    pub fn get_num_liinf(&self) -> i32
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_get_num_liinf() };
-        returned_value
-    }
-    pub fn get_num_dinf(&self) -> i32
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_get_num_dinf() };
-        returned_value
-    }
-    /// Get the index of the integer information item corresponding to the given name. If the index is invalid, NULL is returned.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_idx` 
-    pub fn get_iinf_name(&self,par_idx : i32) -> String
-    {
-        // Arg processing order: par_idx
-        let returned_value = unsafe{ MSK12_get_iinf_name(par_idx) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get the index of the long integer information item corresponding to the given name. If the index is invalid, NULL is returned.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_idx` 
-    pub fn get_liinf_name(&self,par_idx : i32) -> String
-    {
-        // Arg processing order: par_idx
-        let returned_value = unsafe{ MSK12_get_liinf_name(par_idx) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get the index of the long integer information item corresponding to the given name. If the index is invalid, NULL is returned.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_idx` 
-    pub fn get_dinf_name(&self,par_idx : i32) -> String
-    {
-        // Arg processing order: par_idx
-        let returned_value = unsafe{ MSK12_get_dinf_name(par_idx) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// This will retur the index of the integer item orresponding to name, or -1 if the name is not recognized.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_name[.cstring]` (in) Name of the parameter
-    pub fn get_iinf_index(&self,par_name : &str) -> Result<i32,APIError>
-    {
-        // Arg processing order: par_name
-        let cstring_par_name_ =
-          CString::new(par_name)
-             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
-        let returned_value = unsafe{ MSK12_get_iinf_index(cstring_par_name_.as_ptr()) };
-        Ok(returned_value)
-    }
-    /// This will retur the index of the long integer item orresponding to name, or -1 if the name is not recognized.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_name[.cstring]` (in) Name of the parameter
-    pub fn get_liinf_index(&self,par_name : &str) -> Result<i32,APIError>
-    {
-        // Arg processing order: par_name
-        let cstring_par_name_ =
-          CString::new(par_name)
-             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
-        let returned_value = unsafe{ MSK12_get_liinf_index(cstring_par_name_.as_ptr()) };
-        Ok(returned_value)
-    }
-    /// This will retur the index of the double item orresponding to name, or -1 if the name is not recognized.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `name[.cstring]` (in) 
-    pub fn get_dinf_index(&self,name : &str) -> Result<i32,APIError>
-    {
-        // Arg processing order: name
-        let cstring_name_ =
-          CString::new(name)
-             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: name")))?;
-        let returned_value = unsafe{ MSK12_get_dinf_index(cstring_name_.as_ptr()) };
-        Ok(returned_value)
-    }
-    /// Get the index corresponding to a double parameter name.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_name[.cstring]` (in) Name of the parameter
-    pub fn get_double_param_index(&self,par_name : &str) -> Result<i32,APIError>
-    {
-        // Arg processing order: par_name
-        let cstring_par_name_ =
-          CString::new(par_name)
-             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
-        let returned_value = unsafe{ MSK12_get_double_param_index(cstring_par_name_.as_ptr()) };
-        Ok(returned_value)
-    }
-    /// Get the index corresponding to a double parameter name.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_idx` 
-    pub fn get_double_param_name(&self,par_idx : i32) -> String
-    {
-        // Arg processing order: par_idx
-        let returned_value = unsafe{ MSK12_get_double_param_name(par_idx) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get the index corresponding to a double parameter name.
-    pub fn get_num_double_param(&self) -> i32
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_get_num_double_param() };
-        returned_value
-    }
-    /// Get the index corresponding to a integer parameter name.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_name[.cstring]` (in) Name of the parameter
-    pub fn get_int_param_index(&self,par_name : &str) -> Result<i32,APIError>
-    {
-        // Arg processing order: par_name
-        let cstring_par_name_ =
-          CString::new(par_name)
-             .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
-        let returned_value = unsafe{ MSK12_get_int_param_index(cstring_par_name_.as_ptr()) };
-        Ok(returned_value)
-    }
-    /// Get the index corresponding to a integer parameter name.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `par_idx` 
-    pub fn get_int_param_name(&self,par_idx : i32) -> String
-    {
-        // Arg processing order: par_idx
-        let returned_value = unsafe{ MSK12_get_int_param_name(par_idx) };
-        unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
-    }
-    /// Get the index corresponding to a double parameter name.
-    pub fn get_num_int_param(&self) -> i32
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_get_num_int_param() };
-        returned_value
-    }
-    /// Stops all threads and deletes all handles used by the license system. If this
-    /// function is called, it must be called as the last MOSEK API call. No other
-    /// MOSEK API calls are valid after this.
-    pub fn license_cleanup(&self)
-    {
-        // Arg processing order: 
-        unsafe{ MSK12_license_cleanup() };
-    }
-    /// If MOSEK is using a global threadpool, attempt to shut
-    /// this down. If there are currently jobs running, this will do
-    /// nothing.
-    pub fn shutdown_global_threadpool(&self)
-    {
-        // Arg processing order: 
-        unsafe{ MSK12_shutdown_global_threadpool() };
-    }
-    /// Computes vector addition and multiplication by a scalar. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `n` Length of the vectors. 
-    /// - `alpha` The scalar that multiplies x. 
-    /// - `x[n]` (in) The x vector. 
-    /// - `y[n]` (in-out) The y vector. 
-    pub fn axpy(&self,alpha : f64,x : &[f64],y : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: n,alpha,x,y
-        let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_axpy(n,alpha,x.as_ptr(),y.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Computes the inner product of two vectors. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `n` Length of the vectors. 
-    /// - `xty[1]` (out) The result of the inner product. 
-    /// - `x[n]` (in) The x vector. 
-    /// - `y[n]` (in) The y vector. 
-    pub fn dot(&self,x : &[f64],y : &[f64]) -> Result<f64,APIError>
-    {
-        // Arg processing order: n,xty,x,y
-        let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let mut xty : f64 = Default::default();
-        let returned_value = unsafe{ MSK12_dot(n,x.as_ptr(),y.as_ptr(),std::ptr::from_mut(&mut xty)) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(xty)
-    }
-    /// Computes the multiplication of a scaled dense matrix times a dense vector, plus a scaled dense vector. Precisely, if `transa` is false then the update is
-    /// 
-    /// $$
-    /// y := \\alpha A x + \\beta y,
-    /// $$
-    /// 
-    /// and if `transa` is true
-    /// 
-    /// $$
-    /// y := \\alpha A^T x + \\beta y,
-    /// $$
-    /// 
-    /// where \\(\\alpha,\\beta\\) are scalar values and \\(A\\) is a matrix with \\(m\\) rows and \\(n\\) columns.
-    /// 
-    /// Note that the result is stored overwriting \\(y\\). It must not overlap with the other input arrays.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `transa` Indicates whether the matrix A must be transposed. 
-    /// - `m` Specifies the number of rows of the matrix A. 
-    /// - `n` Specifies the number of columns of the matrix A. 
-    /// - `alpha` A scalar value multiplying the matrix A. 
-    /// - `beta` A scalar value multiplying the vector y. 
-    /// - `a` (in) A pointer to the array storing matrix A in a column-major format. 
-    /// - `x` (in) A pointer to the array storing the vector x. 
-    /// - `y` (in-out) A pointer to the array storing the vector y. 
-    pub fn gemv(&self,transa : bool,m : i32,n : i32,alpha : f64,a : &[f64],x : &[f64],beta : f64,y : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: transa,m,n,alpha,beta,a,x,y
-        let returned_value = unsafe{ MSK12_gemv(if transa {1} else {0},m,n,alpha,a.as_ptr(),x.as_ptr(),beta,y.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Performs a matrix multiplication plus addition of dense matrices.
-    /// 
-    /// Given
-    /// \\(A\\), \\(B\\) and \\(C\\) of compatible dimensions, this function
-    /// computes
-    /// 
-    /// .. math:: C:= \\alpha \\mathrm{op}(A)\\mathrm{op}(B) + \\beta C
-    /// 
-    /// where \\(\\alpha,\\beta\\) are two scalar values. The function \\(\mathrm{op}(X)\\)
-    /// denotes \\(X\\) if transX is false, or \\(X^T\\) if set to true. The matrix \\(C\\) has \\(m\\) rows and \\(n\\) columns, and the other matrices must have compatible dimensions.
-    /// 
-    /// The result of this operation is stored in \\(C\\). It must not overlap with the other input arrays.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `transa` Indicates whether the matrix A must be transposed. 
-    /// - `transb` Indicates whether the matrix B must be transposed. 
-    /// - `m` Indicates the number of rows of matrix C. 
-    /// - `n` Indicates the number of columns of matrix C. 
-    /// - `k` Specifies the common dimension along which op(A) and op(B) are multiplied. 
-    /// - `alpha` A scalar value multiplying the result of the matrix multiplication. 
-    /// - `beta` A scalar value that multiplies C. 
-    /// - `a` (in) The pointer to the array storing matrix A in a column-major format. 
-    /// - `b` (in) The pointer to the array storing matrix B in a column-major format.  
-    /// - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
-    pub fn gemm(&self,transa : bool,transb : bool,m : i32,n : i32,k : i32,alpha : f64,a : &[f64],b : &[f64],beta : f64,c : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: transa,transb,m,n,k,alpha,beta,a,b,c
-        let returned_value = unsafe{ MSK12_gemm(if transa {1} else {0},if transb {1} else {0},m,n,k,alpha,a.as_ptr(),b.as_ptr(),beta,c.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Performs a symmetric rank-\\(k\\) update for a symmetric matrix.
-    /// 
-    /// Given a symmetric matrix \\(C\\in \\real^{n\\times n}\\), two scalars
-    /// \\(\\alpha,\\beta\\) and a matrix \\(A\\) of rank \\(k\\leq n\\), it
-    /// computes either
-    /// 
-    /// .. math:: C := \\alpha A A^T + \\beta C,
-    /// 
-    /// when `trans` is set to false and \\(A\\in \\real^{n\\times k}\\), or
-    /// 
-    /// .. math:: C := \\alpha A^T A + \\beta C,
-    /// 
-    /// when `trans` is set to true and \\(A\\in \\real^{k\\times n}\\).
-    /// 
-    /// Only the part of \\(C\\) indicated by `is_upr` is used and only that part is updated with the result. It must not overlap with the other input arrays.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `is_upr` Indicates whether the upper or lower triangular part of C is used. 
-    /// - `trans` Indicates whether the matrix A must be transposed. 
-    /// - `n` Specifies the order of \\(C\\).
-    /// - `k` Indicates the number of rows or columns of \\(A\\), depending on whether or not it is transposed, and its rank.
-    /// - `alpha` A scalar value multiplying the result of the matrix multiplication. 
-    /// - `beta` A scalar value that multiplies C. 
-    /// - `a` (in) The pointer to the array storing matrix A in a column-major format. 
-    /// - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
-    pub fn syrk(&self,is_upr : bool,trans : bool,n : i32,k : i32,alpha : f64,a : &[f64],beta : f64,c : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: is_upr,trans,n,k,alpha,beta,a,c
-        let returned_value = unsafe{ MSK12_syrk(if is_upr {1} else {0},if trans {1} else {0},n,k,alpha,a.as_ptr(),beta,c.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// The function solves a triangular system of the form
-    /// 
-    /// .. math:: L x = b
-    /// 
-    /// or
-    /// 
-    /// .. math:: L^T x = b
-    /// 
-    /// where \\(L\\) is a sparse lower triangular nonsingular matrix. This implies in particular that diagonals in \\(L\\) are nonzero.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `transposed` Controls whether the solve is with L or the transposed L. 
-    /// - `n` Specifies the dimension of L. 
-    /// - `lnzc[n]` (in) `lnzc[j]` is the number of nonzeros in column j. 
-    /// - `b[n]` (in-out) The right-hand side of linear equation system to be solved as a dense vector. 
-    /// - `lsubc` (in) Row indexes for each column stored sequentially. 
-    /// - `lvalc` (in) The value corresponding to row indexed stored lsubc. 
-    pub fn sparse_triangular_solve_dense(&self,transposed : bool,lnzc : &[i32],lsubc : &[i32],lvalc : &[f64],b : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: transposed,n,lnzc,b,lsubc,lvalc
-        let n = i32::try_from([Some(lnzc.len()),Some(b.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_sparse_triangular_solve_dense(if transposed {1} else {0},n,lnzc.as_ptr(),lsubc.as_ptr(),lvalc.as_ptr(),b.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Computes a Cholesky factorization of a real symmetric positive definite dense matrix.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `is_upr` Indicates whether the upper or lower triangular part of the matrix is stored. 
-    /// - `n` Dimension of the symmetric matrix. 
-    /// - `a` (in-out) A symmetric matrix stored in column-major order. 
-    pub fn potrf(&self,is_upr : bool,n : i32,a : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: is_upr,n,a
-        let returned_value = unsafe{ MSK12_potrf(if is_upr {1} else {0},n,a.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Computes all eigenvalues of a real symmetric matrix \\(A\\). Given a matrix \\(A\\in\\real^{n\\times n}\\) it returns a vector \\(w\\in\\real^n\\) containing the eigenvalues of \\(A\\). 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `is_upr` Indicates whether the upper or lower triangular part is used. 
-    /// - `n` Dimension of the symmetric input matrix. 
-    /// - `a` (in) Input matrix A. 
-    /// - `w[n]` (out) Array of length at least n containing the eigenvalues of A. 
-    pub fn syeig(&self,is_upr : bool,a : &[f64],w : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: is_upr,n,a,w
-        let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_syeig(if is_upr {1} else {0},n,a.as_ptr(),w.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Computes all the eigenvalues and eigenvectors a real symmetric matrix.
-    /// Given the input matrix \\(A\\in \\real^{n\\times n}\\), this function returns a
-    /// vector \\(w\\in \\real^n\\) containing the eigenvalues of \\(A\\) and it also computes the eigenvectors
-    /// of \\(A\\). Therefore, this function computes the eigenvalue decomposition of \\(A\\) as
-    /// 
-    /// .. math:: A= U V U^T,
-    /// 
-    /// where \\(V=\\diag(w)\\) and \\(U\\) contains the eigenvectors of \\(A\\).
-    /// 
-    /// Note that the matrix \\(U\\) overwrites the input data \\(A\\).
-    /// 
-    /// # Arguments
-    /// 
-    /// - `is_upr` Indicates whether the upper or lower triangular part is used. 
-    /// - `n` Dimension of the symmetric input matrix. 
-    /// - `a` (in-out) Input matrix A. 
-    /// - `w[n]` (in-out) Array of length at least n containing the eigenvalues of A. 
-    pub fn syevd(&self,is_upr : bool,a : &mut [f64],w : &mut [f64]) -> Result<(),APIError>
-    {
-        // Arg processing order: is_upr,n,a,w
-        let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let returned_value = unsafe{ MSK12_syevd(if is_upr {1} else {0},n,a.as_mut_ptr(),w.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// The function computes a Cholesky factorization of a sparse positive semidefinite matrix. Sparsity is exploited
-    /// during the computations to reduce the amount of space and work required. Both the input and output matrices
-    /// are represented using the sparse format.
-    /// 
-    /// To be precise, given a symmetric matrix \\(A \\in \\real^{n\\times n}\\) the function computes a nonsingular lower triangular matrix \\(L\\), a diagonal matrix \\(D\\) and a permutation matrix \\(P\\) such that
-    /// 
-    /// $$
-    /// LL^T - D = P A P^T
-    /// $$
-    /// 
-    /// If ``order_method`` is zero then reordering heuristics are not employed and \\(P\\) is the identity.
-    /// 
-    /// If a pivot during the computation of the Cholesky factorization is less than
-    /// 
-    /// $$
-    /// -\\rho\\cdot\\max((PAP^T)_{jj},1.0)
-    /// $$
-    /// 
-    /// then the matrix is declared negative semidefinite. On the hand if a pivot is smaller than
-    /// 
-    /// $$
-    /// \\rho\\cdot\\max((PAP^T)_{jj},1.0),
-    /// $$
-    /// 
-    /// then \\(D_{jj}\\) is increased from zero to
-    /// 
-    /// $$
-    /// \\rho\\cdot\\max((PAP^T)_{jj},1.0).
-    /// $$
-    /// 
-    /// Therefore, if \\(A\\) is sufficiently positive definite then \\(D\\) will be the zero matrix.
-    /// Here \\(\\rho\\) is set equal to value of ``tol_singular``.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `num_threads` The number threads that can be used to do the computation. 0 means the code makes the choice. 
-    /// - `order_method` If nonzero, then a sparsity preserving ordering will be employed. 
-    /// - `tol_singular` A positive parameter controlling when a pivot is declared zero. 
-    /// - `n` Specifies the order of \\(A\\). 
-    /// - `alloc` Memory allocation function for allocating the result. If `null`, the system `malloc` function is used. 
-    /// - `alloc_handle` Handle passed to the memory allocation function 
-    /// - `a_col_num_nonzero[n]` (in) `a_col_num_nonzero[j]` is a pointer to the first element in column \\(j\\). 
-    /// - `perm[n]` (out) Permutation array used to specify the permutation matrix \\(P\\) computed by the function. 
-    /// - `diag[n]` (out) The diagonal elements of matrix \\(D\\). 
-    /// - `l_col_num_nonzero[n]` (out) `l_col_num_nonzero[j]` is the number of non zero elements in column \\(j\\) of \\(L\\). 
-    /// - `a_subi` (in) Row indexes for each column stored in increasing order. 
-    /// - `a_val` (in) The value corresponding to row indexed stored in asubc. 
-    /// - `l_subi` (out) Row indexes for each column stored in increasing order. The returned array is guaranteed to be allocated with the allocation function `alloc`.
-    ///   
-    ///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
-    /// - `l_val` (out) The values corresponding to row indexed stored in lsubc. The returned array is guaranteed to be allocated with the allocation function `alloc`.
-    ///   
-    ///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
-    pub fn compute_sparse_cholesky(&self,num_threads : i32,order_method : bool,tol_singular : f64,a_col_num_nonzero : &[i32],a_subi : &[i32],a_val : &[f64],perm : &mut [i32],diag : &mut [f64],l_col_num_nonzero : &mut [i32]) -> Result<(Vec<i32>,Vec<f64>),APIError>
-    {
-        // Arg processing order: num_threads,order_method,tol_singular,n,alloc,alloc_handle,a_col_num_nonzero,perm,diag,l_col_num_nonzero,a_subi,a_val,l_subi,l_val
-        let n = i32::try_from([Some(a_col_num_nonzero.len()),Some(perm.len()),Some(diag.len()),Some(l_col_num_nonzero.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let mut allocated_items : Vec<Vec<u64>> = Vec:: new();
-        let mut ptr_l_subi : * mut i32 = std::ptr::null_mut();
-        let mut ptr_l_val : * mut f64 = std::ptr::null_mut();
-        let returned_value = unsafe{ MSK12_compute_sparse_cholesky(num_threads,if order_method {1} else {0},tol_singular,n,a_col_num_nonzero.as_ptr(),a_subi.as_ptr(),a_val.as_ptr(),perm.as_mut_ptr(),diag.as_mut_ptr(),memory_alloc,(&mut allocated_items) as * mut _ as c_void_p,l_col_num_nonzero.as_mut_ptr(),&mut ptr_l_subi,&mut ptr_l_val) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        let l_subi_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
-        let mut l_subi = vec![i32::default(); l_subi_len];
-        l_subi.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_subi,l_subi_len) });
-        let l_val_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
-        let mut l_val = vec![f64::default(); l_val_len];
-        l_val.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_val,l_val_len) });
-        Ok((l_subi,l_val))
-    }
-    /// Optimize a number of tasks in parallel using a specified number of threads. All
-    /// callbacks and log output streams are disabled.
-    /// 
-    /// Assuming that each task takes about same time and there many more tasks than number of
-    /// threads then a linear speedup can be achieved, also known as strong scaling. A typical
-    /// application of this method is to solve many small tasks of similar type; in this case
-    /// it is recommended that each of them is allocated a single thread by setting parameter `ipar_num_threads` to 1.
-    /// 
-    /// If the parameters `is_race` or `max_time_sec` are used, then the result may not be deterministic, in the sense that the tasks which complete first may vary between runs.
-    /// 
-    /// The remaining behavior, including termination and response codes returned for each task, are the same as if each task was optimized separately.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `is_race` If nonzero, then the function is terminated after the first task has been completed.
-    /// - `max_time_sec` Time limit for the function in seconds. 
-    /// - `num_threads` Number of threads to be employed.
-    /// - `num_task` Number of tasks to optimize. 
-    /// - `tasks[num_task]` (in) An array of tasks to optimize in parallel. 
-    /// - `trm_code[num_task]` (out) The termination code for each task. 
-    /// - `res_code[num_task]` (out) The response code for each task. 
-    pub fn optimize_batch(&self,is_race : bool,max_time_sec : f64,num_threads : i32,tasks : &[&mut Task],trm_code : &mut [i32],res_code : &mut [i32]) -> Result<(),APIError>
-    {
-        // Arg processing order: is_race,max_time_sec,num_threads,num_task,tasks,trm_code,res_code
-        let num_task = i64::try_from([Some(tasks.len()),Some(trm_code.len()),Some(res_code.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
-          .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
-        let ptrs_tasks_ : Vec<Task_t> = tasks.iter().map(|t| t.task).collect();
-        let returned_value = unsafe{ MSK12_optimize_batch(if is_race {1} else {0},max_time_sec,num_threads,num_task,ptrs_tasks_.as_ptr(),trm_code.as_mut_ptr(),res_code.as_mut_ptr()) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Checks out a license feature from the license server. Normally the required
-    /// license features will be automatically checked out the first time they are needed
-    /// by the function [optimize](#func-optimize). This function can be used to check out one
-    /// or more features ahead of time.
-    /// 
-    /// The feature will remain checked out until the environment is deleted or the function
-    /// [check_in_license](func:check_in_license) is called.
-    /// 
-    /// If a given feature is already checked out when this function is called, the call has no effect.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `feature` Feature to check out from the license system. 
-    pub fn check_out_license(&self,feature : Feature) -> Result<(),APIError>
-    {
-        // Arg processing order: feature
-        let returned_value = unsafe{ MSK12_check_out_license(feature as i32) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Check in a license feature to the license server. By default all licenses
-    /// consumed by functions using a single environment are kept checked out for the
-    /// lifetime of the MOSEK environment. This function checks in a given license
-    /// feature back to the license server immediately.
-    /// 
-    /// If the given license feature is not checked out at all, or it is in use by a call to
-    /// [optimize](func:optimize), calling this function has no effect.
-    /// 
-    /// Please note that returning a license to the license server incurs a small
-    /// overhead, so frequent calls to this function should be avoided.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `feature` Feature to check in to the license system. 
-    pub fn check_in_license(&self,feature : Feature) -> Result<(),APIError>
-    {
-        // Arg processing order: feature
-        let returned_value = unsafe{ MSK12_check_in_license(feature as i32) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Check in all unused license features to the license token server. 
-    pub fn check_in_all(&self) -> Result<(),APIError>
-    {
-        // Arg processing order: 
-        let returned_value = unsafe{ MSK12_check_in_all() };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Prints an intro to message stream. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `long_ver` If non-zero, then the intro is slightly longer. 
-    pub fn echo_intro(&self,long_ver : bool) -> Result<(),APIError>
-    {
-        // Arg processing order: long_ver
-        let returned_value = unsafe{ MSK12_echo_intro(if long_ver {1} else {0}) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Obtains MOSEK version information. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `major[1]` (out) Major version number. 
-    /// - `minor[1]` (out) Minor version number. 
-    /// - `revision[1]` (out) Revision number. 
-    pub fn get_version(&self) -> (i32,i32,i32)
-    {
-        // Arg processing order: major,minor,revision
-        let mut major : i32 = Default::default();
-        let mut minor : i32 = Default::default();
-        let mut revision : i32 = Default::default();
-        unsafe{ MSK12_get_version(std::ptr::from_mut(&mut major),std::ptr::from_mut(&mut minor),std::ptr::from_mut(&mut revision)) };
-        (major,minor,revision)
-    }
-    /// Enables debug information for the license system. If `lic_debug` is non-zero, then MOSEK will print debug info regarding the license checkout.  
-    /// 
-    /// # Arguments
-    /// 
-    /// - `lic_debug` Whether license checkout debug info should be printed.  
-    pub fn put_license_debug(&self,lic_debug : bool) -> Result<(),APIError>
-    {
-        // Arg processing order: lic_debug
-        let returned_value = unsafe{ MSK12_put_license_debug(if lic_debug {1} else {0}) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Input a runtime license code.  This function has an effect only before the first optimization. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `code[21]` (in) A license key string. 
-    pub fn put_license_code(&self,code : Option<&[i32]>) -> Result<(),APIError>
-    {
-        // Arg processing order: code
-        let returned_value = unsafe{ MSK12_put_license_code(code.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Control whether MOSEK should wait for an available license if no license is available. If `lic_wait` is non-zero, then MOSEK will wait for `lic_wait-1` milliseconds between each check for an available license.
-    /// 
-    /// # Arguments
-    /// 
-    /// - `lic_wait` Enable waiting for a license until it is available. 
-    pub fn put_license_wait(&self,lic_wait : i32) -> Result<(),APIError>
-    {
-        // Arg processing order: lic_wait
-        let returned_value = unsafe{ MSK12_put_license_wait(lic_wait) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-    /// Set the path to the license file. This function has an effect only before the first optimization. 
-    /// 
-    /// # Arguments
-    /// 
-    /// - `license_path[.cstring]` (in) A path specifying where to search for the license. 
-    pub fn put_license_path(&self,license_path : Option<&str>) -> Result<(),APIError>
-    {
-        // Arg processing order: license_path
-        let cstring_license_path_ : Option<CString> =
-          license_path.map(|n| CString::new(n).map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: {0}",n))))
-            .transpose()?;
-        let returned_value = unsafe{ MSK12_put_license_path(cstring_license_path_.map(|s| s.as_ptr()).unwrap_or(std::ptr::null())) };
-        if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
-        Ok(())
-    }
-
+/// Get the name of a callback code 
+/// 
+/// # Arguments
+/// 
+/// - `code` 
+pub fn get_callback_code_name(code : i32) -> String
+{
+    // Arg processing order: code
+    let returned_value = unsafe{ MSK12_get_callback_code_name(code) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
 }
+/// Get string representing the given response code.
+/// 
+/// # Arguments
+/// 
+/// - `r` 
+pub fn get_resp_name(r : ResCode) -> String
+{
+    // Arg processing order: r
+    let returned_value = unsafe{ MSK12_get_resp_name(r as i32) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get string with a description of the given response code.
+/// 
+/// # Arguments
+/// 
+/// - `r` 
+pub fn get_resp_descr(r : ResCode) -> String
+{
+    // Arg processing order: r
+    let returned_value = unsafe{ MSK12_get_resp_descr(r as i32) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get string representing the given termination code.
+/// 
+/// # Arguments
+/// 
+/// - `trm` 
+pub fn get_trm_name(trm : TrmCode) -> String
+{
+    // Arg processing order: trm
+    let returned_value = unsafe{ MSK12_get_trm_name(trm as i32) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get string with a description if the given termination code.
+/// 
+/// # Arguments
+/// 
+/// - `trm` 
+pub fn get_trm_descr(trm : TrmCode) -> String
+{
+    // Arg processing order: trm
+    let returned_value = unsafe{ MSK12_get_trm_descr(trm as i32) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Create a new task from a file. Accepted file formats are PTF, JSON and TASK, and accepted compressions are plain, zstd and gzip.
+pub fn new_task() -> Task
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_new_task() };
+    Task::from_ptr(returned_value)
+}
+pub fn get_num_iinf() -> i32
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_get_num_iinf() };
+    returned_value
+}
+pub fn get_num_liinf() -> i32
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_get_num_liinf() };
+    returned_value
+}
+pub fn get_num_dinf() -> i32
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_get_num_dinf() };
+    returned_value
+}
+/// Get the index of the integer information item corresponding to the given name. If the index is invalid, NULL is returned.
+/// 
+/// # Arguments
+/// 
+/// - `par_idx` 
+pub fn get_iinf_name(par_idx : i32) -> String
+{
+    // Arg processing order: par_idx
+    let returned_value = unsafe{ MSK12_get_iinf_name(par_idx) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get the index of the long integer information item corresponding to the given name. If the index is invalid, NULL is returned.
+/// 
+/// # Arguments
+/// 
+/// - `par_idx` 
+pub fn get_liinf_name(par_idx : i32) -> String
+{
+    // Arg processing order: par_idx
+    let returned_value = unsafe{ MSK12_get_liinf_name(par_idx) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get the index of the long integer information item corresponding to the given name. If the index is invalid, NULL is returned.
+/// 
+/// # Arguments
+/// 
+/// - `par_idx` 
+pub fn get_dinf_name(par_idx : i32) -> String
+{
+    // Arg processing order: par_idx
+    let returned_value = unsafe{ MSK12_get_dinf_name(par_idx) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// This will retur the index of the integer item orresponding to name, or -1 if the name is not recognized.
+/// 
+/// # Arguments
+/// 
+/// - `par_name[.cstring]` (in) Name of the parameter
+pub fn get_iinf_index(par_name : &str) -> Result<i32,APIError>
+{
+    // Arg processing order: par_name
+    let cstring_par_name_ =
+      CString::new(par_name)
+         .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
+    let returned_value = unsafe{ MSK12_get_iinf_index(cstring_par_name_.as_ptr()) };
+    Ok(returned_value)
+}
+/// This will retur the index of the long integer item orresponding to name, or -1 if the name is not recognized.
+/// 
+/// # Arguments
+/// 
+/// - `par_name[.cstring]` (in) Name of the parameter
+pub fn get_liinf_index(par_name : &str) -> Result<i32,APIError>
+{
+    // Arg processing order: par_name
+    let cstring_par_name_ =
+      CString::new(par_name)
+         .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
+    let returned_value = unsafe{ MSK12_get_liinf_index(cstring_par_name_.as_ptr()) };
+    Ok(returned_value)
+}
+/// This will retur the index of the double item orresponding to name, or -1 if the name is not recognized.
+/// 
+/// # Arguments
+/// 
+/// - `name[.cstring]` (in) 
+pub fn get_dinf_index(name : &str) -> Result<i32,APIError>
+{
+    // Arg processing order: name
+    let cstring_name_ =
+      CString::new(name)
+         .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: name")))?;
+    let returned_value = unsafe{ MSK12_get_dinf_index(cstring_name_.as_ptr()) };
+    Ok(returned_value)
+}
+/// Get the index corresponding to a double parameter name.
+/// 
+/// # Arguments
+/// 
+/// - `par_name[.cstring]` (in) Name of the parameter
+pub fn get_double_param_index(par_name : &str) -> Result<i32,APIError>
+{
+    // Arg processing order: par_name
+    let cstring_par_name_ =
+      CString::new(par_name)
+         .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
+    let returned_value = unsafe{ MSK12_get_double_param_index(cstring_par_name_.as_ptr()) };
+    Ok(returned_value)
+}
+/// Get the index corresponding to a double parameter name.
+/// 
+/// # Arguments
+/// 
+/// - `par_idx` 
+pub fn get_double_param_name(par_idx : i32) -> String
+{
+    // Arg processing order: par_idx
+    let returned_value = unsafe{ MSK12_get_double_param_name(par_idx) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get the index corresponding to a double parameter name.
+pub fn get_num_double_param() -> i32
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_get_num_double_param() };
+    returned_value
+}
+/// Get the index corresponding to a integer parameter name.
+/// 
+/// # Arguments
+/// 
+/// - `par_name[.cstring]` (in) Name of the parameter
+pub fn get_int_param_index(par_name : &str) -> Result<i32,APIError>
+{
+    // Arg processing order: par_name
+    let cstring_par_name_ =
+      CString::new(par_name)
+         .map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: par_name")))?;
+    let returned_value = unsafe{ MSK12_get_int_param_index(cstring_par_name_.as_ptr()) };
+    Ok(returned_value)
+}
+/// Get the index corresponding to a integer parameter name.
+/// 
+/// # Arguments
+/// 
+/// - `par_idx` 
+pub fn get_int_param_name(par_idx : i32) -> String
+{
+    // Arg processing order: par_idx
+    let returned_value = unsafe{ MSK12_get_int_param_name(par_idx) };
+    unsafe { CStr::from_ptr(returned_value) }.to_string_lossy().into_owned()
+}
+/// Get the index corresponding to a double parameter name.
+pub fn get_num_int_param() -> i32
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_get_num_int_param() };
+    returned_value
+}
+/// Stops all threads and deletes all handles used by the license system. If this
+/// function is called, it must be called as the last MOSEK API call. No other
+/// MOSEK API calls are valid after this.
+pub fn license_cleanup()
+{
+    // Arg processing order: 
+    unsafe{ MSK12_license_cleanup() };
+}
+/// If MOSEK is using a global threadpool, attempt to shut
+/// this down. If there are currently jobs running, this will do
+/// nothing.
+pub fn shutdown_global_threadpool()
+{
+    // Arg processing order: 
+    unsafe{ MSK12_shutdown_global_threadpool() };
+}
+/// Computes vector addition and multiplication by a scalar. 
+/// 
+/// # Arguments
+/// 
+/// - `n` Length of the vectors. 
+/// - `alpha` The scalar that multiplies x. 
+/// - `x[n]` (in) The x vector. 
+/// - `y[n]` (in-out) The y vector. 
+pub fn axpy(alpha : f64,x : &[f64],y : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: n,alpha,x,y
+    let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let returned_value = unsafe{ MSK12_axpy(n,alpha,x.as_ptr(),y.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Computes the inner product of two vectors. 
+/// 
+/// # Arguments
+/// 
+/// - `n` Length of the vectors. 
+/// - `xty[1]` (out) The result of the inner product. 
+/// - `x[n]` (in) The x vector. 
+/// - `y[n]` (in) The y vector. 
+pub fn dot(x : &[f64],y : &[f64]) -> Result<f64,APIError>
+{
+    // Arg processing order: n,xty,x,y
+    let n = i32::try_from([Some(x.len()),Some(y.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let mut xty : f64 = Default::default();
+    let returned_value = unsafe{ MSK12_dot(n,x.as_ptr(),y.as_ptr(),std::ptr::from_mut(&mut xty)) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(xty)
+}
+/// Computes the multiplication of a scaled dense matrix times a dense vector, plus a scaled dense vector. Precisely, if `transa` is false then the update is
+/// 
+/// $$
+/// y := \\alpha A x + \\beta y,
+/// $$
+/// 
+/// and if `transa` is true
+/// 
+/// $$
+/// y := \\alpha A^T x + \\beta y,
+/// $$
+/// 
+/// where \\(\\alpha,\\beta\\) are scalar values and \\(A\\) is a matrix with \\(m\\) rows and \\(n\\) columns.
+/// 
+/// Note that the result is stored overwriting \\(y\\). It must not overlap with the other input arrays.
+/// 
+/// # Arguments
+/// 
+/// - `transa` Indicates whether the matrix A must be transposed. 
+/// - `m` Specifies the number of rows of the matrix A. 
+/// - `n` Specifies the number of columns of the matrix A. 
+/// - `alpha` A scalar value multiplying the matrix A. 
+/// - `beta` A scalar value multiplying the vector y. 
+/// - `a` (in) A pointer to the array storing matrix A in a column-major format. 
+/// - `x` (in) A pointer to the array storing the vector x. 
+/// - `y` (in-out) A pointer to the array storing the vector y. 
+pub fn gemv(transa : bool,m : i32,n : i32,alpha : f64,a : &[f64],x : &[f64],beta : f64,y : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: transa,m,n,alpha,beta,a,x,y
+    let returned_value = unsafe{ MSK12_gemv(if transa {1} else {0},m,n,alpha,a.as_ptr(),x.as_ptr(),beta,y.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Performs a matrix multiplication plus addition of dense matrices.
+/// 
+/// Given
+/// \\(A\\), \\(B\\) and \\(C\\) of compatible dimensions, this function
+/// computes
+/// 
+/// .. math:: C:= \\alpha \\mathrm{op}(A)\\mathrm{op}(B) + \\beta C
+/// 
+/// where \\(\\alpha,\\beta\\) are two scalar values. The function \\(\mathrm{op}(X)\\)
+/// denotes \\(X\\) if transX is false, or \\(X^T\\) if set to true. The matrix \\(C\\) has \\(m\\) rows and \\(n\\) columns, and the other matrices must have compatible dimensions.
+/// 
+/// The result of this operation is stored in \\(C\\). It must not overlap with the other input arrays.
+/// 
+/// # Arguments
+/// 
+/// - `transa` Indicates whether the matrix A must be transposed. 
+/// - `transb` Indicates whether the matrix B must be transposed. 
+/// - `m` Indicates the number of rows of matrix C. 
+/// - `n` Indicates the number of columns of matrix C. 
+/// - `k` Specifies the common dimension along which op(A) and op(B) are multiplied. 
+/// - `alpha` A scalar value multiplying the result of the matrix multiplication. 
+/// - `beta` A scalar value that multiplies C. 
+/// - `a` (in) The pointer to the array storing matrix A in a column-major format. 
+/// - `b` (in) The pointer to the array storing matrix B in a column-major format.  
+/// - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
+pub fn gemm(transa : bool,transb : bool,m : i32,n : i32,k : i32,alpha : f64,a : &[f64],b : &[f64],beta : f64,c : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: transa,transb,m,n,k,alpha,beta,a,b,c
+    let returned_value = unsafe{ MSK12_gemm(if transa {1} else {0},if transb {1} else {0},m,n,k,alpha,a.as_ptr(),b.as_ptr(),beta,c.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Performs a symmetric rank-\\(k\\) update for a symmetric matrix.
+/// 
+/// Given a symmetric matrix \\(C\\in \\real^{n\\times n}\\), two scalars
+/// \\(\\alpha,\\beta\\) and a matrix \\(A\\) of rank \\(k\\leq n\\), it
+/// computes either
+/// 
+/// .. math:: C := \\alpha A A^T + \\beta C,
+/// 
+/// when `trans` is set to false and \\(A\\in \\real^{n\\times k}\\), or
+/// 
+/// .. math:: C := \\alpha A^T A + \\beta C,
+/// 
+/// when `trans` is set to true and \\(A\\in \\real^{k\\times n}\\).
+/// 
+/// Only the part of \\(C\\) indicated by `is_upr` is used and only that part is updated with the result. It must not overlap with the other input arrays.
+/// 
+/// # Arguments
+/// 
+/// - `is_upr` Indicates whether the upper or lower triangular part of C is used. 
+/// - `trans` Indicates whether the matrix A must be transposed. 
+/// - `n` Specifies the order of \\(C\\).
+/// - `k` Indicates the number of rows or columns of \\(A\\), depending on whether or not it is transposed, and its rank.
+/// - `alpha` A scalar value multiplying the result of the matrix multiplication. 
+/// - `beta` A scalar value that multiplies C. 
+/// - `a` (in) The pointer to the array storing matrix A in a column-major format. 
+/// - `c` (in-out) The pointer to the array storing matrix C in a column-major format. 
+pub fn syrk(is_upr : bool,trans : bool,n : i32,k : i32,alpha : f64,a : &[f64],beta : f64,c : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: is_upr,trans,n,k,alpha,beta,a,c
+    let returned_value = unsafe{ MSK12_syrk(if is_upr {1} else {0},if trans {1} else {0},n,k,alpha,a.as_ptr(),beta,c.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// The function solves a triangular system of the form
+/// 
+/// .. math:: L x = b
+/// 
+/// or
+/// 
+/// .. math:: L^T x = b
+/// 
+/// where \\(L\\) is a sparse lower triangular nonsingular matrix. This implies in particular that diagonals in \\(L\\) are nonzero.
+/// 
+/// # Arguments
+/// 
+/// - `transposed` Controls whether the solve is with L or the transposed L. 
+/// - `n` Specifies the dimension of L. 
+/// - `lnzc[n]` (in) `lnzc[j]` is the number of nonzeros in column j. 
+/// - `b[n]` (in-out) The right-hand side of linear equation system to be solved as a dense vector. 
+/// - `lsubc` (in) Row indexes for each column stored sequentially. 
+/// - `lvalc` (in) The value corresponding to row indexed stored lsubc. 
+pub fn sparse_triangular_solve_dense(transposed : bool,lnzc : &[i32],lsubc : &[i32],lvalc : &[f64],b : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: transposed,n,lnzc,b,lsubc,lvalc
+    let n = i32::try_from([Some(lnzc.len()),Some(b.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let returned_value = unsafe{ MSK12_sparse_triangular_solve_dense(if transposed {1} else {0},n,lnzc.as_ptr(),lsubc.as_ptr(),lvalc.as_ptr(),b.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Computes a Cholesky factorization of a real symmetric positive definite dense matrix.
+/// 
+/// # Arguments
+/// 
+/// - `is_upr` Indicates whether the upper or lower triangular part of the matrix is stored. 
+/// - `n` Dimension of the symmetric matrix. 
+/// - `a` (in-out) A symmetric matrix stored in column-major order. 
+pub fn potrf(is_upr : bool,n : i32,a : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: is_upr,n,a
+    let returned_value = unsafe{ MSK12_potrf(if is_upr {1} else {0},n,a.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Computes all eigenvalues of a real symmetric matrix \\(A\\). Given a matrix \\(A\\in\\real^{n\\times n}\\) it returns a vector \\(w\\in\\real^n\\) containing the eigenvalues of \\(A\\). 
+/// 
+/// # Arguments
+/// 
+/// - `is_upr` Indicates whether the upper or lower triangular part is used. 
+/// - `n` Dimension of the symmetric input matrix. 
+/// - `a` (in) Input matrix A. 
+/// - `w[n]` (out) Array of length at least n containing the eigenvalues of A. 
+pub fn syeig(is_upr : bool,a : &[f64],w : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: is_upr,n,a,w
+    let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let returned_value = unsafe{ MSK12_syeig(if is_upr {1} else {0},n,a.as_ptr(),w.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Computes all the eigenvalues and eigenvectors a real symmetric matrix.
+/// Given the input matrix \\(A\\in \\real^{n\\times n}\\), this function returns a
+/// vector \\(w\\in \\real^n\\) containing the eigenvalues of \\(A\\) and it also computes the eigenvectors
+/// of \\(A\\). Therefore, this function computes the eigenvalue decomposition of \\(A\\) as
+/// 
+/// .. math:: A= U V U^T,
+/// 
+/// where \\(V=\\diag(w)\\) and \\(U\\) contains the eigenvectors of \\(A\\).
+/// 
+/// Note that the matrix \\(U\\) overwrites the input data \\(A\\).
+/// 
+/// # Arguments
+/// 
+/// - `is_upr` Indicates whether the upper or lower triangular part is used. 
+/// - `n` Dimension of the symmetric input matrix. 
+/// - `a` (in-out) Input matrix A. 
+/// - `w[n]` (in-out) Array of length at least n containing the eigenvalues of A. 
+pub fn syevd(is_upr : bool,a : &mut [f64],w : &mut [f64]) -> Result<(),APIError>
+{
+    // Arg processing order: is_upr,n,a,w
+    let n = i32::try_from([Some(w.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let returned_value = unsafe{ MSK12_syevd(if is_upr {1} else {0},n,a.as_mut_ptr(),w.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// The function computes a Cholesky factorization of a sparse positive semidefinite matrix. Sparsity is exploited
+/// during the computations to reduce the amount of space and work required. Both the input and output matrices
+/// are represented using the sparse format.
+/// 
+/// To be precise, given a symmetric matrix \\(A \\in \\real^{n\\times n}\\) the function computes a nonsingular lower triangular matrix \\(L\\), a diagonal matrix \\(D\\) and a permutation matrix \\(P\\) such that
+/// 
+/// $$
+/// LL^T - D = P A P^T
+/// $$
+/// 
+/// If ``order_method`` is zero then reordering heuristics are not employed and \\(P\\) is the identity.
+/// 
+/// If a pivot during the computation of the Cholesky factorization is less than
+/// 
+/// $$
+/// -\\rho\\cdot\\max((PAP^T)_{jj},1.0)
+/// $$
+/// 
+/// then the matrix is declared negative semidefinite. On the hand if a pivot is smaller than
+/// 
+/// $$
+/// \\rho\\cdot\\max((PAP^T)_{jj},1.0),
+/// $$
+/// 
+/// then \\(D_{jj}\\) is increased from zero to
+/// 
+/// $$
+/// \\rho\\cdot\\max((PAP^T)_{jj},1.0).
+/// $$
+/// 
+/// Therefore, if \\(A\\) is sufficiently positive definite then \\(D\\) will be the zero matrix.
+/// Here \\(\\rho\\) is set equal to value of ``tol_singular``.
+/// 
+/// # Arguments
+/// 
+/// - `num_threads` The number threads that can be used to do the computation. 0 means the code makes the choice. 
+/// - `order_method` If nonzero, then a sparsity preserving ordering will be employed. 
+/// - `tol_singular` A positive parameter controlling when a pivot is declared zero. 
+/// - `n` Specifies the order of \\(A\\). 
+/// - `alloc` Memory allocation function for allocating the result. If `null`, the system `malloc` function is used. 
+/// - `alloc_handle` Handle passed to the memory allocation function 
+/// - `a_col_num_nonzero[n]` (in) `a_col_num_nonzero[j]` is a pointer to the first element in column \\(j\\). 
+/// - `perm[n]` (out) Permutation array used to specify the permutation matrix \\(P\\) computed by the function. 
+/// - `diag[n]` (out) The diagonal elements of matrix \\(D\\). 
+/// - `l_col_num_nonzero[n]` (out) `l_col_num_nonzero[j]` is the number of non zero elements in column \\(j\\) of \\(L\\). 
+/// - `a_subi` (in) Row indexes for each column stored in increasing order. 
+/// - `a_val` (in) The value corresponding to row indexed stored in asubc. 
+/// - `l_subi` (out) Row indexes for each column stored in increasing order. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+///   
+///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+/// - `l_val` (out) The values corresponding to row indexed stored in lsubc. The returned array is guaranteed to be allocated with the allocation function `alloc`.
+///   
+///   Notice that upon return, whether the function failed or suceeded, if a non-null value is returned here, it means that it was allocated and it must be deallocated acordingly.
+pub fn compute_sparse_cholesky(num_threads : i32,order_method : bool,tol_singular : f64,a_col_num_nonzero : &[i32],a_subi : &[i32],a_val : &[f64],perm : &mut [i32],diag : &mut [f64],l_col_num_nonzero : &mut [i32]) -> Result<(Vec<i32>,Vec<f64>),APIError>
+{
+    // Arg processing order: num_threads,order_method,tol_singular,n,alloc,alloc_handle,a_col_num_nonzero,perm,diag,l_col_num_nonzero,a_subi,a_val,l_subi,l_val
+    let n = i32::try_from([Some(a_col_num_nonzero.len()),Some(perm.len()),Some(diag.len()),Some(l_col_num_nonzero.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let mut allocated_items : Vec<Vec<u64>> = Vec:: new();
+    let mut ptr_l_subi : * mut i32 = std::ptr::null_mut();
+    let mut ptr_l_val : * mut f64 = std::ptr::null_mut();
+    let returned_value = unsafe{ MSK12_compute_sparse_cholesky(num_threads,if order_method {1} else {0},tol_singular,n,a_col_num_nonzero.as_ptr(),a_subi.as_ptr(),a_val.as_ptr(),perm.as_mut_ptr(),diag.as_mut_ptr(),memory_alloc,(&mut allocated_items) as * mut _ as c_void_p,l_col_num_nonzero.as_mut_ptr(),&mut ptr_l_subi,&mut ptr_l_val) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    let l_subi_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
+    let mut l_subi = vec![i32::default(); l_subi_len];
+    l_subi.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_subi,l_subi_len) });
+    let l_val_len : usize = l_col_num_nonzero.iter().map(|&v| usize::try_from(v).unwrap()).sum::<usize>().try_into().unwrap();
+    let mut l_val = vec![f64::default(); l_val_len];
+    l_val.copy_from_slice(unsafe{ std::slice::from_raw_parts(ptr_l_val,l_val_len) });
+    Ok((l_subi,l_val))
+}
+/// Optimize a number of tasks in parallel using a specified number of threads. All
+/// callbacks and log output streams are disabled.
+/// 
+/// Assuming that each task takes about same time and there many more tasks than number of
+/// threads then a linear speedup can be achieved, also known as strong scaling. A typical
+/// application of this method is to solve many small tasks of similar type; in this case
+/// it is recommended that each of them is allocated a single thread by setting parameter `ipar_num_threads` to 1.
+/// 
+/// If the parameters `is_race` or `max_time_sec` are used, then the result may not be deterministic, in the sense that the tasks which complete first may vary between runs.
+/// 
+/// The remaining behavior, including termination and response codes returned for each task, are the same as if each task was optimized separately.
+/// 
+/// # Arguments
+/// 
+/// - `is_race` If nonzero, then the function is terminated after the first task has been completed.
+/// - `max_time_sec` Time limit for the function in seconds. 
+/// - `num_threads` Number of threads to be employed.
+/// - `num_task` Number of tasks to optimize. 
+/// - `tasks[num_task]` (in) An array of tasks to optimize in parallel. 
+/// - `trm_code[num_task]` (out) The termination code for each task. 
+/// - `res_code[num_task]` (out) The response code for each task. 
+pub fn optimize_batch(is_race : bool,max_time_sec : f64,num_threads : i32,tasks : &[&mut Task],trm_code : &mut [i32],res_code : &mut [i32]) -> Result<(),APIError>
+{
+    // Arg processing order: is_race,max_time_sec,num_threads,num_task,tasks,trm_code,res_code
+    let num_task = i64::try_from([Some(tasks.len()),Some(trm_code.len()),Some(res_code.len())].iter().cloned().filter_map(|v| v).min().unwrap_or(0))
+      .map_err(|_| APIError::from("err_internal","","Invalid length conversion"))?;
+    let ptrs_tasks_ : Vec<Task_t> = tasks.iter().map(|t| t.task).collect();
+    let returned_value = unsafe{ MSK12_optimize_batch(if is_race {1} else {0},max_time_sec,num_threads,num_task,ptrs_tasks_.as_ptr(),trm_code.as_mut_ptr(),res_code.as_mut_ptr()) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Checks out a license feature from the license server. Normally the required
+/// license features will be automatically checked out the first time they are needed
+/// by the function [optimize](#func-optimize). This function can be used to check out one
+/// or more features ahead of time.
+/// 
+/// The feature will remain checked out until the environment is deleted or the function
+/// [check_in_license](func:check_in_license) is called.
+/// 
+/// If a given feature is already checked out when this function is called, the call has no effect.
+/// 
+/// # Arguments
+/// 
+/// - `feature` Feature to check out from the license system. 
+pub fn check_out_license(feature : Feature) -> Result<(),APIError>
+{
+    // Arg processing order: feature
+    let returned_value = unsafe{ MSK12_check_out_license(feature as i32) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Check in a license feature to the license server. By default all licenses
+/// consumed by functions using a single environment are kept checked out for the
+/// lifetime of the MOSEK environment. This function checks in a given license
+/// feature back to the license server immediately.
+/// 
+/// If the given license feature is not checked out at all, or it is in use by a call to
+/// [optimize](func:optimize), calling this function has no effect.
+/// 
+/// Please note that returning a license to the license server incurs a small
+/// overhead, so frequent calls to this function should be avoided.
+/// 
+/// # Arguments
+/// 
+/// - `feature` Feature to check in to the license system. 
+pub fn check_in_license(feature : Feature) -> Result<(),APIError>
+{
+    // Arg processing order: feature
+    let returned_value = unsafe{ MSK12_check_in_license(feature as i32) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Check in all unused license features to the license token server. 
+pub fn check_in_all() -> Result<(),APIError>
+{
+    // Arg processing order: 
+    let returned_value = unsafe{ MSK12_check_in_all() };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Prints an intro to message stream. 
+/// 
+/// # Arguments
+/// 
+/// - `long_ver` If non-zero, then the intro is slightly longer. 
+pub fn echo_intro(long_ver : bool) -> Result<(),APIError>
+{
+    // Arg processing order: long_ver
+    let returned_value = unsafe{ MSK12_echo_intro(if long_ver {1} else {0}) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Obtains MOSEK version information. 
+/// 
+/// # Arguments
+/// 
+/// - `major[1]` (out) Major version number. 
+/// - `minor[1]` (out) Minor version number. 
+/// - `revision[1]` (out) Revision number. 
+pub fn get_version() -> (i32,i32,i32)
+{
+    // Arg processing order: major,minor,revision
+    let mut major : i32 = Default::default();
+    let mut minor : i32 = Default::default();
+    let mut revision : i32 = Default::default();
+    unsafe{ MSK12_get_version(std::ptr::from_mut(&mut major),std::ptr::from_mut(&mut minor),std::ptr::from_mut(&mut revision)) };
+    (major,minor,revision)
+}
+/// Enables debug information for the license system. If `lic_debug` is non-zero, then MOSEK will print debug info regarding the license checkout.  
+/// 
+/// # Arguments
+/// 
+/// - `lic_debug` Whether license checkout debug info should be printed.  
+pub fn put_license_debug(lic_debug : bool) -> Result<(),APIError>
+{
+    // Arg processing order: lic_debug
+    let returned_value = unsafe{ MSK12_put_license_debug(if lic_debug {1} else {0}) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Input a runtime license code.  This function has an effect only before the first optimization. 
+/// 
+/// # Arguments
+/// 
+/// - `code[21]` (in) A license key string. 
+pub fn put_license_code(code : Option<&[i32]>) -> Result<(),APIError>
+{
+    // Arg processing order: code
+    let returned_value = unsafe{ MSK12_put_license_code(code.map(|a| a.as_ptr()).unwrap_or(std::ptr::null())) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Control whether MOSEK should wait for an available license if no license is available. If `lic_wait` is non-zero, then MOSEK will wait for `lic_wait-1` milliseconds between each check for an available license.
+/// 
+/// # Arguments
+/// 
+/// - `lic_wait` Enable waiting for a license until it is available. 
+pub fn put_license_wait(lic_wait : i32) -> Result<(),APIError>
+{
+    // Arg processing order: lic_wait
+    let returned_value = unsafe{ MSK12_put_license_wait(lic_wait) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+/// Set the path to the license file. This function has an effect only before the first optimization. 
+/// 
+/// # Arguments
+/// 
+/// - `license_path[.cstring]` (in) A path specifying where to search for the license. 
+pub fn put_license_path(license_path : Option<&str>) -> Result<(),APIError>
+{
+    // Arg processing order: license_path
+    let cstring_license_path_ : Option<CString> =
+      license_path.map(|n| CString::new(n).map_err(|_| APIError::from("err_invalid_string","",format!("Invalid string: {0}",n))))
+        .transpose()?;
+    let returned_value = unsafe{ MSK12_put_license_path(cstring_license_path_.map(|s| s.as_ptr()).unwrap_or(std::ptr::null())) };
+    if 0 != returned_value { return Err(api_error_from(returned_value,"")); }
+    Ok(())
+}
+
 
 extern "C" fn stream_cb(handle : WriteHandle, msg : *const c_char) {
     let f = handle as * mut Box<dyn FnMut(&str)>;
@@ -1625,6 +1610,16 @@ extern "C" fn intsol_cb(h : CallbackHandle,num : i32,primal_obj : f64, xx : *con
 
 
 impl Task {
+    pub fn new() -> Result<Task,APIError> {
+        let p = unsafe { MSK12_new_task() };
+        if p == std::ptr::null_mut() {
+            Err(APIError::from("err_task_creation","","Failed to create MOSEK Core API Task"))
+        }
+        else {
+            Ok(Task::from_ptr(p))
+        }
+    }
+
     fn from_ptr(task : Task_t) -> Task { Task{ task } }
     fn last_error(&self) -> Result<(),APIError> {
         let r = unsafe { MSK12_get_last_resp(self.task) };

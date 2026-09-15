@@ -14,7 +14,7 @@ use mosek_stable_api as msk;
 
 
 fn cqo1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let numvar : i32 = 6;
     let numrow : i64 = 8;
@@ -27,7 +27,7 @@ fn cqo1() -> Result<(),msk::APIError> {
     let cof    = &[1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
     let rowlen = &[3, 3, 1, 1, 1, 1, 1, 1];
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -86,7 +86,7 @@ fn cqo1() -> Result<(),msk::APIError> {
                         {
                             msk::SolSta::INFEAS_CERT => println!("Primal or dual infeasibility certificate found."),
                             msk::SolSta::ILLPOSED_CERT => println!("Primal or dual illposedness certificate found."),
-                            _ => println!("The status of the solution could not be determined. Termination code: {}.\n", mskapi.get_trm_name(trmcode))
+                            _ => println!("The status of the solution could not be determined. Termination code: {}.\n", msk::get_trm_name(trmcode))
                         },
                     _ => println!("Other solution status.")
                 }

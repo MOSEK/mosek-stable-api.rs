@@ -17,9 +17,9 @@
 use mosek_stable_api as msk;
 
 fn sdo2() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -109,7 +109,7 @@ fn sdo2() -> Result<(),msk::APIError> {
                             msk::SolSta::INFEAS_CERT => println!("Primal infeasibility certificate found."),
                             msk::SolSta::ILLPOSED_CERT => println!("Primal illposedness certificate found."),
                             _ => println!("The status of the solution could not be determined. Termination code: {}.",
-                                         mskapi.get_trm_name(trmcode)),
+                                         msk::get_trm_name(trmcode)),
                         },
                     _ => panic!("Other solution status.")
                 }

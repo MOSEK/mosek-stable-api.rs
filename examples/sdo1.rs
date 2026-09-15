@@ -23,7 +23,7 @@
 use mosek_stable_api as msk;
 
 fn sdo1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     const LENBARVAR : &[i32] = &[3 * (3 + 1) / 2]; /* Number of scalar SD variables  */
     const NUMVAR : i32 = 3;
@@ -45,7 +45,7 @@ fn sdo1() -> Result<(),msk::APIError> {
     let bara_j = &[0, 1, 2, 0, 0, 0, 1, 1, 2];
     let bara_v = &[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0];
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -126,7 +126,7 @@ fn sdo1() -> Result<(),msk::APIError> {
                             msk::SolSta::ILLPOSED_CERT => println!("Primal certificate of illposedness found."),
                             _ => {
                                 println!("The solution status is unknown.");
-                                println!("The optimizer terminitated with code: {}\n", mskapi.get_trm_name(trmcode));
+                                println!("The optimizer terminitated with code: {}\n", msk::get_trm_name(trmcode));
                             }
                         },
                     _ => panic!("Other solution status.")

@@ -8,7 +8,7 @@
 //!
 //!          Demonstrates using the exponential cone and log-sum-exp in Optimizer API.
 
-use mosek_stable_api::{self as moco, APIError};
+use mosek_stable_api::{self as msk, APIError};
 use itertools::{izip,iproduct};
 
 // Adds constraints for "soft plus",
@@ -44,7 +44,7 @@ use itertools::{izip,iproduct};
 // - `y` Data for a `n×n` of booleans.
 //
 #[allow(non_snake_case)]
-fn soft_plus(task : & mut moco::Task, d : usize, voff_theta : i32, voff_t : i32, X : &[f64], y : &[bool]) -> Result<(), APIError>
+fn soft_plus(task : & mut msk::Task, d : usize, voff_theta : i32, voff_t : i32, X : &[f64], y : &[bool]) -> Result<(), APIError>
 {
     let n = X.len() / d;
 
@@ -135,7 +135,7 @@ fn logistic_regression(d : usize,    // dimension
                        lambda : f64,
                        theta_val : &mut [f64]) -> Result<(),APIError>
 {
-    let msk = moco::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
     let n = X.len()/d;
     assert_eq!(n*d,X.len());
     assert_eq!(n,y.len());
@@ -150,10 +150,10 @@ fn logistic_regression(d : usize,    // dimension
     let roff_reg = roff_obj + 1;
     let numrow = roff_reg + d as i64 + 1;
 
-    msk.task()?
+    msk::Task::new()?
         /* Directs the log task stream to the printer function. */
         .with_stream_callback(
-            moco::StreamType::MSG,
+            msk::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task| {
                 // Variables [r; theta; t]
@@ -169,7 +169,7 @@ fn logistic_regression(d : usize,    // dimension
 
                 task.append_rows(numrow)?;
                 // Objective λ*r + sum(t)
-                task.put_obj_sense(moco::ObjSense::MINIMIZE);
+                task.put_obj_sense(msk::ObjSense::MINIMIZE);
                 task.put_obj_row(roff_obj)?;
 
                 task.put_row(0, &(voff_t..).take(n).collect::<Vec<i32>>(), &vec![1.0;n])?;
@@ -187,7 +187,7 @@ fn logistic_regression(d : usize,    // dimension
                 task.write_task_to_file("dump.ptf")?;
                 // Solution
                 let _trm = task.optimize()?;
-                task.solution_summary(moco::StreamType::MSG)?;
+                task.solution_summary(msk::StreamType::MSG)?;
 
                 let solidx = 0;
                 task.get_sol_xx_slice(solidx, voff_theta, theta_val)?;

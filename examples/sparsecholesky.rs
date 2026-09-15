@@ -28,7 +28,7 @@ fn print_sparse(
 
 fn sparse_cholelsky() -> Result<(),APIError>
 {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     //Observe that anzc, aptrc, asubc and avalc only specify the lower triangular part.
     {
@@ -44,7 +44,7 @@ fn sparse_cholelsky() -> Result<(),APIError>
 
         println!("\nExample with positive definite A.");
 
-        let (l_subi, l_val) = mskapi.compute_sparse_cholesky(
+        let (l_subi, l_val) = msk::compute_sparse_cholesky(
             0,       /* Mosek chooses number of threads */
             true,    /* Apply a reordering heuristic */
             1.0e-14, /* Singularity tolerance */
@@ -61,10 +61,10 @@ fn sparse_cholelsky() -> Result<(),APIError>
         let mut x : Vec<f64> = perm.iter().map(|&i| b[i as usize]).collect();
 
         /* Compute inv(L)*x. */
-        mskapi.sparse_triangular_solve_dense(false, &l_col_num_nonzero, &l_subi, &l_val, &mut x)?;
+        msk::sparse_triangular_solve_dense(false, &l_col_num_nonzero, &l_subi, &l_val, &mut x)?;
 
         /* Compute inv(L^T)*x. */
-        mskapi.sparse_triangular_solve_dense(true, &l_col_num_nonzero, &l_subi, &l_val, &mut x)?;
+        msk::sparse_triangular_solve_dense(true, &l_col_num_nonzero, &l_subi, &l_val, &mut x)?;
 
         let mut res = vec![0.0;n]; for (&j,&xj) in perm.iter().zip(x.iter()) { res[j as usize] = xj; }
         println!("\nSolution A x = b, x = {:?} ",res);
@@ -90,7 +90,7 @@ fn sparse_cholelsky() -> Result<(),APIError>
         let mut perm = vec![0i32; n];
         let mut diag = vec![0.0; n];
         let mut l_col_num_nonzero = vec![0i32; n];
-        let (l_subi,l_val) = mskapi.compute_sparse_cholesky(
+        let (l_subi,l_val) = msk::compute_sparse_cholesky(
             0,      /* Mosek chooses number of threads */
             true,   /* Use reordering heuristic */
             1.0e-14,/* Singularity tolerance */

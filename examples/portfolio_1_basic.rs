@@ -29,11 +29,11 @@
 //!      x > 0
 //! ```
 
-use mosek_stable_api as moco;
+use mosek_stable_api as msk;
 
-fn portfolio() -> Result<(),moco::APIError>
+fn portfolio() -> Result<(),msk::APIError>
 {
-    let msk = moco::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let n : i32     = 8;
     let gamma : f64 = 36.0;
@@ -61,10 +61,10 @@ fn portfolio() -> Result<(),moco::APIError>
 
     // Constraints offsets
 
-    msk.task()?
+    msk::Task::new()?
         /* Directs the log task stream to the printer function. */
         .with_stream_callback(
-            moco::StreamType::MSG,
+            msk::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task| {
 
@@ -92,7 +92,7 @@ fn portfolio() -> Result<(),moco::APIError>
             // Set objective
             task.put_row(0, xidxs, mu)?;
             task.put_obj_row(0)?;
-            task.put_obj_sense(moco::ObjSense::MAXIMIZE);
+            task.put_obj_sense(msk::ObjSense::MAXIMIZE);
 
             // Set budget constraint
             task.put_row(1, xidxs, ones)?;
@@ -116,12 +116,12 @@ fn portfolio() -> Result<(),moco::APIError>
             let _trmcode = task.optimize()?;
 
             /* Display the solution summary for quick inspection of results. */
-            task.solution_summary(moco::StreamType::MSG)?;
+            task.solution_summary(msk::StreamType::MSG)?;
 
             // Check if the interior point solution is an optimal point
             let solidx = 0;
             match task.get_sol_status(solidx)? {
-                (moco::SolSta::OPTIMAL,_) => {
+                (msk::SolSta::OPTIMAL,_) => {
                     /* Read the x variables one by one and compute expected return. */
                     /* Can also be obtained as value of the objective. */
                     let mut xx = vec![0.0; n as usize];

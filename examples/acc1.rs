@@ -15,8 +15,8 @@
 use mosek_stable_api as msk;
 
 fn acc1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
-    mskapi.task()?
+    msk::initialize_with_defaults()?;
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -109,7 +109,7 @@ fn acc1() -> Result<(),msk::APIError> {
                         {
                             msk::SolSta::INFEAS_CERT   => println!("Primal infeasibility certificate found."),
                             msk::SolSta::ILLPOSED_CERT => println!("Primal illposedness certificate found."),
-                            _ => println!("The status of the solution could not be determined. Termination code: {}.\n", mskapi.get_trm_name(trmcode))
+                            _ => println!("The status of the solution could not be determined. Termination code: {}.\n", msk::get_trm_name(trmcode))
                         }
                     _ => {}
                 }

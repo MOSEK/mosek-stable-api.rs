@@ -42,14 +42,14 @@ DAMAGE.
 //! `initialize_with_paths()`, which will load the actual library dynamically.
 //!
 //! ```
-//! use mosek_stable_api as mca;
+//! use mosek_stable_api as msk;
 //!
 //! fn main() {
 //!     lo1().unwrap();
 //! }
 //!
-//! fn lo1() -> Result<(),mca::APIError> {
-//!     let msk = mca::initialize()?;
+//! fn lo1() -> Result<(),msk::APIError> {
+//!     msk::initialize_with_defaults()?;
 //!     // All the normal lo1 data:
 //!     const numvar : i32 = 4;
 //!     const numcon : i64 = 3;
@@ -67,11 +67,11 @@ DAMAGE.
 //!     let blx : &[f64]  = &[ 0.0,           0.0,            0.0,           0.0 ];
 //!     let bux : &[f64]  = &[ f64::INFINITY, 10.0, f64::INFINITY, f64::INFINITY ];
 //!     // implementation
-//!     msk.task()?
+//!     msk::Task::new()?
 //!         .with_stream_callback(
-//!             mca::StreamType::LOG,
+//!             msk::StreamType::LOG,
 //!             |msg| print!("{0}",msg),
-//!             |task : &mut mca::Task| {
+//!             |task : &mut msk::Task| {
 //!                 task.append_vars(numvar)?;
 //!                 task.append_rows(4)?;
 //!                 task.put_var_bound_slice(0,blx,bux)?;
@@ -91,25 +91,25 @@ DAMAGE.
 //!                         task.append_con(domidx,&[(i+1) as i64],Some(&[bu]))?;
 //!                     }
 //!                 }
-//!                 task.put_obj_sense(mca::ObjSense::MAXIMIZE);
+//!                 task.put_obj_sense(msk::ObjSense::MAXIMIZE);
 //!                 task.put_row(0, cj, c)?;
 //!                 task.put_obj_row(0)?;
 //!
 //!                 let trmcode = task.optimize()?;
 //!
-//!                 task.solution_summary(mca::StreamType::MSG)?;
+//!                 task.solution_summary(msk::StreamType::MSG)?;
 //!
 //!                const solidx : i32 = 0;
 //!                match task.get_sol_status(solidx)? {
-//!                    (mca::SolSta::OPTIMAL,_) => {
+//!                    (msk::SolSta::OPTIMAL,_) => {
 //!                        let mut xx = vec![0.0; numvar as usize];
 //!                        task.get_sol_xx_slice(solidx, 0, &mut xx)?;
 //!                        println!("xx: {:?}\n", xx);
 //!                    },
-//!                    (mca::SolSta::INFEAS_CERT,_)|(_,mca::SolSta::INFEAS_CERT) => {
+//!                    (msk::SolSta::INFEAS_CERT,_)|(_,msk::SolSta::INFEAS_CERT) => {
 //!                        println!("Primal or dual infeasibility certificate found.");
 //!                    },
-//!                    (mca::SolSta::ILLPOSED_CERT,_)|(_,mca::SolSta::ILLPOSED_CERT) => {
+//!                    (msk::SolSta::ILLPOSED_CERT,_)|(_,msk::SolSta::ILLPOSED_CERT) => {
 //!                        println!("Primal or dual illposed certificate found.");
 //!                    },
 //!                    _ => {
@@ -174,7 +174,7 @@ impl From<APIError> for String {
 /// - win: `$USERDRIVE/$USERPATH/mosek`
 /// - win: `$USERPROFILE/mosek`
 /// - win: `$LOCALAPPDATA/mosek`
-pub fn initialize_with_defaults() -> Result<MosekStableAPI,APIError>
+pub fn initialize_with_defaults() -> Result<(),APIError>
 {
     initialize()
         .or_else(|_| {
@@ -228,7 +228,6 @@ pub fn initialize_with_defaults() -> Result<MosekStableAPI,APIError>
 
             let paths : Vec<&str> = spaths.iter().filter_map(|p| if p.exists() { p.to_str() } else { None }).collect();
 
-            println!("Search in paths: {:?}",paths);
             if paths.is_empty() {
                 initialize()
             }

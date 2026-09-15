@@ -17,9 +17,9 @@ use std::f64;
 use mosek_stable_api as msk;
 
 fn milo1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -88,7 +88,7 @@ fn milo1() -> Result<(),msk::APIError> {
                         match prosta {
                             msk::ProSta::PRIMAL_INFEASIBLE_OR_UNBOUNDED => println!("Problem status Infeasible or unbounded"),
                             msk::ProSta::PRIMAL_INFEASIBLE => println!("Problem status Infeasible."),
-                            msk::ProSta::UNKNOWN => println!("Problem status unknown. Termination code {}.", mskapi.get_trm_name(trmcode)),
+                            msk::ProSta::UNKNOWN => println!("Problem status unknown. Termination code {}.", msk::get_trm_name(trmcode)),
                             _ => println!("Other problem status.")
                         }
                     },

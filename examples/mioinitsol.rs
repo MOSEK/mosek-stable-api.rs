@@ -10,12 +10,12 @@
 use mosek_stable_api as msk;
 
 fn mioinitsol() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let numvar    = 4;
     let numrow    = 1;
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -52,8 +52,8 @@ fn mioinitsol() -> Result<(),msk::APIError> {
                 {
                     println!("Solution: {:?}",xx);
                     /*  Was the initial guess used?     */
-                    let constr = mskapi.get_iinf_index("iinf_mio_construct_solution").ok().map(|i| task.get_iinf(i)).transpose()?;
-                    let constr_obj = mskapi.get_dinf_index("dinf_mio_construct_solution_obj").ok().map(|i| task.get_dinf(i)).transpose()?;
+                    let constr = msk::get_iinf_index("iinf_mio_construct_solution").ok().map(|i| task.get_iinf(i)).transpose()?;
+                    let constr_obj = msk::get_dinf_index("dinf_mio_construct_solution_obj").ok().map(|i| task.get_dinf(i)).transpose()?;
 
                     if let (Some(constr),Some(constr_obj)) = (constr,constr_obj) {
                         println!("Construct solution utilization: {}\nConstruct solution objective: {:.3}", constr, constr_obj);

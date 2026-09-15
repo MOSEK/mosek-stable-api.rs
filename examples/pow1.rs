@@ -21,7 +21,7 @@
 use mosek_stable_api as msk;
 
 fn pow1() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let numvar : i32 = 5;
     let numrow : i64 = 8;
@@ -36,7 +36,7 @@ fn pow1() -> Result<(),msk::APIError> {
     let blx = &[ 0.0,0.0,0.0,f64::NEG_INFINITY,f64::NEG_INFINITY ];
     let bux = &[ f64::INFINITY,f64::INFINITY,f64::INFINITY,f64::INFINITY,f64::INFINITY ];
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -80,7 +80,7 @@ fn pow1() -> Result<(),msk::APIError> {
                         {
                             msk::SolSta::INFEAS_CERT => println!("Primal infeasibility certificate found."),
                             msk::SolSta::ILLPOSED_CERT => println!("Primal illposedness certificate found."),
-                            _ => println!("The status of the solution could not be determined. Termination code: {}.", mskapi.get_trm_name(trmcode))
+                            _ => println!("The status of the solution could not be determined. Termination code: {}.", msk::get_trm_name(trmcode))
                         }
                     _ => panic!("Other solution status.")
                 }

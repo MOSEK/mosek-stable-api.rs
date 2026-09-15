@@ -12,13 +12,13 @@ use mosek_stable_api as msk;
 ///    Optimizes tasks whose names were read from command line.
 fn parallel(filenames : &[&str]) -> Result<(),msk::APIError>
 {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     /* Create an example list of tasks to optimize */
     let mut tasks : Vec<msk::Task> =
         filenames.iter()
             .filter_map(|&fname| {
-                let mut t : msk::Task = mskapi.task().ok()?;
+                let mut t : msk::Task = msk::Task::new().ok()?;
                 t.read_from_file(fname).ok()?;
                 /* We can set the number of threads for each task */
                 t.put_int_param("ipar_num_threads",2).ok()?;
@@ -31,7 +31,7 @@ fn parallel(filenames : &[&str]) -> Result<(),msk::APIError>
     let threadpoolsize = 6;
 
     /* Optimize all the given tasks in parallel */
-    mskapi.optimize_batch(
+    msk::optimize_batch(
         false, // not a race
         -1.0, // max_time_sec
         threadpoolsize, // num_threads
@@ -41,8 +41,8 @@ fn parallel(filenames : &[&str]) -> Result<(),msk::APIError>
 
     for (i,trm,res,task) in izip!(0..,trm_code.iter(),res_code.iter(),tasks.iter()) {
         let obj2 = task.get_primal_obj(0)?;
-        let obj  = task.get_dinf(mskapi.get_dinf_index("dinf_intpnt_primal_obj" )?)?;
-        let tm   = task.get_dinf(mskapi.get_dinf_index("dinf_optimizer_time")?)?;
+        let obj  = task.get_dinf(msk::get_dinf_index("dinf_intpnt_primal_obj" )?)?;
+        let tm   = task.get_dinf(msk::get_dinf_index("dinf_optimizer_time")?)?;
 
         println!("Task  {i}  res: {res}  trm: {trm}   obj_val: {obj:.5}/{obj2:.5}  time: {tm:.5}");
     }

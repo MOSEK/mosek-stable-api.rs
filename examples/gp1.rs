@@ -121,8 +121,8 @@ fn max_volume_box(
     let exp2_rhs   = &[ 0.0,0.0,0.0 ];
 
 
-    let mskapi = msk::initialize_with_defaults()?;
-    mskapi.task()?
+    msk::initialize_with_defaults()?;
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),
@@ -177,7 +177,7 @@ fn max_volume_box(
 
                         for (t,&s) in hwd.iter_mut().zip(xyz.iter()) { *t = s.exp(); }
                     },
-                    _ => panic!("Solution not optimal, termination code {}.\n", mskapi.get_trm_name(trmcode))
+                    _ => panic!("Solution not optimal, termination code {}.\n", msk::get_trm_name(trmcode))
                 }
                 Ok(())
             })

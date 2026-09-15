@@ -19,10 +19,10 @@
 //!      0.0 < x2 < 10.0
 //! ```
 
-use mosek_stable_api as moco;
+use mosek_stable_api as msk;
 
-fn lo2() -> Result<(),moco::APIError> {
-    let msk = moco::initialize_with_defaults()?;
+fn lo2() -> Result<(),msk::APIError> {
+    msk::initialize_with_defaults()?;
 
     let numvar : usize = 4;
     let numrow : usize = 4;
@@ -44,10 +44,10 @@ fn lo2() -> Result<(),moco::APIError> {
     let blx : &[f64]     = &[ 0.0, 0.0, 0.0, 0.0 ];
     let bux : &[f64]     = &[ f64::INFINITY, 10.0, f64::INFINITY, f64::INFINITY ];
 
-    msk.task()?
+    msk::Task::new()?
         /* Directs the log task stream to the printer function. */
         .with_stream_callback(
-            moco::StreamType::MSG,
+            msk::StreamType::MSG,
             |msg| print!("{0}",msg),
             |task| {
                 /* Bounds on constraints. */
@@ -88,28 +88,28 @@ fn lo2() -> Result<(),moco::APIError> {
                 }
 
             /* Maximize objective function. */
-            task.put_obj_sense(moco::ObjSense::MAXIMIZE);
+            task.put_obj_sense(msk::ObjSense::MAXIMIZE);
             task.put_obj_row(0)?;
 
             /* Run optimizer */
             let trmcode = task.optimize()?;
             /* Print a summary containing information
                 * about the solution for debugging purposes. */
-            task.solution_summary(moco::StreamType::LOG)?;
+            task.solution_summary(msk::StreamType::LOG)?;
 
             let solidx : i32 = 0;
             match task.get_sol_status(solidx)? {
-                (moco::SolSta::OPTIMAL,_) => {
+                (msk::SolSta::OPTIMAL,_) => {
                     let mut xx = vec![0.0; numvar]; task.get_sol_xx_slice(solidx,0,&mut xx)?;
                     println!("Optimal primal solution = {:?}",xx);
                 },
-                (moco::SolSta::INFEAS_CERT,_) => println!("Certificate of dual infeasibility found."),
-                (_,moco::SolSta::INFEAS_CERT) => println!("Certificate of primal infeasibility found."),
-                (moco::SolSta::ILLPOSED_CERT,_) => println!("Certificate of dual illposedness found."),
-                (_,moco::SolSta::ILLPOSED_CERT) => println!("Certificate of primal illposedness found."),
-                (moco::SolSta::UNKNOWN,moco::SolSta::UNKNOWN) => {
+                (msk::SolSta::INFEAS_CERT,_) => println!("Certificate of dual infeasibility found."),
+                (_,msk::SolSta::INFEAS_CERT) => println!("Certificate of primal infeasibility found."),
+                (msk::SolSta::ILLPOSED_CERT,_) => println!("Certificate of dual illposedness found."),
+                (_,msk::SolSta::ILLPOSED_CERT) => println!("Certificate of primal illposedness found."),
+                (msk::SolSta::UNKNOWN,msk::SolSta::UNKNOWN) => {
                     println!("The solution status is unknown.");
-                    println!("The optimizer terminitated with code: {}", msk.get_trm_name(trmcode));
+                    println!("The optimizer terminitated with code: {}", msk::get_trm_name(trmcode));
                 },
                 _ => println!("Other solution status.")
             }

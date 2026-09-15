@@ -22,7 +22,7 @@ use itertools::izip;
 
 #[allow(non_snake_case)]
 fn portfolio() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let n : i32 = 8;
     let mu = &[0.07197, 0.15518, 0.17535, 0.08981, 0.42896, 0.39292, 0.32171, 0.18379];
@@ -61,7 +61,7 @@ fn portfolio() -> Result<(),msk::APIError> {
     let roff_rdeltax : i64 = roff_deltax+n as i64; // k rows
     let numrow = roff_rdeltax+n as i64;
 
-    mskapi.task()?
+    msk::Task::new()?
         .with_stream_callback(
             msk::StreamType::MSG,
             |msg| print!("{}",msg),

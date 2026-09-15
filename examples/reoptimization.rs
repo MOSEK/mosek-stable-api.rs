@@ -13,12 +13,12 @@ use std::f64;
 use mosek_stable_api as msk;
 
 fn reoptimization() -> Result<(),msk::APIError> {
-    let mskapi = msk::initialize_with_defaults()?;
+    msk::initialize_with_defaults()?;
 
     let numvar = 3;
     let numrow = 4;
 
-    let mut task = mskapi.task()?;
+    let mut task = msk::Task::new()?;
     /* Append the constraints. */
     task.append_rows(numrow)?;
 
