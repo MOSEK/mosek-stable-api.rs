@@ -1706,6 +1706,7 @@ if (NULL == (MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)__loads
     }
     goto EXIT_OK;
 EXIT_ERROR:
+    printf("%s:%d: initialize_with_paths: Err = %s ",__FILE__,__LINE__,errmsg);
     if (libmosek_handle) {
         __dlclose(libmosek_handle);
         libmosek_handle = NULL;
@@ -1961,6 +1962,7 @@ MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)MSK12_default_return
     if (buf) free(buf);
     return 1;
 EXIT_OK:
+    printf("%s:%d: initialize_with_paths: Yay! ",__FILE__,__LINE__);
     if (buf) free(buf);
     return 0;
 }

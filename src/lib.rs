@@ -176,63 +176,74 @@ impl From<APIError> for String {
 /// - win: `$LOCALAPPDATA/mosek`
 pub fn initialize_with_defaults() -> Result<(),APIError>
 {
-    initialize()
-        .or_else(|_| {
-            let pfname =
-                match (std::env::consts::OS,std::env::consts::ARCH) {
-                    ("linux",  "x86_64") => "linux64x86",
-                    ("linux",  "arm") => "linuxaarch64",
-                    ("osx",    "arm") => "osxaarch64",
-                    ("windows","x86_64") => "win64x86",
-                    _ => return Err(APIError::from("err_incompatible_platform",
-                                                  "Unsupported platform OS and/or architecture",
-                                                  "Unsupported platform OS and/or architecture"))
-                };
+    if is_initialized() { Ok (()) }
+    else {
+        let pfname =
+            match (std::env::consts::OS,std::env::consts::ARCH) {
+                ("linux",  "x86_64") => "linux64x86",
+                ("linux",  "arm") => "linuxaarch64",
+                ("osx",    "arm") => "osxaarch64",
+                ("windows","x86_64") => "win64x86",
+                _ => return Err(APIError::from("err_incompatible_platform",
+                                                "Unsupported platform OS and/or architecture",
+                                                "Unsupported platform OS and/or architecture"))
+            };
 
-            let mut basepaths = Vec::new();
-            match env::consts::OS {
-                "linux"|"osx" =>
-                    if let Some(homep) = env::var("HOME").ok() {
-                        let p = Path::new(&homep).join("mosek");
+        let mut basepaths = Vec::new();
+        match env::consts::OS {
+            "linux"|"osx" =>
+                if let Some(homep) = env::var("HOME").ok() {
+                    let p = Path::new(&homep).join("mosek");
+                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
+                    if env::consts::OS == "osx" {
+                        let p = Path::new(&homep).join("Applications").join("mosek");
                         if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                        if env::consts::OS == "osx" {
-                            let p = Path::new(&homep).join("Applications").join("mosek");
-                            if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                        }
-                        let p = Path::new(&homep).join(".local").join("mosek");
-                        if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                    },
-                "windows" => {
-                    if let Some(p) = env::var("LOCALAPPDATA").ok() {
-                        let p = Path::new(&p).join("mosek");
-                        if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
                     }
-
-                    if let Some(p) = env::var("USERPROFILE").ok() {
-                        let p = Path::new(&p).join("mosek");
-                        if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
-                    }
-
-                    if let Some(p) = env::var("USERDRIVE").ok().and_then(|drive| env::var("USERPATH").ok().map(|p| format!("{drive}{p}"))) {
-                        let p = Path::new(&p).join("mosek");
-                        if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
-                    }
+                    let p = Path::new(&homep).join(".local").join("mosek");
+                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
                 },
-                _ => {}
-            }
+            "windows" => {
+                if let Some(p) = env::var("LOCALAPPDATA").ok() {
+                    let p = Path::new(&p).join("mosek");
+                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
+                }
 
-            let spaths : Vec<PathBuf> =
-                basepaths.iter().filter_map(|p| Path::new(p).read_dir().ok())
-                    .flat_map(|entry| entry.filter_map(|e| e.ok()).map(|entry| entry.path().join("tools").join(pfname).join("bin")))
-                    .collect();
+                if let Some(p) = env::var("USERPROFILE").ok() {
+                    let p = Path::new(&p).join("mosek");
+                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
+                }
 
-            let paths : Vec<&str> = spaths.iter().filter_map(|p| if p.exists() { p.to_str() } else { None }).collect();
+                if let Some(p) = env::var("USERDRIVE").ok().and_then(|drive| env::var("USERPATH").ok().map(|p| format!("{drive}{p}"))) {
+                    let p = Path::new(&p).join("mosek");
+                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
+                }
+            },
+            _ => {}
+        }
 
-            if paths.is_empty() {
-                initialize()
-            }
-            else {
-                initialize_with_paths(&paths)
-            }
-        })
+        let spaths : Vec<PathBuf> =
+            basepaths.iter().filter_map(|p|
+                Path::new(p).read_dir().ok())
+                    .flat_map(|entry| entry.filter_map(|e| e.ok()))
+                    .filter_map(|entry| {
+                        let fname = entry.file_name();
+                        let (svmaj,svmin) = fname.to_str()?.split_once('.')?;
+                        let vmaj = svmaj.parse::<u32>().ok()?;
+                        let _vmin = svmin.parse::<u32>().ok()?;
+
+                        if vmaj >= 12 { Some(entry.path().join("tools").join("platform").join(pfname).join("bin")) }
+                        else { None }
+                    })
+                .collect();
+
+        let paths : Vec<&str> = spaths.iter().filter_map(|p| if p.exists() { p.to_str() } else { None }).collect();
+
+        if paths.is_empty() {
+            initialize()
+        }
+        else {
+            //println!("Search in paths: {:?}",paths);
+            initialize_with_paths(&paths)
+        }
+    }
 }

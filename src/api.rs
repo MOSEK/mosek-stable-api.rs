@@ -873,13 +873,11 @@ pub fn initialize() -> Result<(),APIError>
 pub fn initialize_with_paths(paths : &[&str]) -> Result<(),APIError>
 {
     if ! is_initialized() {
-        let mut ps = Vec::with_capacity(paths.len()+1);
-        for p in paths {
-            ps.push(CStr::from_bytes_until_nul(p.as_bytes()).map_err(|_| APIError::from("err_invalid_path", "", "Invalid path cannot be converted to a C string"))?.as_ptr())
-        }
+        let paths : Vec<CString> = paths.iter().filter_map(|s| CString::new(*s).ok()).collect();
+        let mut ps : Vec<* const c_char> = paths.iter().map(|s| s.as_ptr()).collect();
         ps.push(std::ptr::null());
 
-        if unsafe { MSK12_initialize_library_with_paths(ps.as_ptr()) } == 0 {
+        if unsafe { MSK12_initialize_library_with_paths(ps.as_ptr()) } != 0 {
             Err(APIError::from("err_mosek_core_dynamic_load", "","Failed to load MOSEK Core API library"))
         }
         else {
