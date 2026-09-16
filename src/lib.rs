@@ -181,8 +181,8 @@ pub fn initialize_with_defaults() -> Result<(),APIError>
         let pfname =
             match (std::env::consts::OS,std::env::consts::ARCH) {
                 ("linux",  "x86_64") => "linux64x86",
-                ("linux",  "arm") => "linuxaarch64",
-                ("osx",    "arm") => "osxaarch64",
+                ("linux",  "arm")    => "linuxaarch64",
+                ("osx",    "arm")    => "osxaarch64",
                 ("windows","x86_64") => "win64x86",
                 _ => return Err(APIError::from("err_incompatible_platform",
                                                 "Unsupported platform OS and/or architecture",
@@ -190,38 +190,34 @@ pub fn initialize_with_defaults() -> Result<(),APIError>
             };
 
         let mut basepaths = Vec::new();
-        match env::consts::OS {
-            "linux"|"osx" =>
-                if let Some(homep) = env::var("HOME").ok() {
-                    let p = Path::new(&homep).join("mosek");
-                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                    if env::consts::OS == "osx" {
-                        let p = Path::new(&homep).join("Applications").join("mosek");
-                        if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                    }
-                    let p = Path::new(&homep).join(".local").join("mosek");
-                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()) } }
-                },
-            "windows" => {
-                if let Some(p) = env::var("LOCALAPPDATA").ok() {
-                    let p = Path::new(&p).join("mosek");
-                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
-                }
+        #[cfg(target_os = "windows")]
+        {
+            if let Some(p) = env::var_os("LOCALAPPDATA") {
+                let mut p = PathBuf::from(&p); p.push("mosek");
+                if p.exists() { basepaths.push(p); }
+            }
 
-                if let Some(p) = env::var("USERPROFILE").ok() {
-                    let p = Path::new(&p).join("mosek");
-                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
-                }
+            if let Some(p) = env::var_os("USERPROFILE") {
+                let mut p = PathBuf::from(&p); p.push("mosek");
+                if p.exists() { basepaths.push(p); }
+            }
+        }
+        #[cfg(not(target_os = "windows"))]
+        if let Some(home) = env::var_os("HOME") {
+            #[cfg(target_os = "macos")]
+            {
+                let mut p = PathBuf::from(&home); p.push("Applications"); p.push("mosek");
+                if p.exists() { basepaths.push(p); }
+            }
 
-                if let Some(p) = env::var("USERDRIVE").ok().and_then(|drive| env::var("USERPATH").ok().map(|p| format!("{drive}{p}"))) {
-                    let p = Path::new(&p).join("mosek");
-                    if p.exists() { if let Some(p) = p.to_str() { basepaths.push(p.to_string()); } }
-                }
-            },
-            _ => {}
+            let mut p = PathBuf::from(&home); p.push(".local"); p.push("mosek");
+            if p.exists() { basepaths.push(p); }
+
+            let mut p = PathBuf::from(&home); p.push("mosek");
+            if p.exists() { basepaths.push(p); }
         }
 
-        let spaths : Vec<PathBuf> =
+        let paths : Vec<PathBuf> =
             basepaths.iter().filter_map(|p|
                 Path::new(p).read_dir().ok())
                     .flat_map(|entry| entry.filter_map(|e| e.ok()))
@@ -231,19 +227,24 @@ pub fn initialize_with_defaults() -> Result<(),APIError>
                         let vmaj = svmaj.parse::<u32>().ok()?;
                         let _vmin = svmin.parse::<u32>().ok()?;
 
-                        if vmaj >= 12 { Some(entry.path().join("tools").join("platform").join(pfname).join("bin")) }
+                        if vmaj >= 12 {
+                            let mut p = PathBuf::from(entry.path());
+                            p.push("tools");
+                            p.push("platform");
+                            p.push(pfname);
+                            p.push("bin");
+                            Some(p)
+                        }
                         else { None }
                     })
                 .collect();
-
-        let paths : Vec<&str> = spaths.iter().filter_map(|p| if p.exists() { p.to_str() } else { None }).collect();
 
         if paths.is_empty() {
             initialize()
         }
         else {
             //println!("Search in paths: {:?}",paths);
-            initialize_with_paths(&paths)
+            initialize_with_paths(&paths.iter().map(|p| p.as_path()).collect::<Vec<&Path>>())
         }
     }
 }

@@ -870,11 +870,11 @@ pub fn initialize() -> Result<(),APIError>
 }
 
 
-pub fn initialize_with_paths(paths : &[&str]) -> Result<(),APIError>
+pub fn initialize_with_paths(paths : &[&std::path::Path]) -> Result<(),APIError>
 {
     if ! is_initialized() {
-        let paths : Vec<CString> = paths.iter().filter_map(|s| CString::new(*s).ok()).collect();
-        let mut ps : Vec<* const c_char> = paths.iter().map(|s| s.as_ptr()).collect();
+        let cpaths : Vec<CString> = paths.iter().filter_map(|&p| CString::new(p.as_os_str().as_encoded_bytes()).ok()).collect();
+        let mut ps : Vec<*const c_char> = cpaths.iter().map(|s| s.as_ptr()).collect();
         ps.push(std::ptr::null());
 
         if unsafe { MSK12_initialize_library_with_paths(ps.as_ptr()) } != 0 {
