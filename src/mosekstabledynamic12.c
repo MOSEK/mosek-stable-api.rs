@@ -107,6 +107,17 @@ static int64_t      MSK12_default_returns_i64() { return 0; }
 static size_t       MSK12_default_returns_usize() { return 0; }
 /*static double       MSK12_default_returns_f64() { return 0; }*/
 
+#ifdef _WIN32
+HANDLE libhandle_mux = CreateMutex(NULL,FALSE,NULL);
+#define acquire_handle() WaitForSingleObject(libhandle_mux, INFINITE)
+#define release_handle() ReleaseMutex(libhandle_mux)
+#else
+#include <pthread.h>
+pthread_mutex_t libhandle_mux = PTHREAD_MUTEX_INITIALIZER;
+#define acquire_handle() pthread_mutex_lock(&libhandle_mux)
+#define release_handle() pthread_mutex_unlock(&libhandle_mux)
+#endif
+
 static libhandle_t libmosek_handle = NULL;
 MSK12_get_callback_code_name_func_t MSK12_get_callback_code_name_ptr = (MSK12_get_callback_code_name_func_t)MSK12_default_returns_ptr;
 const char* MSK12_get_callback_code_name(int32_t code) { return MSK12_get_callback_code_name_ptr(code); }
@@ -1429,6 +1440,7 @@ int MSK12_library_initialized() {
 int MSK12_initialize_library_with_paths(const char * paths[]) {
     const char * errmsg = NULL;
     char * buf = NULL;
+    acquire_handle();
     if (! libmosek_handle) {
         if (paths && paths[0]) {
             size_t libnamelen = strlen(libname);
@@ -1706,7 +1718,6 @@ if (NULL == (MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)__loads
     }
     goto EXIT_OK;
 EXIT_ERROR:
-    printf("%s:%d: initialize_with_paths: Err = %s ",__FILE__,__LINE__,errmsg);
     if (libmosek_handle) {
         __dlclose(libmosek_handle);
         libmosek_handle = NULL;
@@ -1960,10 +1971,11 @@ MSK12_put_license_path_ptr = (MSK12_put_license_path_func_t)MSK12_default_return
 
     }
     if (buf) free(buf);
+    release_handle();
     return 1;
 EXIT_OK:
-    printf("%s:%d: initialize_with_paths: Yay! ",__FILE__,__LINE__);
     if (buf) free(buf);
+    release_handle();
     return 0;
 }
 

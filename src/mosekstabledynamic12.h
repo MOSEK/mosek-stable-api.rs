@@ -4513,8 +4513,17 @@ extern MSK12_put_license_path_func_t MSK12_put_license_path_ptr;
 MSK12_ResCode MSK12_put_license_path(NULLABLE const char* license_path);
 
 
+/** Initialize dynamically loaded library. Search the given paths for the MOSEK library, and fall back to loading from
+ *  default system paths. Once the library has been successfully initialized any subsequent calls to this function will
+ *  do nothing and always succeed.
+ *
+ * # Arguments
+ * - `paths` A NULL terminated list of paths to search.
+ */
 int MSK12_initialize_library_with_paths(const char * paths[]);
 int MSK12_library_initialized();
+
+/** Initialize dynamically loaded library. */
 int MSK12_initialize_library();
 
 #ifdef __cplusplus
