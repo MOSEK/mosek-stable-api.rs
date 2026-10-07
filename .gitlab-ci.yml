@@ -20,11 +20,12 @@ test:
     rust
   before_script:
     - |
-      curl -o minidist-linux64x86.tar.bz2 http://files.mosek.intranet/artifacts/item/mosek/minidist-linux64x86-12.0
-      tar xf minidist-linux64x86.tar.bz2      
+      VERSION=$(curl https://download.mosek.com/stable/12.0/version)
+      curl -L -o mosektoolslinux64x86.tar.bz2 http://download.mosek.com/stable/$VERSION/mosektoolslinux64x86.tar.bz2
+      tar xf mosektoolslinux64x86.tar.bz2
   variables:
     LD_LIBRARY_PATH: minidist/bin
-  script: 
+  script:
     - |
       cargo test --release
       cargo test --examples --release
