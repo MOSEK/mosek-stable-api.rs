@@ -59,7 +59,9 @@ fn milo1() -> Result<(),msk::APIError> {
                 _ = task.put_double_param("dpar_mio_max_time", 60.0)?;
 
                 // Run optimizer
-                let trmcode = task.optimize()?;
+                let trmcode = task.optimize_with_callbacks(
+                    |_:i32,_:&[i32],_:&[i64],_:&[f64]| -> bool { false },
+                    |pobj : f64,xx : &[f64]| println!("New integer solution: {pobj} -- {xx:?}"))?;
 
                 // Print a summary containing information
                 // about the solution for debugging purposes

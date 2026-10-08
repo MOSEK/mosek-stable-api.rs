@@ -1592,7 +1592,7 @@ extern "C" fn stream_cb(handle : WriteHandle, msg : *const c_char) {
 }
 
 extern "C" fn info_cb(h : CallbackHandle,code : i32,len_iinf : i32,iinf : *const i32,len_liinf : i32,liinf : *const i64,len_dinf : i32,dinf : *const f64) -> i32 {
-    let func = h as *mut Box<dyn Fn(i32,&[i32],&[i64],&[f64]) -> bool>;
+    let func = h as *mut Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool>;
     let r = unsafe{ (*func)(
         code,
         std::slice::from_raw_parts(iinf, usize::try_from(len_iinf).unwrap_or(0)),
@@ -1602,7 +1602,7 @@ extern "C" fn info_cb(h : CallbackHandle,code : i32,len_iinf : i32,iinf : *const
 }
 
 extern "C" fn intsol_cb(h : CallbackHandle,num : i32,primal_obj : f64, xx : *const f64) {
-    let func = h as *mut Box<dyn Fn(f64,&[f64])>;
+    let func = h as *mut Box<dyn FnMut(f64,&[f64])>;
     unsafe{ (*func)(primal_obj,std::slice::from_raw_parts(xx, usize::try_from(num).unwrap_or(0))) };
 }
 
@@ -1653,25 +1653,24 @@ impl Task {
         res
     }
 
-    pub fn optimize_with_callbacks<F1,F2>(&mut self, info_f : Option<F1>, intsol_f : Option<F2>) -> Result<TrmCode,APIError>
+    pub fn optimize_with_callbacks<F1,F2>(&mut self, info_f : F1, intsol_f : F2) -> Result<TrmCode,APIError>
         where
             F1 : FnMut(i32,&[i32],&[i64],&[f64]) -> bool,
             F2 : FnMut(f64,&[f64])
     {
-        let info   = if let Some(f) = info_f { let r : Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> = Box::new(f); Some(r) } else { None };
-        let intsol = if let Some(f) = intsol_f { let r : Box<dyn FnMut(f64,&[f64])> = Box::new(f); Some(r) } else { None };
-
-        let has_info = info.is_some();
-        let has_intsol = intsol.is_some();
+        let info   : Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> = Box::new(info_f);
+        let intsol : Box<dyn FnMut(f64,&[f64])> = Box::new(intsol_f);
 
         let mut trm : i32 = 0;
         let r = unsafe { MSK12_optimize_callback(
             self.task,
             &mut trm as * mut _,
-            info.as_ref().map(|f| f as * const Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> as CallbackHandle).unwrap_or(std::ptr::null_mut()),
-            if has_info { Some(info_cb as extern "C" fn(*mut c_void, i32, i32, *const i32, i32, *const i64, i32, *const f64) -> i32) } else {None},
-            intsol.as_ref().map(|f| f as * const _ as CallbackHandle).unwrap_or(std::ptr::null_mut()),
-            if has_intsol { Some(intsol_cb as extern "C" fn(*mut c_void, i32,f64,*const f64)) } else {None}) };
+            (&info) as * const Box<dyn FnMut(i32,&[i32],&[i64],&[f64]) -> bool> as CallbackHandle,
+            Some(info_cb),
+            //info_cb as extern "C" fn(*mut c_void, i32, i32, *const i32, i32, *const i64, i32, *const f64) -> i32,
+            (&intsol) as * const _ as CallbackHandle,
+            Some(intsol_cb)) };
+            //intsol_cb as extern "C" fn(*mut c_void, i32,f64,*const f64)) };
         if 0 != r {
             self.last_error()?
         }
